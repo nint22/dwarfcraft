@@ -1,0 +1,677 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		060DBD6F14FDC897008BD6E6 /* UISkin.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060DBD6E14FDC88D008BD6E6 /* UISkin.png */; };
+		060EE31F14FC683900D0A08C /* AnimalEntity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2EE14FC683900D0A08C /* AnimalEntity.cpp */; };
+		060EE32014FC683900D0A08C /* dBlocks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F014FC683900D0A08C /* dBlocks.cpp */; };
+		060EE32114FC683900D0A08C /* DesignationsView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F214FC683900D0A08C /* DesignationsView.cpp */; };
+		060EE32214FC683900D0A08C /* DwarfEntity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F414FC683900D0A08C /* DwarfEntity.cpp */; };
+		060EE32314FC683900D0A08C /* Entities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F614FC683900D0A08C /* Entities.cpp */; };
+		060EE32414FC683900D0A08C /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F814FC683900D0A08C /* Entity.cpp */; };
+		060EE32514FC683900D0A08C /* EntityPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2FA14FC683900D0A08C /* EntityPath.cpp */; };
+		060EE32614FC683900D0A08C /* g2TasksController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2FC14FC683900D0A08C /* g2TasksController.cpp */; };
+		060EE32714FC683900D0A08C /* g2ChatController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2FE14FC683900D0A08C /* g2ChatController.cpp */; };
+		060EE32814FC683900D0A08C /* g2DashboardController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE30014FC683900D0A08C /* g2DashboardController.cpp */; };
+		060EE32914FC683900D0A08C /* g2EntityController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE30214FC683900D0A08C /* g2EntityController.cpp */; };
+		060EE32A14FC683900D0A08C /* ItemsView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE30414FC683900D0A08C /* ItemsView.cpp */; };
+		060EE32B14FC683900D0A08C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE30614FC683900D0A08C /* main.cpp */; };
+		060EE32D14FC683900D0A08C /* PerlinNoise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE30914FC683900D0A08C /* PerlinNoise.cpp */; };
+		060EE32E14FC683900D0A08C /* PlasmaNoise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE30B14FC683900D0A08C /* PlasmaNoise.cpp */; };
+		060EE32F14FC683900D0A08C /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE30D14FC683900D0A08C /* Shader.cpp */; };
+		060EE33214FC683900D0A08C /* StructsView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE31114FC683900D0A08C /* StructsView.cpp */; };
+		060EE33314FC683900D0A08C /* UserInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE31314FC683900D0A08C /* UserInterface.cpp */; };
+		060EE33414FC683900D0A08C /* VBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE31514FC683900D0A08C /* VBuffer.cpp */; };
+		060EE33514FC683900D0A08C /* GameRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE31714FC683900D0A08C /* GameRender.cpp */; };
+		060EE33614FC683900D0A08C /* WorldGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE31914FC683900D0A08C /* WorldGenerator.cpp */; };
+		060EE33714FC683900D0A08C /* WorldView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE31B14FC683900D0A08C /* WorldView.cpp */; };
+		060EE33814FC683900D0A08C /* WorldContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE31D14FC683900D0A08C /* WorldContainer.cpp */; };
+		060EE34814FC737100D0A08C /* GrfxObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE33B14FC737100D0A08C /* GrfxObject.cpp */; };
+		060EE34914FC737100D0A08C /* GrfxWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE33D14FC737100D0A08C /* GrfxWindow.cpp */; };
+		060EE34A14FC737100D0A08C /* MUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE34114FC737100D0A08C /* MUtil.cpp */; };
+		060EE34E14FC793900D0A08C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 060EE34D14FC793900D0A08C /* OpenGL.framework */; };
+		060EE35014FC793D00D0A08C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 060EE34F14FC793D00D0A08C /* GLUT.framework */; };
+		060EE35514FC798D00D0A08C /* World.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2EC14FC66B400D0A08C /* World.cfg */; };
+		060EE35714FC798D00D0A08C /* Font_Small.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2DE14FC665100D0A08C /* Font_Small.png */; };
+		060EE35914FC798D00D0A08C /* Time.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2DC14FC665100D0A08C /* Time.png */; };
+		060EE35A14FC798D00D0A08C /* Terrain.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2EA14FC66B400D0A08C /* Terrain.cfg */; };
+		060EE35B14FC798D00D0A08C /* terrain.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2DB14FC665100D0A08C /* terrain.png */; };
+		060EE35C14FC798D00D0A08C /* items.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2D914FC665100D0A08C /* items.png */; };
+		060EE35D14FC798D00D0A08C /* CaravanModel.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2CE14FC659400D0A08C /* CaravanModel.cfg */; };
+		060EE35E14FC798D00D0A08C /* MushroomModel.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2CF14FC659400D0A08C /* MushroomModel.cfg */; };
+		060EE35F14FC798D00D0A08C /* pinetree.obx in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2CA14FC656900D0A08C /* pinetree.obx */; };
+		060EE36014FC798D00D0A08C /* Caravan.obx in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2C814FC656900D0A08C /* Caravan.obx */; };
+		060EE36114FC798D00D0A08C /* Mushroom.obx in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2C914FC656900D0A08C /* Mushroom.obx */; };
+		060EE36214FC798D00D0A08C /* Caravan.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2CB14FC657B00D0A08C /* Caravan.png */; };
+		060EE36314FC798D00D0A08C /* Red Mushroom.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2CD14FC657B00D0A08C /* Red Mushroom.png */; };
+		060EE36414FC798D00D0A08C /* pinetree.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2CC14FC657B00D0A08C /* pinetree.png */; };
+		060EE36514FC798D00D0A08C /* Lightest Dwarf.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E414FC66B400D0A08C /* Lightest Dwarf.cfg */; };
+		060EE36614FC798D00D0A08C /* BabyWolf.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E014FC66B400D0A08C /* BabyWolf.cfg */; };
+		060EE36714FC798D00D0A08C /* BabyWolf.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2D614FC661C00D0A08C /* BabyWolf.png */; };
+		060EE36814FC798D00D0A08C /* LightestDwarf.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2D514FC661100D0A08C /* LightestDwarf.png */; };
+		060EE36914FC798D00D0A08C /* Leather Armor.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E214FC66B400D0A08C /* Leather Armor.cfg */; };
+		060EE36A14FC798D00D0A08C /* Leather Boots.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E314FC66B400D0A08C /* Leather Boots.cfg */; };
+		060EE36B14FC798D00D0A08C /* Mining pick.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E514FC66B400D0A08C /* Mining pick.cfg */; };
+		060EE36C14FC798D00D0A08C /* RedHair.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E614FC66B400D0A08C /* RedHair.cfg */; };
+		060EE36D14FC798D00D0A08C /* RedLongBeard.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E714FC66B400D0A08C /* RedLongBeard.cfg */; };
+		060EE36E14FC798D00D0A08C /* Steel Armor.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E814FC66B400D0A08C /* Steel Armor.cfg */; };
+		060EE36F14FC798D00D0A08C /* Steel Boots.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2E914FC66B400D0A08C /* Steel Boots.cfg */; };
+		060EE37014FC798D00D0A08C /* MiningPick.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2DA14FC665100D0A08C /* MiningPick.png */; };
+		060EE37114FC798D00D0A08C /* RedHair.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2D314FC660900D0A08C /* RedHair.png */; };
+		060EE37214FC798D00D0A08C /* RedLongBeard.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2D414FC660900D0A08C /* RedLongBeard.png */; };
+		060EE37314FC798D00D0A08C /* LeatherArmor.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2D114FC660000D0A08C /* LeatherArmor.png */; };
+		060EE37414FC798D00D0A08C /* LeatherBoots.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2D214FC660000D0A08C /* LeatherBoots.png */; };
+		060EE37514FC798D00D0A08C /* Armors.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE2D014FC65F300D0A08C /* Armors.png */; };
+		060EE37D14FC7AE000D0A08C /* UITheme.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE37C14FC7AD000D0A08C /* UITheme.cfg */; };
+		060EE37E14FC7AE000D0A08C /* Font_Large.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE37A14FC7ABF00D0A08C /* Font_Large.png */; };
+		060EE38014FC7AEC00D0A08C /* Sobel.frag in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE30F14FC683900D0A08C /* Sobel.frag */; };
+		060EE38114FC7AEC00D0A08C /* Sobel.vert in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060EE31014FC683900D0A08C /* Sobel.vert */; };
+		0614F72B14FDE83B00842808 /* Glui2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0614F72A14FDE83B00842808 /* Glui2.framework */; };
+		0614F74314FDF18C00842808 /* Glui2.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0614F74214FDF18C00842808 /* Glui2.framework */; };
+		0614F74514FDFB4600842808 /* terrain_mc.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0614F74414FDFB3C00842808 /* terrain_mc.png */; };
+		0614F75114FF0F2F00842808 /* MainView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0614F74F14FF0F2D00842808 /* MainView.cpp */; };
+		0614F75414FF0F5900842808 /* BackgroundView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0614F75214FF0F5800842808 /* BackgroundView.cpp */; };
+		06C497BE1500474000456F34 /* moon.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06C497BB1500468700456F34 /* moon.png */; };
+		06C497BF1500474000456F34 /* sun.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06C497BC1500468700456F34 /* sun.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		060EE2AD14FC637500D0A08C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				06C497BE1500474000456F34 /* moon.png in CopyFiles */,
+				06C497BF1500474000456F34 /* sun.png in CopyFiles */,
+				0614F74514FDFB4600842808 /* terrain_mc.png in CopyFiles */,
+				0614F74314FDF18C00842808 /* Glui2.framework in CopyFiles */,
+				060DBD6F14FDC897008BD6E6 /* UISkin.png in CopyFiles */,
+				060EE38014FC7AEC00D0A08C /* Sobel.frag in CopyFiles */,
+				060EE38114FC7AEC00D0A08C /* Sobel.vert in CopyFiles */,
+				060EE37D14FC7AE000D0A08C /* UITheme.cfg in CopyFiles */,
+				060EE37E14FC7AE000D0A08C /* Font_Large.png in CopyFiles */,
+				060EE35514FC798D00D0A08C /* World.cfg in CopyFiles */,
+				060EE35714FC798D00D0A08C /* Font_Small.png in CopyFiles */,
+				060EE35914FC798D00D0A08C /* Time.png in CopyFiles */,
+				060EE35A14FC798D00D0A08C /* Terrain.cfg in CopyFiles */,
+				060EE35B14FC798D00D0A08C /* terrain.png in CopyFiles */,
+				060EE35C14FC798D00D0A08C /* items.png in CopyFiles */,
+				060EE35D14FC798D00D0A08C /* CaravanModel.cfg in CopyFiles */,
+				060EE35E14FC798D00D0A08C /* MushroomModel.cfg in CopyFiles */,
+				060EE35F14FC798D00D0A08C /* pinetree.obx in CopyFiles */,
+				060EE36014FC798D00D0A08C /* Caravan.obx in CopyFiles */,
+				060EE36114FC798D00D0A08C /* Mushroom.obx in CopyFiles */,
+				060EE36214FC798D00D0A08C /* Caravan.png in CopyFiles */,
+				060EE36314FC798D00D0A08C /* Red Mushroom.png in CopyFiles */,
+				060EE36414FC798D00D0A08C /* pinetree.png in CopyFiles */,
+				060EE36514FC798D00D0A08C /* Lightest Dwarf.cfg in CopyFiles */,
+				060EE36614FC798D00D0A08C /* BabyWolf.cfg in CopyFiles */,
+				060EE36714FC798D00D0A08C /* BabyWolf.png in CopyFiles */,
+				060EE36814FC798D00D0A08C /* LightestDwarf.png in CopyFiles */,
+				060EE36914FC798D00D0A08C /* Leather Armor.cfg in CopyFiles */,
+				060EE36A14FC798D00D0A08C /* Leather Boots.cfg in CopyFiles */,
+				060EE36B14FC798D00D0A08C /* Mining pick.cfg in CopyFiles */,
+				060EE36C14FC798D00D0A08C /* RedHair.cfg in CopyFiles */,
+				060EE36D14FC798D00D0A08C /* RedLongBeard.cfg in CopyFiles */,
+				060EE36E14FC798D00D0A08C /* Steel Armor.cfg in CopyFiles */,
+				060EE36F14FC798D00D0A08C /* Steel Boots.cfg in CopyFiles */,
+				060EE37014FC798D00D0A08C /* MiningPick.png in CopyFiles */,
+				060EE37114FC798D00D0A08C /* RedHair.png in CopyFiles */,
+				060EE37214FC798D00D0A08C /* RedLongBeard.png in CopyFiles */,
+				060EE37314FC798D00D0A08C /* LeatherArmor.png in CopyFiles */,
+				060EE37414FC798D00D0A08C /* LeatherBoots.png in CopyFiles */,
+				060EE37514FC798D00D0A08C /* Armors.png in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		060DBD6E14FDC88D008BD6E6 /* UISkin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = UISkin.png; path = Resources/UISkin.png; sourceTree = "<group>"; };
+		060EE2AF14FC637500D0A08C /* Dwarfcraft */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Dwarfcraft; sourceTree = BUILT_PRODUCTS_DIR; };
+		060EE2C814FC656900D0A08C /* Caravan.obx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Caravan.obx; path = "Resources/3D Models/Exported Objects/Caravan.obx"; sourceTree = "<group>"; };
+		060EE2C914FC656900D0A08C /* Mushroom.obx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Mushroom.obx; path = "Resources/3D Models/Exported Objects/Mushroom.obx"; sourceTree = "<group>"; };
+		060EE2CA14FC656900D0A08C /* pinetree.obx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = pinetree.obx; path = "Resources/3D Models/Exported Objects/pinetree.obx"; sourceTree = "<group>"; };
+		060EE2CB14FC657B00D0A08C /* Caravan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Caravan.png; path = "Resources/3D Models/Textures/Caravan.png"; sourceTree = "<group>"; };
+		060EE2CC14FC657B00D0A08C /* pinetree.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pinetree.png; path = "Resources/3D Models/Textures/pinetree.png"; sourceTree = "<group>"; };
+		060EE2CD14FC657B00D0A08C /* Red Mushroom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Red Mushroom.png"; path = "Resources/3D Models/Textures/Red Mushroom.png"; sourceTree = "<group>"; };
+		060EE2CE14FC659400D0A08C /* CaravanModel.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CaravanModel.cfg; path = "Resources/Configuration files/CaravanModel.cfg"; sourceTree = "<group>"; };
+		060EE2CF14FC659400D0A08C /* MushroomModel.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = MushroomModel.cfg; path = "Resources/Configuration files/MushroomModel.cfg"; sourceTree = "<group>"; };
+		060EE2D014FC65F300D0A08C /* Armors.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Armors.png; path = Resources/Armors.png; sourceTree = "<group>"; };
+		060EE2D114FC660000D0A08C /* LeatherArmor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LeatherArmor.png; path = Resources/LeatherArmor.png; sourceTree = "<group>"; };
+		060EE2D214FC660000D0A08C /* LeatherBoots.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LeatherBoots.png; path = Resources/LeatherBoots.png; sourceTree = "<group>"; };
+		060EE2D314FC660900D0A08C /* RedHair.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RedHair.png; path = Resources/RedHair.png; sourceTree = "<group>"; };
+		060EE2D414FC660900D0A08C /* RedLongBeard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = RedLongBeard.png; path = Resources/RedLongBeard.png; sourceTree = "<group>"; };
+		060EE2D514FC661100D0A08C /* LightestDwarf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LightestDwarf.png; path = Resources/LightestDwarf.png; sourceTree = "<group>"; };
+		060EE2D614FC661C00D0A08C /* BabyWolf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = BabyWolf.png; path = Resources/BabyWolf.png; sourceTree = "<group>"; };
+		060EE2D914FC665100D0A08C /* items.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = items.png; path = Resources/items.png; sourceTree = "<group>"; };
+		060EE2DA14FC665100D0A08C /* MiningPick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MiningPick.png; path = Resources/MiningPick.png; sourceTree = "<group>"; };
+		060EE2DB14FC665100D0A08C /* terrain.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = terrain.png; path = Resources/terrain.png; sourceTree = "<group>"; };
+		060EE2DC14FC665100D0A08C /* Time.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Time.png; path = Resources/Time.png; sourceTree = "<group>"; };
+		060EE2DE14FC665100D0A08C /* Font_Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Font_Small.png; path = Resources/Font_Small.png; sourceTree = "<group>"; };
+		060EE2E014FC66B400D0A08C /* BabyWolf.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = BabyWolf.cfg; path = "Resources/Configuration files/BabyWolf.cfg"; sourceTree = "<group>"; };
+		060EE2E214FC66B400D0A08C /* Leather Armor.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Leather Armor.cfg"; path = "Resources/Configuration files/Leather Armor.cfg"; sourceTree = "<group>"; };
+		060EE2E314FC66B400D0A08C /* Leather Boots.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Leather Boots.cfg"; path = "Resources/Configuration files/Leather Boots.cfg"; sourceTree = "<group>"; };
+		060EE2E414FC66B400D0A08C /* Lightest Dwarf.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Lightest Dwarf.cfg"; path = "Resources/Configuration files/Lightest Dwarf.cfg"; sourceTree = "<group>"; };
+		060EE2E514FC66B400D0A08C /* Mining pick.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Mining pick.cfg"; path = "Resources/Configuration files/Mining pick.cfg"; sourceTree = "<group>"; };
+		060EE2E614FC66B400D0A08C /* RedHair.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = RedHair.cfg; path = "Resources/Configuration files/RedHair.cfg"; sourceTree = "<group>"; };
+		060EE2E714FC66B400D0A08C /* RedLongBeard.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = RedLongBeard.cfg; path = "Resources/Configuration files/RedLongBeard.cfg"; sourceTree = "<group>"; };
+		060EE2E814FC66B400D0A08C /* Steel Armor.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Steel Armor.cfg"; path = "Resources/Configuration files/Steel Armor.cfg"; sourceTree = "<group>"; };
+		060EE2E914FC66B400D0A08C /* Steel Boots.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Steel Boots.cfg"; path = "Resources/Configuration files/Steel Boots.cfg"; sourceTree = "<group>"; };
+		060EE2EA14FC66B400D0A08C /* Terrain.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Terrain.cfg; path = "Resources/Configuration files/Terrain.cfg"; sourceTree = "<group>"; };
+		060EE2EC14FC66B400D0A08C /* World.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = World.cfg; path = "Resources/Configuration files/World.cfg"; sourceTree = "<group>"; };
+		060EE2EE14FC683900D0A08C /* AnimalEntity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AnimalEntity.cpp; path = Dwarfcraft/AnimalEntity.cpp; sourceTree = "<group>"; };
+		060EE2EF14FC683900D0A08C /* AnimalEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimalEntity.h; path = Dwarfcraft/AnimalEntity.h; sourceTree = "<group>"; };
+		060EE2F014FC683900D0A08C /* dBlocks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dBlocks.cpp; path = Dwarfcraft/dBlocks.cpp; sourceTree = "<group>"; };
+		060EE2F114FC683900D0A08C /* dBlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dBlocks.h; path = Dwarfcraft/dBlocks.h; sourceTree = "<group>"; };
+		060EE2F214FC683900D0A08C /* DesignationsView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DesignationsView.cpp; path = Dwarfcraft/DesignationsView.cpp; sourceTree = "<group>"; };
+		060EE2F314FC683900D0A08C /* DesignationsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DesignationsView.h; path = Dwarfcraft/DesignationsView.h; sourceTree = "<group>"; };
+		060EE2F414FC683900D0A08C /* DwarfEntity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DwarfEntity.cpp; path = Dwarfcraft/DwarfEntity.cpp; sourceTree = "<group>"; };
+		060EE2F514FC683900D0A08C /* DwarfEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DwarfEntity.h; path = Dwarfcraft/DwarfEntity.h; sourceTree = "<group>"; };
+		060EE2F614FC683900D0A08C /* Entities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Entities.cpp; path = Dwarfcraft/Entities.cpp; sourceTree = "<group>"; };
+		060EE2F714FC683900D0A08C /* Entities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entities.h; path = Dwarfcraft/Entities.h; sourceTree = "<group>"; };
+		060EE2F814FC683900D0A08C /* Entity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Entity.cpp; path = Dwarfcraft/Entity.cpp; sourceTree = "<group>"; };
+		060EE2F914FC683900D0A08C /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entity.h; path = Dwarfcraft/Entity.h; sourceTree = "<group>"; };
+		060EE2FA14FC683900D0A08C /* EntityPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EntityPath.cpp; path = Dwarfcraft/EntityPath.cpp; sourceTree = "<group>"; };
+		060EE2FB14FC683900D0A08C /* EntityPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EntityPath.h; path = Dwarfcraft/EntityPath.h; sourceTree = "<group>"; };
+		060EE2FC14FC683900D0A08C /* g2TasksController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = g2TasksController.cpp; path = Dwarfcraft/g2TasksController.cpp; sourceTree = "<group>"; };
+		060EE2FD14FC683900D0A08C /* g2TasksController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = g2TasksController.h; path = Dwarfcraft/g2TasksController.h; sourceTree = "<group>"; };
+		060EE2FE14FC683900D0A08C /* g2ChatController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = g2ChatController.cpp; path = Dwarfcraft/g2ChatController.cpp; sourceTree = "<group>"; };
+		060EE2FF14FC683900D0A08C /* g2ChatController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = g2ChatController.h; path = Dwarfcraft/g2ChatController.h; sourceTree = "<group>"; };
+		060EE30014FC683900D0A08C /* g2DashboardController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = g2DashboardController.cpp; path = Dwarfcraft/g2DashboardController.cpp; sourceTree = "<group>"; };
+		060EE30114FC683900D0A08C /* g2DashboardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = g2DashboardController.h; path = Dwarfcraft/g2DashboardController.h; sourceTree = "<group>"; };
+		060EE30214FC683900D0A08C /* g2EntityController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = g2EntityController.cpp; path = Dwarfcraft/g2EntityController.cpp; sourceTree = "<group>"; };
+		060EE30314FC683900D0A08C /* g2EntityController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = g2EntityController.h; path = Dwarfcraft/g2EntityController.h; sourceTree = "<group>"; };
+		060EE30414FC683900D0A08C /* ItemsView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ItemsView.cpp; path = Dwarfcraft/ItemsView.cpp; sourceTree = "<group>"; };
+		060EE30514FC683900D0A08C /* ItemsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ItemsView.h; path = Dwarfcraft/ItemsView.h; sourceTree = "<group>"; };
+		060EE30614FC683900D0A08C /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = Dwarfcraft/main.cpp; sourceTree = "<group>"; };
+		060EE30914FC683900D0A08C /* PerlinNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PerlinNoise.cpp; path = Dwarfcraft/PerlinNoise.cpp; sourceTree = "<group>"; };
+		060EE30A14FC683900D0A08C /* PerlinNoise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PerlinNoise.h; path = Dwarfcraft/PerlinNoise.h; sourceTree = "<group>"; };
+		060EE30B14FC683900D0A08C /* PlasmaNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PlasmaNoise.cpp; path = Dwarfcraft/PlasmaNoise.cpp; sourceTree = "<group>"; };
+		060EE30C14FC683900D0A08C /* PlasmaNoise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlasmaNoise.h; path = Dwarfcraft/PlasmaNoise.h; sourceTree = "<group>"; };
+		060EE30D14FC683900D0A08C /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Shader.cpp; path = Dwarfcraft/Shader.cpp; sourceTree = "<group>"; };
+		060EE30E14FC683900D0A08C /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Shader.h; path = Dwarfcraft/Shader.h; sourceTree = "<group>"; };
+		060EE30F14FC683900D0A08C /* Sobel.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Sobel.frag; path = Dwarfcraft/Sobel.frag; sourceTree = "<group>"; };
+		060EE31014FC683900D0A08C /* Sobel.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Sobel.vert; path = Dwarfcraft/Sobel.vert; sourceTree = "<group>"; };
+		060EE31114FC683900D0A08C /* StructsView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StructsView.cpp; path = Dwarfcraft/StructsView.cpp; sourceTree = "<group>"; };
+		060EE31214FC683900D0A08C /* StructsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StructsView.h; path = Dwarfcraft/StructsView.h; sourceTree = "<group>"; };
+		060EE31314FC683900D0A08C /* UserInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserInterface.cpp; path = Dwarfcraft/UserInterface.cpp; sourceTree = "<group>"; };
+		060EE31414FC683900D0A08C /* UserInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UserInterface.h; path = Dwarfcraft/UserInterface.h; sourceTree = "<group>"; };
+		060EE31514FC683900D0A08C /* VBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VBuffer.cpp; path = Dwarfcraft/VBuffer.cpp; sourceTree = "<group>"; };
+		060EE31614FC683900D0A08C /* VBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VBuffer.h; path = Dwarfcraft/VBuffer.h; sourceTree = "<group>"; };
+		060EE31714FC683900D0A08C /* GameRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = GameRender.cpp; path = Dwarfcraft/GameRender.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		060EE31814FC683900D0A08C /* GameRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameRender.h; path = Dwarfcraft/GameRender.h; sourceTree = "<group>"; };
+		060EE31914FC683900D0A08C /* WorldGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WorldGenerator.cpp; path = Dwarfcraft/WorldGenerator.cpp; sourceTree = "<group>"; };
+		060EE31A14FC683900D0A08C /* WorldGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WorldGenerator.h; path = Dwarfcraft/WorldGenerator.h; sourceTree = "<group>"; };
+		060EE31B14FC683900D0A08C /* WorldView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WorldView.cpp; path = Dwarfcraft/WorldView.cpp; sourceTree = "<group>"; };
+		060EE31C14FC683900D0A08C /* WorldView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WorldView.h; path = Dwarfcraft/WorldView.h; sourceTree = "<group>"; };
+		060EE31D14FC683900D0A08C /* WorldContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WorldContainer.cpp; path = Dwarfcraft/WorldContainer.cpp; sourceTree = "<group>"; };
+		060EE31E14FC683900D0A08C /* WorldContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WorldContainer.h; path = Dwarfcraft/WorldContainer.h; sourceTree = "<group>"; };
+		060EE33A14FC737100D0A08C /* Dictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dictionary.h; path = Magi3/Dictionary.h; sourceTree = "<group>"; };
+		060EE33B14FC737100D0A08C /* GrfxObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GrfxObject.cpp; path = Magi3/GrfxObject.cpp; sourceTree = "<group>"; };
+		060EE33C14FC737100D0A08C /* GrfxObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GrfxObject.h; path = Magi3/GrfxObject.h; sourceTree = "<group>"; };
+		060EE33D14FC737100D0A08C /* GrfxWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GrfxWindow.cpp; path = Magi3/GrfxWindow.cpp; sourceTree = "<group>"; };
+		060EE33E14FC737100D0A08C /* GrfxWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GrfxWindow.h; path = Magi3/GrfxWindow.h; sourceTree = "<group>"; };
+		060EE33F14FC737100D0A08C /* List.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = List.h; path = Magi3/List.h; sourceTree = "<group>"; };
+		060EE34014FC737100D0A08C /* MGrfx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGrfx.h; path = Magi3/MGrfx.h; sourceTree = "<group>"; };
+		060EE34114FC737100D0A08C /* MUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MUtil.cpp; path = Magi3/MUtil.cpp; sourceTree = "<group>"; };
+		060EE34214FC737100D0A08C /* MUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MUtil.h; path = Magi3/MUtil.h; sourceTree = "<group>"; };
+		060EE34314FC737100D0A08C /* PriorityQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PriorityQueue.h; path = Magi3/PriorityQueue.h; sourceTree = "<group>"; };
+		060EE34414FC737100D0A08C /* Queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Queue.h; path = Magi3/Queue.h; sourceTree = "<group>"; };
+		060EE34514FC737100D0A08C /* Stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Stack.h; path = Magi3/Stack.h; sourceTree = "<group>"; };
+		060EE34614FC737100D0A08C /* Vector2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Vector2.h; path = Magi3/Vector2.h; sourceTree = "<group>"; };
+		060EE34714FC737100D0A08C /* Vector3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Vector3.h; path = Magi3/Vector3.h; sourceTree = "<group>"; };
+		060EE34D14FC793900D0A08C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		060EE34F14FC793D00D0A08C /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		060EE37A14FC7ABF00D0A08C /* Font_Large.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Font_Large.png; path = Resources/Font_Large.png; sourceTree = "<group>"; };
+		060EE37C14FC7AD000D0A08C /* UITheme.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = UITheme.cfg; path = "Resources/Configuration files/UITheme.cfg"; sourceTree = "<group>"; };
+		0614F72A14FDE83B00842808 /* Glui2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Glui2.framework; sourceTree = "<group>"; };
+		0614F74214FDF18C00842808 /* Glui2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Glui2.framework; sourceTree = "<group>"; };
+		0614F74414FDFB3C00842808 /* terrain_mc.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = terrain_mc.png; path = Resources/terrain_mc.png; sourceTree = "<group>"; };
+		0614F74F14FF0F2D00842808 /* MainView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MainView.cpp; path = Dwarfcraft/MainView.cpp; sourceTree = "<group>"; };
+		0614F75014FF0F2E00842808 /* MainView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainView.h; path = Dwarfcraft/MainView.h; sourceTree = "<group>"; };
+		0614F75214FF0F5800842808 /* BackgroundView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BackgroundView.cpp; path = Dwarfcraft/BackgroundView.cpp; sourceTree = "<group>"; };
+		0614F75314FF0F5900842808 /* BackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackgroundView.h; path = Dwarfcraft/BackgroundView.h; sourceTree = "<group>"; };
+		0614F75514FF108900842808 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Globals.h; path = Dwarfcraft/Globals.h; sourceTree = "<group>"; };
+		06C497BB1500468700456F34 /* moon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = moon.png; path = Resources/Background/moon.png; sourceTree = "<group>"; };
+		06C497BC1500468700456F34 /* sun.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sun.png; path = Resources/Background/sun.png; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		060EE2AC14FC637500D0A08C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0614F72B14FDE83B00842808 /* Glui2.framework in Frameworks */,
+				060EE35014FC793D00D0A08C /* GLUT.framework in Frameworks */,
+				060EE34E14FC793900D0A08C /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		060EE2A414FC637400D0A08C = {
+			isa = PBXGroup;
+			children = (
+				060EE2C614FC64CD00D0A08C /* Game */,
+				060EE33914FC735D00D0A08C /* Magi3 Lite */,
+				060EE2ED14FC670600D0A08C /* Configuration */,
+				060EE2C214FC63FD00D0A08C /* Resources */,
+				060EE2C114FC63F700D0A08C /* Framework */,
+				060EE2B014FC637500D0A08C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		060EE2B014FC637500D0A08C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				060EE2AF14FC637500D0A08C /* Dwarfcraft */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		060EE2C114FC63F700D0A08C /* Framework */ = {
+			isa = PBXGroup;
+			children = (
+				0614F72A14FDE83B00842808 /* Glui2.framework */,
+				0614F74214FDF18C00842808 /* Glui2.framework */,
+				060EE34F14FC793D00D0A08C /* GLUT.framework */,
+				060EE34D14FC793900D0A08C /* OpenGL.framework */,
+			);
+			name = Framework;
+			sourceTree = "<group>";
+		};
+		060EE2C214FC63FD00D0A08C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				060EE2D714FC663100D0A08C /* GUI */,
+				060EE2C714FC64E700D0A08C /* World */,
+				060EE2C514FC64CB00D0A08C /* Models */,
+				060EE2C414FC64C800D0A08C /* Entities */,
+				060EE2C314FC64C600D0A08C /* Misc */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		060EE2C314FC64C600D0A08C /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				060EE2E214FC66B400D0A08C /* Leather Armor.cfg */,
+				060EE2E314FC66B400D0A08C /* Leather Boots.cfg */,
+				060EE2E514FC66B400D0A08C /* Mining pick.cfg */,
+				060EE2E614FC66B400D0A08C /* RedHair.cfg */,
+				060EE2E714FC66B400D0A08C /* RedLongBeard.cfg */,
+				060EE2E814FC66B400D0A08C /* Steel Armor.cfg */,
+				060EE2E914FC66B400D0A08C /* Steel Boots.cfg */,
+				060EE2DA14FC665100D0A08C /* MiningPick.png */,
+				060EE2D314FC660900D0A08C /* RedHair.png */,
+				060EE2D414FC660900D0A08C /* RedLongBeard.png */,
+				060EE2D114FC660000D0A08C /* LeatherArmor.png */,
+				060EE2D214FC660000D0A08C /* LeatherBoots.png */,
+				060EE2D014FC65F300D0A08C /* Armors.png */,
+			);
+			name = Misc;
+			sourceTree = "<group>";
+		};
+		060EE2C414FC64C800D0A08C /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				060EE2E414FC66B400D0A08C /* Lightest Dwarf.cfg */,
+				060EE2E014FC66B400D0A08C /* BabyWolf.cfg */,
+				060EE2D614FC661C00D0A08C /* BabyWolf.png */,
+				060EE2D514FC661100D0A08C /* LightestDwarf.png */,
+			);
+			name = Entities;
+			sourceTree = "<group>";
+		};
+		060EE2C514FC64CB00D0A08C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				060EE2CE14FC659400D0A08C /* CaravanModel.cfg */,
+				060EE2CF14FC659400D0A08C /* MushroomModel.cfg */,
+				060EE2CA14FC656900D0A08C /* pinetree.obx */,
+				060EE2C814FC656900D0A08C /* Caravan.obx */,
+				060EE2C914FC656900D0A08C /* Mushroom.obx */,
+				060EE2CB14FC657B00D0A08C /* Caravan.png */,
+				060EE2CD14FC657B00D0A08C /* Red Mushroom.png */,
+				060EE2CC14FC657B00D0A08C /* pinetree.png */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		060EE2C614FC64CD00D0A08C /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				060EE30614FC683900D0A08C /* main.cpp */,
+				0614F74F14FF0F2D00842808 /* MainView.cpp */,
+				0614F75014FF0F2E00842808 /* MainView.h */,
+				060EE37914FC7A1700D0A08C /* World */,
+				060EE34C14FC738A00D0A08C /* Shared */,
+				060EE34B14FC737700D0A08C /* Entities */,
+				060EE37814FC79FD00D0A08C /* Views */,
+				060EE37614FC79D100D0A08C /* GUI */,
+			);
+			name = Game;
+			sourceTree = "<group>";
+		};
+		060EE2C714FC64E700D0A08C /* World */ = {
+			isa = PBXGroup;
+			children = (
+				06C497BB1500468700456F34 /* moon.png */,
+				06C497BC1500468700456F34 /* sun.png */,
+				060EE2EA14FC66B400D0A08C /* Terrain.cfg */,
+				060EE2DB14FC665100D0A08C /* terrain.png */,
+				0614F74414FDFB3C00842808 /* terrain_mc.png */,
+				060EE2D914FC665100D0A08C /* items.png */,
+			);
+			name = World;
+			sourceTree = "<group>";
+		};
+		060EE2D714FC663100D0A08C /* GUI */ = {
+			isa = PBXGroup;
+			children = (
+				060EE37C14FC7AD000D0A08C /* UITheme.cfg */,
+				060DBD6E14FDC88D008BD6E6 /* UISkin.png */,
+				060EE37A14FC7ABF00D0A08C /* Font_Large.png */,
+				060EE2DE14FC665100D0A08C /* Font_Small.png */,
+				060EE2DC14FC665100D0A08C /* Time.png */,
+			);
+			name = GUI;
+			sourceTree = "<group>";
+		};
+		060EE2ED14FC670600D0A08C /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				060EE2EC14FC66B400D0A08C /* World.cfg */,
+			);
+			name = Configuration;
+			sourceTree = "<group>";
+		};
+		060EE33914FC735D00D0A08C /* Magi3 Lite */ = {
+			isa = PBXGroup;
+			children = (
+				060EE33A14FC737100D0A08C /* Dictionary.h */,
+				060EE33B14FC737100D0A08C /* GrfxObject.cpp */,
+				060EE33C14FC737100D0A08C /* GrfxObject.h */,
+				060EE33D14FC737100D0A08C /* GrfxWindow.cpp */,
+				060EE33E14FC737100D0A08C /* GrfxWindow.h */,
+				060EE33F14FC737100D0A08C /* List.h */,
+				060EE34014FC737100D0A08C /* MGrfx.h */,
+				060EE34114FC737100D0A08C /* MUtil.cpp */,
+				060EE34214FC737100D0A08C /* MUtil.h */,
+				060EE34314FC737100D0A08C /* PriorityQueue.h */,
+				060EE34414FC737100D0A08C /* Queue.h */,
+				060EE34514FC737100D0A08C /* Stack.h */,
+				060EE34614FC737100D0A08C /* Vector2.h */,
+				060EE34714FC737100D0A08C /* Vector3.h */,
+			);
+			name = "Magi3 Lite";
+			sourceTree = "<group>";
+		};
+		060EE34B14FC737700D0A08C /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				060EE2F814FC683900D0A08C /* Entity.cpp */,
+				060EE2F914FC683900D0A08C /* Entity.h */,
+				060EE2F614FC683900D0A08C /* Entities.cpp */,
+				060EE2F714FC683900D0A08C /* Entities.h */,
+				060EE2FA14FC683900D0A08C /* EntityPath.cpp */,
+				060EE2FB14FC683900D0A08C /* EntityPath.h */,
+				060EE2F414FC683900D0A08C /* DwarfEntity.cpp */,
+				060EE2F514FC683900D0A08C /* DwarfEntity.h */,
+				060EE2EE14FC683900D0A08C /* AnimalEntity.cpp */,
+				060EE2EF14FC683900D0A08C /* AnimalEntity.h */,
+			);
+			name = Entities;
+			sourceTree = "<group>";
+		};
+		060EE34C14FC738A00D0A08C /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				060EE31514FC683900D0A08C /* VBuffer.cpp */,
+				060EE31614FC683900D0A08C /* VBuffer.h */,
+				060EE2F014FC683900D0A08C /* dBlocks.cpp */,
+				060EE2F114FC683900D0A08C /* dBlocks.h */,
+				060EE30D14FC683900D0A08C /* Shader.cpp */,
+				060EE30E14FC683900D0A08C /* Shader.h */,
+				0614F75514FF108900842808 /* Globals.h */,
+				060EE30F14FC683900D0A08C /* Sobel.frag */,
+				060EE31014FC683900D0A08C /* Sobel.vert */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
+		060EE37614FC79D100D0A08C /* GUI */ = {
+			isa = PBXGroup;
+			children = (
+				060EE31314FC683900D0A08C /* UserInterface.cpp */,
+				060EE31414FC683900D0A08C /* UserInterface.h */,
+				060EE2FC14FC683900D0A08C /* g2TasksController.cpp */,
+				060EE2FD14FC683900D0A08C /* g2TasksController.h */,
+				060EE2FE14FC683900D0A08C /* g2ChatController.cpp */,
+				060EE2FF14FC683900D0A08C /* g2ChatController.h */,
+				060EE30014FC683900D0A08C /* g2DashboardController.cpp */,
+				060EE30114FC683900D0A08C /* g2DashboardController.h */,
+				060EE30214FC683900D0A08C /* g2EntityController.cpp */,
+				060EE30314FC683900D0A08C /* g2EntityController.h */,
+			);
+			name = GUI;
+			sourceTree = "<group>";
+		};
+		060EE37814FC79FD00D0A08C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				060EE31714FC683900D0A08C /* GameRender.cpp */,
+				060EE31814FC683900D0A08C /* GameRender.h */,
+				060EE31B14FC683900D0A08C /* WorldView.cpp */,
+				060EE31C14FC683900D0A08C /* WorldView.h */,
+				060EE30414FC683900D0A08C /* ItemsView.cpp */,
+				060EE30514FC683900D0A08C /* ItemsView.h */,
+				060EE2F214FC683900D0A08C /* DesignationsView.cpp */,
+				060EE2F314FC683900D0A08C /* DesignationsView.h */,
+				060EE31114FC683900D0A08C /* StructsView.cpp */,
+				060EE31214FC683900D0A08C /* StructsView.h */,
+				0614F75214FF0F5800842808 /* BackgroundView.cpp */,
+				0614F75314FF0F5900842808 /* BackgroundView.h */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		060EE37914FC7A1700D0A08C /* World */ = {
+			isa = PBXGroup;
+			children = (
+				060EE31D14FC683900D0A08C /* WorldContainer.cpp */,
+				060EE31E14FC683900D0A08C /* WorldContainer.h */,
+				060EE31914FC683900D0A08C /* WorldGenerator.cpp */,
+				060EE31A14FC683900D0A08C /* WorldGenerator.h */,
+				060EE30914FC683900D0A08C /* PerlinNoise.cpp */,
+				060EE30A14FC683900D0A08C /* PerlinNoise.h */,
+				060EE30B14FC683900D0A08C /* PlasmaNoise.cpp */,
+				060EE30C14FC683900D0A08C /* PlasmaNoise.h */,
+			);
+			name = World;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		060EE2AE14FC637500D0A08C /* Dwarfcraft */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 060EE2B914FC637500D0A08C /* Build configuration list for PBXNativeTarget "Dwarfcraft" */;
+			buildPhases = (
+				060EE2AB14FC637500D0A08C /* Sources */,
+				060EE2AC14FC637500D0A08C /* Frameworks */,
+				060EE2AD14FC637500D0A08C /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Dwarfcraft;
+			productName = Dwarfcraft;
+			productReference = 060EE2AF14FC637500D0A08C /* Dwarfcraft */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		060EE2A614FC637400D0A08C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
+			buildConfigurationList = 060EE2A914FC637400D0A08C /* Build configuration list for PBXProject "Dwarfcraft" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 060EE2A414FC637400D0A08C;
+			productRefGroup = 060EE2B014FC637500D0A08C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				060EE2AE14FC637500D0A08C /* Dwarfcraft */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		060EE2AB14FC637500D0A08C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				060EE31F14FC683900D0A08C /* AnimalEntity.cpp in Sources */,
+				060EE32014FC683900D0A08C /* dBlocks.cpp in Sources */,
+				060EE32114FC683900D0A08C /* DesignationsView.cpp in Sources */,
+				060EE32214FC683900D0A08C /* DwarfEntity.cpp in Sources */,
+				060EE32314FC683900D0A08C /* Entities.cpp in Sources */,
+				060EE32414FC683900D0A08C /* Entity.cpp in Sources */,
+				060EE32514FC683900D0A08C /* EntityPath.cpp in Sources */,
+				060EE32614FC683900D0A08C /* g2TasksController.cpp in Sources */,
+				060EE32714FC683900D0A08C /* g2ChatController.cpp in Sources */,
+				060EE32814FC683900D0A08C /* g2DashboardController.cpp in Sources */,
+				060EE32914FC683900D0A08C /* g2EntityController.cpp in Sources */,
+				060EE32A14FC683900D0A08C /* ItemsView.cpp in Sources */,
+				060EE32B14FC683900D0A08C /* main.cpp in Sources */,
+				060EE32D14FC683900D0A08C /* PerlinNoise.cpp in Sources */,
+				060EE32E14FC683900D0A08C /* PlasmaNoise.cpp in Sources */,
+				060EE32F14FC683900D0A08C /* Shader.cpp in Sources */,
+				060EE33214FC683900D0A08C /* StructsView.cpp in Sources */,
+				060EE33314FC683900D0A08C /* UserInterface.cpp in Sources */,
+				060EE33414FC683900D0A08C /* VBuffer.cpp in Sources */,
+				060EE33514FC683900D0A08C /* GameRender.cpp in Sources */,
+				060EE33614FC683900D0A08C /* WorldGenerator.cpp in Sources */,
+				060EE33714FC683900D0A08C /* WorldView.cpp in Sources */,
+				060EE33814FC683900D0A08C /* WorldContainer.cpp in Sources */,
+				060EE34814FC737100D0A08C /* GrfxObject.cpp in Sources */,
+				060EE34914FC737100D0A08C /* GrfxWindow.cpp in Sources */,
+				060EE34A14FC737100D0A08C /* MUtil.cpp in Sources */,
+				0614F75114FF0F2F00842808 /* MainView.cpp in Sources */,
+				0614F75414FF0F5900842808 /* BackgroundView.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		060EE2B714FC637500D0A08C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		060EE2B814FC637500D0A08C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		060EE2BA14FC637500D0A08C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Dwarfcraft\"",
+					"\"$(SRCROOT)\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		060EE2BB14FC637500D0A08C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Dwarfcraft\"",
+					"\"$(SRCROOT)\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		060EE2A914FC637400D0A08C /* Build configuration list for PBXProject "Dwarfcraft" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				060EE2B714FC637500D0A08C /* Debug */,
+				060EE2B814FC637500D0A08C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		060EE2B914FC637500D0A08C /* Build configuration list for PBXNativeTarget "Dwarfcraft" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				060EE2BA14FC637500D0A08C /* Debug */,
+				060EE2BB14FC637500D0A08C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 060EE2A614FC637400D0A08C /* Project object */;
+}

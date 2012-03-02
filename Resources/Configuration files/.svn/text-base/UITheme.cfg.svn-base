@@ -1,0 +1,86 @@
+# The core theme file associated with Dwarfcraft
+
+[general]
+image: UISkin.png
+font: Font_Large.png
+background_color: 255 255 255
+
+[Button]
+point: 0 47
+size: 18 18
+
+[Button_pressed]
+point: 20 47
+size: 18 18
+
+[TextField]
+point: 0 83
+size: 48 12
+
+[ProgressBar]
+point: 0 34
+size: 48 11
+
+[ProgressBar_Fill]
+point: 48 11
+size: 16 9
+
+[Panel]
+point: 80 34
+size: 48 21
+
+[Slider]
+point: 98 138
+size: 48 11
+
+[SliderButton]
+point: 148 147
+size: 11 7
+
+[SliderButton_Pressed]
+point: 148 147
+size: 11 7
+
+[VSlider]
+point: 168 151
+size: 11 48
+
+[VSliderButton]
+point: 170 138
+size: 7 11
+
+[VSliderButton_Pressed]
+point: 170 138
+size: 7 11
+
+[VSliderButton_Disabled]
+point: 72 24
+size: 7 11
+
+[ChatController]
+point: 0 0
+size: 96 44
+
+[TasksController]
+point: 160 0
+size: 96 44
+
+[Chains]
+point: 0 247
+size: 256 8
+
+[DashboardController]
+point: 0 45
+size: 93 36
+
+[DepthIcon]
+point: 182 151
+size: 11 11
+
+[ZoomIcon]
+point: 182 164
+size: 11 11
+
+[InfoTab]
+point: 0 83
+size: 53 8

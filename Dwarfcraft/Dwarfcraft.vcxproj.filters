@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Dwarfcraft">
+      <UniqueIdentifier>{563138a7-c45e-41dd-ab6e-3518ce9355db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dwarfcraft\Game">
+      <UniqueIdentifier>{15110d0b-9b04-4cf4-80d9-921764b72168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dwarfcraft\User Interface">
+      <UniqueIdentifier>{c705ef07-74c8-4b57-baea-9a35bf357482}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{9217800f-0a1e-4236-a6dc-ff77c944e0b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Magi3">
+      <UniqueIdentifier>{b1ee23ac-46fe-4841-8e72-d326cc597bcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dwarfcraft\Game\Shared">
+      <UniqueIdentifier>{258ffc56-db86-4afd-bb6e-3010331d3e2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dwarfcraft\Game\Generation">
+      <UniqueIdentifier>{d542e83f-d821-4c64-9b47-92fd94b9ac99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dwarfcraft\Game\Views">
+      <UniqueIdentifier>{39a984df-9a8f-479b-82df-a1d48b30daeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dwarfcraft\Game\Entities">
+      <UniqueIdentifier>{8109a11f-293a-4926-8ab5-b29b301bc965}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dwarfcraft\Game\Logic">
+      <UniqueIdentifier>{78b04b65-c92c-4a9c-a621-f4d03c29038b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Magi3\Vector3.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\Dictionary.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\GrfxObject.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\GrfxWindow.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\List.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\MGrfx.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\MUtil.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\PriorityQueue.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\Queue.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\Stack.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Magi3\Vector2.h">
+      <Filter>Magi3</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterface.h">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="g2BarController.h">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="g2ChatController.h">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="MainScreen.h">
+      <Filter>Dwarfcraft</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimalEntity.h">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Entities.h">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="PlasmaNoise.h">
+      <Filter>Dwarfcraft\Game\Generation</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldGenerator.h">
+      <Filter>Dwarfcraft\Game\Generation</Filter>
+    </ClInclude>
+    <ClInclude Include="PerlinNoise.h">
+      <Filter>Dwarfcraft\Game\Generation</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldView.h">
+      <Filter>Dwarfcraft\Game\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="dBlocks.h">
+      <Filter>Dwarfcraft\Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="DwarfEntity.h">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldVolume.h">
+      <Filter>Dwarfcraft\Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeView.h">
+      <Filter>Dwarfcraft\Game\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityPath.h">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Dwarfcraft\Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="g2EntityController.h">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="VBuffer.h">
+      <Filter>Dwarfcraft\Game\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="DesignationsView.h">
+      <Filter>Dwarfcraft\Game\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemsView.h">
+      <Filter>Dwarfcraft\Game\Logic</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Magi3\GrfxObject.cpp">
+      <Filter>Magi3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Magi3\GrfxWindow.cpp">
+      <Filter>Magi3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Magi3\MUtil.cpp">
+      <Filter>Magi3</Filter>
+    </ClCompile>
+    <ClCompile Include="g2ClockController.cpp">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface.cpp">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="g2BarController.cpp">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="g2ChatController.cpp">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Dwarfcraft</Filter>
+    </ClCompile>
+    <ClCompile Include="MainScreen.cpp">
+      <Filter>Dwarfcraft</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimalEntity.cpp">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldGenerator.cpp">
+      <Filter>Dwarfcraft\Game\Generation</Filter>
+    </ClCompile>
+    <ClCompile Include="PerlinNoise.cpp">
+      <Filter>Dwarfcraft\Game\Generation</Filter>
+    </ClCompile>
+    <ClCompile Include="PlasmaNoise.cpp">
+      <Filter>Dwarfcraft\Game\Generation</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldView.cpp">
+      <Filter>Dwarfcraft\Game\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="dBlocks.cpp">
+      <Filter>Dwarfcraft\Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="DwarfEntity.cpp">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Entities.cpp">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldVolume.cpp">
+      <Filter>Dwarfcraft\Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumeView.cpp">
+      <Filter>Dwarfcraft\Game\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityPath.cpp">
+      <Filter>Dwarfcraft\Game\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Dwarfcraft\Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="g2EntityController.cpp">
+      <Filter>Dwarfcraft\User Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="VBuffer.cpp">
+      <Filter>Dwarfcraft\Game\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="DesignationsView.cpp">
+      <Filter>Dwarfcraft\Game\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemsView.cpp">
+      <Filter>Dwarfcraft\Game\Logic</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resources\Time.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\Animals.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\default.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\DwarfConcept.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\entities.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\g2Blue.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\g2Blue.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\items.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\Kimpa.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\Medieval.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\stone.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Resources\terrain.png">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="ClassDiagram1.cd">
+      <Filter>Magi3</Filter>
+    </None>
+    <None Include="ClassDiagram3.cd">
+      <Filter>Magi3</Filter>
+    </None>
+    <None Include="ClassDiagram2.cd">
+      <Filter>Magi3</Filter>
+    </None>
+  </ItemGroup>
+</Project>

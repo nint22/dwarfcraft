@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{67FF564B-8626-4415-8FDD-64F548C38D4C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Dwarfcraft</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\WinLibs\;$(ProjectDir)..\Magi3\;$(ProjectDir)..\Dwarfcraft\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\WinLibs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Glui2.lib;zlibwapi.lib;glu32.lib;glew32.lib;pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Magi3\Dictionary.h" />
+    <ClInclude Include="..\Magi3\GrfxObject.h" />
+    <ClInclude Include="..\Magi3\GrfxWindow.h" />
+    <ClInclude Include="..\Magi3\List.h" />
+    <ClInclude Include="..\Magi3\MGrfx.h" />
+    <ClInclude Include="..\Magi3\MUtil.h" />
+    <ClInclude Include="..\Magi3\PriorityQueue.h" />
+    <ClInclude Include="..\Magi3\Queue.h" />
+    <ClInclude Include="..\Magi3\Stack.h" />
+    <ClInclude Include="..\Magi3\Vector2.h" />
+    <ClInclude Include="..\Magi3\Vector3.h" />
+    <ClInclude Include="AnimalEntity.h" />
+    <ClInclude Include="dBlocks.h" />
+    <ClInclude Include="DesignationsView.h" />
+    <ClInclude Include="DwarfEntity.h" />
+    <ClInclude Include="Entities.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityPath.h" />
+    <ClInclude Include="g2BarController.h" />
+    <ClInclude Include="g2ChatController.h" />
+    <ClInclude Include="g2EntityController.h" />
+    <ClInclude Include="ItemsView.h" />
+    <ClInclude Include="MainScreen.h" />
+    <ClInclude Include="PerlinNoise.h" />
+    <ClInclude Include="PlasmaNoise.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="UserInterface.h" />
+    <ClInclude Include="VBuffer.h" />
+    <ClInclude Include="VolumeView.h" />
+    <ClInclude Include="WorldGenerator.h" />
+    <ClInclude Include="WorldView.h" />
+    <ClInclude Include="WorldVolume.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Magi3\GrfxObject.cpp" />
+    <ClCompile Include="..\Magi3\GrfxWindow.cpp" />
+    <ClCompile Include="..\Magi3\MUtil.cpp" />
+    <ClCompile Include="AnimalEntity.cpp" />
+    <ClCompile Include="dBlocks.cpp" />
+    <ClCompile Include="DesignationsView.cpp" />
+    <ClCompile Include="DwarfEntity.cpp" />
+    <ClCompile Include="Entities.cpp" />
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityPath.cpp" />
+    <ClCompile Include="g2BarController.cpp" />
+    <ClCompile Include="g2ChatController.cpp" />
+    <ClCompile Include="g2ClockController.cpp" />
+    <ClCompile Include="g2EntityController.cpp" />
+    <ClCompile Include="ItemsView.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainScreen.cpp" />
+    <ClCompile Include="PerlinNoise.cpp" />
+    <ClCompile Include="PlasmaNoise.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="UserInterface.cpp" />
+    <ClCompile Include="VBuffer.cpp" />
+    <ClCompile Include="VolumeView.cpp" />
+    <ClCompile Include="WorldGenerator.cpp" />
+    <ClCompile Include="WorldView.cpp" />
+    <ClCompile Include="WorldVolume.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resources\Animals.png" />
+    <None Include="..\Resources\default.png" />
+    <None Include="..\Resources\DwarfConcept.png" />
+    <None Include="..\Resources\entities.png" />
+    <None Include="..\Resources\g2Blue.cfg" />
+    <None Include="..\Resources\g2Blue.png" />
+    <None Include="..\Resources\items.png" />
+    <None Include="..\Resources\Kimpa.png" />
+    <None Include="..\Resources\Medieval.png" />
+    <None Include="..\Resources\stone.png" />
+    <None Include="..\Resources\terrain.png" />
+    <None Include="..\Resources\Time.png" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram3.cd" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
