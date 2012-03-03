@@ -159,7 +159,7 @@ void GameRender::Render()
     
     /*** Render World ***/
     
-    // Draw the world about the camera
+    // Draw the world about the camera (note that we move the camera further away a little more)
     Vector3<float> RightDirection(cos(CameraRotation - UtilPI / 2.0f), 0, sin(CameraRotation - UtilPI / 2.0f));
     WorldRender->Render(CameraSource, RightDirection, LayerCutoff);
     

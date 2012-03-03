@@ -21,6 +21,7 @@
 #include "MGrfx.h"
 #include "WorldContainer.h"
 #include "VBuffer.h"
+#include "Stack.h"
 
 // A column's layer VBO representation
 struct WorldView_Plane

@@ -72,7 +72,7 @@ void WorldView::Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int
             GenerateColumnVBO(ChunkX, ChunkZ);
         
         // For this chunk's height
-        for(int i = 0; i < LayerCutoff + 1; i++)
+        for(int i = 0; i <= LayerCutoff; i++)
         {
             // Get the layer and ignore if no geometry
             WorldView_Plane& Plane = ChunkGraphics->Planes[i];
@@ -88,43 +88,16 @@ void WorldView::Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int
             if(Plane.WorldGeometry != NULL)
                 Plane.WorldGeometry->Render();
             
+            // Render the hidden geometry
+            if(i == LayerCutoff && Plane.HiddenGeometry != NULL)
+                Plane.HiddenGeometry->Render();
+            
+            // Render the side geometry
+            if(i == LayerCutoff && Plane.SideGeometry != NULL)
+                Plane.SideGeometry->Render();
+            
+            // Done rendering this layer
             glPopMatrix();
-            
-//            // For each model
-//            int ModelCount = Layer.Models.GetSize();
-//            for(int j = 0; j < ModelCount; j++)
-//            {
-//                // Get model
-//                glPushMatrix();
-//                GameRender_Model Model = Layer.Models.Dequeue();
-//                
-//                // Render
-//                glTranslatef(GlobalX + Model.x, GlobalY + Layer.DepthIndex, GlobalZ + Model.z);
-//                
-//                // Disabled models
-//                Model.ModelData->Render();
-//            }
-            
-            // Disabled for now
-//            // Only render if this layer is the cutoff layer
-//            if(Layer.DepthIndex == LayerCutoff)
-//            {
-//                /*** Hidden Layer ***/
-//                
-//                // Push local translation
-//                glPushMatrix();
-//                glTranslatef(GlobalX, GlobalY, GlobalZ);
-//                Layer.HiddenGeometry->Render();
-//                glPopMatrix();
-//                
-//                /*** Side Layer ***/
-//                
-//                // Push local translation
-//                glPushMatrix();
-//                glTranslatef(GlobalX, GlobalY, GlobalZ);
-//                Layer.SideGeometry->Render();
-//                glPopMatrix();
-//            }
         }
     }
 }
@@ -182,6 +155,8 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
     
     // Short hand some data to easier / faster access
     const int ColumnWidth = WorldData->GetColumnWidth();
+    const float StripOverlap = -0.001f;
+    const int y = Y;
     
     // What is the global data origins?
     int OriginX = ChunkX * ColumnWidth;
@@ -194,176 +169,184 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
     if(IsFilled)
         FillType = WorldData->GetChunk(ChunkX, ChunkZ)->Planes[OriginY].Data.PlaneType;
     
-    // If the layer is just air, ignore
-    if(IsFilled && FillType == dBlockType_Air)
-        return false;
+    /*** Cube Geometry ***/
     
-    // For each block
-    const int y = Y;
-    for(int z = OriginZ; z < OriginZ + ColumnWidth; z++)
-    for(int x = OriginX; x < OriginX + ColumnWidth; x++)
+    // If the layer is just air, ignore the cube geometry
+    if(!IsFilled || FillType != dBlockType_Air)
     {
-        // Get block and ignore if air
-        dBlock TargetBlock = WorldData->GetBlock(x, y, z);
-        if(TargetBlock.GetType() == dBlockType_Air)
-            continue;
-        
-        // Case 1: Regular block geometry
-        if(!dHasSpecialGeometry(TargetBlock))
+        // For each block
+        for(int z = OriginZ; z < OriginZ + ColumnWidth; z++)
+        for(int x = OriginX; x < OriginX + ColumnWidth; x++)
         {
-            // For each face of the block, is it facing an air block or is it the top-most?
-            // Six faces in total (Top, bottom, left, right, front, back)
-            for(int OffsetIndex = 0; OffsetIndex < 5; OffsetIndex++)
+            // Get block and ignore if air
+            dBlock TargetBlock = WorldData->GetBlock(x, y, z);
+            if(TargetBlock.GetType() == dBlockType_Air)
+                continue;
+            
+            // Case 1: Regular block geometry
+            if(!dHasSpecialGeometry(TargetBlock))
             {
-                // Pull out the offset
-                Vector3<int> FaceOffset = GameRender_FaceOffsets[OffsetIndex];
-                
-                // Ignore if out of bounds
-                if(!WorldData->IsWithinWorld(x + FaceOffset.x, y + FaceOffset.y, z + FaceOffset.z))
-                    continue;
-                
-                // Get block (we know it is in the world for sure)
-                dBlock AdjacentBlock = WorldData->GetBlock(x + FaceOffset.x, y + FaceOffset.y, z + FaceOffset.z);
-                
-                // Only render if next to a valid visible block
-                if(!dAdjacentCheck(TargetBlock, AdjacentBlock))
-                    continue;
-                
-                // If we are checking the above-block, hide if above is a half-block (dAdjacentCheck can't do it...)
-                if(OffsetIndex == 0 && !AdjacentBlock.IsWhole())
-                    continue;
-                
-                // If we are a whole block next to a half block, only render the top half of the vertices
-                if(OffsetIndex > 0 && TargetBlock.IsWhole() && !AdjacentBlock.IsWhole())
+                // For each face of the block, is it facing an air block or is it the top-most?
+                // Six faces in total (Top, bottom, left, right, front, back)
+                for(int OffsetIndex = 0; OffsetIndex < 5; OffsetIndex++)
                 {
-                    // Top geometry
-                    for(int i = 0; i < 2; i++)
-                        AddVertex(Layer->WorldGeometry, Vector3<float>(x, y, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
-                    for(int i = 2; i < 4; i++)
-                        AddVertex(Layer->WorldGeometry, Vector3<float>(x, y + 0.5f, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
+                    // Pull out the offset
+                    Vector3<int> FaceOffset = GameRender_FaceOffsets[OffsetIndex];
+                    
+                    // Ignore if out of bounds
+                    if(!WorldData->IsWithinWorld(x + FaceOffset.x, y + FaceOffset.y, z + FaceOffset.z))
+                        continue;
+                    
+                    // Get block (we know it is in the world for sure)
+                    dBlock AdjacentBlock = WorldData->GetBlock(x + FaceOffset.x, y + FaceOffset.y, z + FaceOffset.z);
+                    
+                    // Only render if next to a valid visible block
+                    if(!dAdjacentCheck(TargetBlock, AdjacentBlock))
+                        continue;
+                    
+                    // If we are checking the above-block, hide if above is a half-block (dAdjacentCheck can't do it...)
+                    if(OffsetIndex == 0 && !AdjacentBlock.IsWhole())
+                        continue;
+                    
+                    // If we are a whole block next to a half block, only render the top half of the vertices
+                    if(OffsetIndex > 0 && TargetBlock.IsWhole() && !AdjacentBlock.IsWhole())
+                    {
+                        // Top geometry
+                        for(int i = 0; i < 2; i++)
+                            AddVertex(Layer->WorldGeometry, Vector3<float>(x, y, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
+                        for(int i = 2; i < 4; i++)
+                            AddVertex(Layer->WorldGeometry, Vector3<float>(x, y + 0.5f, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
+                    }
+                    // Normal geometry
+                    else
+                    {
+                        // If this is a face we should render, push geometry into the queue
+                        for(int i = 0; i < 4; i++)
+                            AddVertex(Layer->WorldGeometry, Vector3<float>(x, y, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
+                    }
                 }
-                // Normal geometry
-                else
+            }
+                
+    //            // Case 2: Specialty 3D model (i.e. workbench)
+    //            else if(TargetBlock.GetType() == dBlockType_Mushroom)
+    //            {
+    //                // Allocate new model
+    //                GameRender_Model Model;
+    //                Model.x = x;
+    //                Model.z = z;
+    //                Model.ModelData = new VBuffer("MushroomModel.cfg");
+    //                
+    //                // Push to this layer's model list
+    //                LayerOut->Models.Enqueue(Model);
+    //            }
+                
+            // Case 3: Generic 3D model (x-shape, for bushes, etc.)
+            else
+            {
+                // Render only the sides, not the top
+                for(int OffsetIndex = 1; OffsetIndex < 5; OffsetIndex++)
                 {
-                    // If this is a face we should render, push geometry into the queue
                     for(int i = 0; i < 4; i++)
                         AddVertex(Layer->WorldGeometry, Vector3<float>(x, y, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
                 }
             }
+            
+            // Done with this block
         }
-        
-//        // Case 2: Specialty 3D model (i.e. workbench)
-//        else if(TargetBlock.GetType() == dBlockType_Mushroom)
-//        {
-//            // Allocate new model
-//            GameRender_Model Model;
-//            Model.x = x;
-//            Model.z = z;
-//            Model.ModelData = new VBuffer("MushroomModel.cfg");
-//            
-//            // Push to this layer's model list
-//            LayerOut->Models.Enqueue(Model);
-//        }
-        
-        // Case 3: Generic 3D model (x-shape, for bushes, etc.)
-        else
-        {
-            // Render only the sides, not the top
-            for(int OffsetIndex = 1; OffsetIndex < 5; OffsetIndex++)
-            {
-                for(int i = 0; i < 4; i++)
-                    AddVertex(Layer->WorldGeometry, Vector3<float>(x, y, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
-            }
-        }
-        
-        // Done with this block
     }
     
-//    /*** Slice Detection ***/
-//    
-//    // If we have a block above (or after that), then mark black
-//    for(int z = 0; z < WorldWidth; z++)
-//    {
-//        // Stack of x positions we should coalesce
-//        Stack<int> BorderFaces;
-//        
-//        // We build x-length strips of black
-//        // Note: we do [0...x] instead of [0...x) because we want to
-//        // read off and parse the last few faces..
-//        for(int x = 0; x <= WorldWidth; x++)
-//        {
-//            // If this is a black tile, we push to save...
-//            if(x < WorldWidth && MainVolume->IsWithinWorld(x, LayerIndex + 1, z) && dIsSolid(MainVolume->GetBlock(x, LayerIndex + 1, z)))
-//                BorderFaces.Push(x);
-//            // Else, this is a solid tile and thus we are complete with our work
-//            else if(!BorderFaces.IsEmpty())
-//            {
-//                // Get the geometry start and end
-//                int EndX = BorderFaces.Pop();
-//                int StartX = EndX;
-//                while(!BorderFaces.IsEmpty())
-//                    StartX = BorderFaces.Pop();
-//                
-//                // Place starting and ending vertices
-//                // Ternary operator is to unduce overlap
-//                static const float Overlap = -0.001f;
-//                for(int i = 0; i < 2; i++)
-//                    AddVertex(LayerOut->HiddenGeometry, Vector3<float>(StartX, LayerIndex, z + ((i == 0) ? Overlap : -Overlap)) + GameRender_FaceQuads[0][i], GameRender_Normals[0], i, dBlockType_Border);
-//                for(int i = 2; i < 4; i++)
-//                    AddVertex(LayerOut->HiddenGeometry, Vector3<float>(EndX, LayerIndex, z + ((i == 3) ? Overlap : -Overlap)) + GameRender_FaceQuads[0][i], GameRender_Normals[0], i, dBlockType_Border);
-//            }
-//        }
-//    }
-//    
-//    /*** Side Removal ***/
-//    
-//    // Front side (0, ...)
-//    for(int z = 0; z < WorldWidth; z++)
-//    {
-//        // If anything non-air, place the hidden surface
-//        const int x = 0;
-//        if(dIsSolid(MainVolume->GetBlock(x, LayerIndex, z).GetType()))
-//        {
-//            for(int i = 0; i < 4; i++)
-//                AddVertex(LayerOut->SideGeometry, Vector3<float>(x, LayerIndex, z) + GameRender_FaceQuads[2][i], GameRender_Normals[2], i, dBlockType_Dirt);
-//        }
-//    }
-//    
-//    // Back side (WorldWidth - 1, ...)
-//    for(int z = 0; z < WorldWidth; z++)
-//    {
-//        // If anything non-air, place the hidden surface
-//        const int x = WorldWidth - 1;
-//        if(dIsSolid(MainVolume->GetBlock(x, LayerIndex, z)))
-//        {
-//            for(int i = 0; i < 4; i++)
-//                AddVertex(LayerOut->SideGeometry, Vector3<float>(x, LayerIndex, z) + GameRender_FaceQuads[1][i], GameRender_Normals[1], i, dBlockType_Dirt);
-//        }
-//    }
-//    
-//    // Left side (..., 0)
-//    for(int x = 0; x < WorldWidth; x++)
-//    {
-//        // If anything non-air, place the hidden surface
-//        const int z = 0;
-//        if(dIsSolid(MainVolume->GetBlock(x, LayerIndex, z)))
-//        {
-//            for(int i = 0; i < 4; i++)
-//                AddVertex(LayerOut->SideGeometry, Vector3<float>(x, LayerIndex, z) + GameRender_FaceQuads[3][i], GameRender_Normals[3], i, dBlockType_Dirt);
-//        }
-//    }
-//    
-//    // Left side (..., WorldWidth - 1)
-//    for(int x = 0; x < WorldWidth; x++)
-//    {
-//        // If anything non-air, place the hidden surface
-//        const int z = WorldWidth - 1;
-//        if(dIsSolid(MainVolume->GetBlock(x, LayerIndex, z)))
-//        {
-//            for(int i = 0; i < 4; i++)
-//                AddVertex(LayerOut->SideGeometry, Vector3<float>(x, LayerIndex, z) + GameRender_FaceQuads[4][i], GameRender_Normals[4], i, dBlockType_Dirt);
-//        }
-//    }
+    /*** Slice Detection ***/
+    
+    // If we have a block above (or after that), then mark black
+    for(int z = OriginZ; z < OriginZ + ColumnWidth; z++)
+    {
+        // Stack of x positions we should coalesce
+        Stack<int> BorderFaces;
+        
+        // Build x-length strips of black
+        for(int x = OriginX; x <= OriginX + ColumnWidth; x++)
+        {
+            // Make sure we are not at the last block, and within the world, to do an occlusion test
+            if(x != (OriginX + ColumnWidth) && WorldData->IsWithinWorld(x, y + 1, z) && dIsSolid(WorldData->GetBlock(x, y + 1, z)))
+            {
+                BorderFaces.Push(x);
+            }
+            // Else, this is a solid tile and thus we are complete with this strip and start again
+            else if(!BorderFaces.IsEmpty())
+            {
+                // Get the geometry start and end
+                int EndX = BorderFaces.Pop();
+                int StartX = EndX;
+                while(!BorderFaces.IsEmpty())
+                    StartX = BorderFaces.Pop();
+                
+                // Place starting and ending vertices
+                // Ternary operator is to unduce overlap
+                for(int i = 0; i < 2; i++)
+                    AddVertex(Layer->HiddenGeometry, Vector3<float>(StartX, y, z + ((i == 0) ? StripOverlap : -StripOverlap)) + WorldView_FaceQuads[0][i], WorldView_Normals[0], i, dBlockType_Border);
+                for(int i = 2; i < 4; i++)
+                    AddVertex(Layer->HiddenGeometry, Vector3<float>(EndX, y, z + ((i == 3) ? StripOverlap : -StripOverlap)) + WorldView_FaceQuads[0][i], WorldView_Normals[0], i, dBlockType_Border);
+            }
+        }
+    }
+    
+    /*** World-Bounds Occlusion ***/
+    
+    // If this column has a surface that touches a world edge
+    for(int z = OriginZ; z < OriginZ + ColumnWidth; z++)
+    for(int x = OriginX; x < OriginX + ColumnWidth; x++)
+    {
+        if(x == 0 || x == WorldData->GetWorldWidth() - 1 || z == 0 || z == WorldData->GetWorldWidth() - 1)
+        {
+            // A stack of blocks that must be occluded
+            Stack<int> BorderFaces;
+            
+            // We are on a column that needs to have all sides occluded
+            // d for depth
+            for(int d = 0; d <= y; d++)
+            {
+                // If solid and not at the world end, hide
+                bool IsSolid = dIsSolid(WorldData->GetBlock(x, d, z));
+                if(IsSolid)
+                    BorderFaces.Push(d);
+                
+                // Else, this is a gap, or the end of the column
+                if((d == y || !IsSolid) && !BorderFaces.IsEmpty())
+                {
+                    // Get the strip start and end
+                    int EndY = BorderFaces.Pop();
+                    int StartY = EndY;
+                    while(!BorderFaces.IsEmpty())
+                        StartY = BorderFaces.Pop();
+                    
+                    // Which faces should we render here?
+                    int FaceList[4] = {0, 0, 0, 0};
+                    if(x == 0)
+                        FaceList[0] = 2;
+                    if(x == WorldData->GetWorldWidth() - 1)
+                        FaceList[1] = 1;
+                    if(z == 0)
+                        FaceList[2] = 3;
+                    if(z == WorldData->GetWorldWidth() - 1)
+                        FaceList[3] = 4;
+                    
+                    // Push the strip geometry
+                    for(int j = 0; j < 4; j++)
+                    {
+                        if(FaceList[j] != 0)
+                        {
+                            for(int i = 0; i < 2; i++)
+                                AddVertex(Layer->SideGeometry, Vector3<float>(x, EndY, z) + WorldView_FaceQuads[FaceList[j]][i], WorldView_Normals[FaceList[j]], i, dBlockType_Border);
+                            for(int i = 2; i < 4; i++)
+                                AddVertex(Layer->SideGeometry, Vector3<float>(x, StartY, z) + WorldView_FaceQuads[FaceList[j]][i], WorldView_Normals[FaceList[j]], i, dBlockType_Border);
+                        }
+                    }
+                }
+            }
+            
+            // Done with this column's occlusion
+        }
+    }
     
     /*** Finalize Geometry ***/
     

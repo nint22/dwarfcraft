@@ -59,10 +59,7 @@ void WorldGenerator::Generate(WorldContainer* WorldData, const char* Seed)
     // Fill lower 2 levels with just lava
     for(int z = 0; z < WorldWidth; z += WorldData->GetColumnWidth())
     for(int x = 0; x < WorldWidth; x += WorldData->GetColumnWidth())
-    {
-        WorldData->FillChunk(x, 1, z, dBlockType_Lava);
-        WorldData->FillChunk(x, 1, z, dBlockType_Lava);
-    }
+        WorldData->FillChunk(x, 0, z, dBlockType_Lava);
     
     /*** Fill each column with stone, dirt, and surface layers ***/
     for(int z = 0; z < WorldWidth; z++)
