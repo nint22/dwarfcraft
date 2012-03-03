@@ -21,8 +21,7 @@ Entity::Entity(const char* ConfigName)
 {
     // Save location
     SetFacingAngle(UtilPI / 2.0f); // Default facing north
-    SetCameraAngle(0.0f);
-
+    
     // Attempt to read configuration file
     ConfigFile = new g2Config();
     ConfigFile->LoadFile(ConfigName);
@@ -217,11 +216,6 @@ float Entity::GetFacingAngle()
     return FacingTheta;
 }
 
-void Entity::SetCameraAngle(float Theta)
-{
-    CameraTheta = Theta;
-}
-
 float Entity::GetCameraAngle()
 {
     return CameraTheta;
@@ -337,8 +331,11 @@ void Entity::__Update(float dT)
     }
 }
 
-void Entity::__Render()
+void Entity::__Render(float CameraAngle)
 {
+    // Save this new camera angle for internal use
+    CameraTheta = CameraAngle;
+    
     /*** Main Sprite ***/
     
     // Check for any facing changes, or state changes

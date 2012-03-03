@@ -60,6 +60,9 @@ public:
     BackgroundView(GrfxObject* Parent, int ObjectDepth);
     ~BackgroundView();
     
+    // Pass the current camera angle, so we only draw the sun / moon in the same area..
+    void SetCameraAngle(float CameraAngle, float CameraPitch);
+    
 protected:
     
     // Standard render and update functions from GrfxObject
@@ -80,6 +83,9 @@ private:
     
     // Current window width / height
     int WindowWidth, WindowHeight;
+    
+    // Used to translate the sun and moon a little
+    float CameraAngle, CameraPitch;
     
     // Moon and sun texture handles
     GLuint SunTextureID, MoonTextureID;

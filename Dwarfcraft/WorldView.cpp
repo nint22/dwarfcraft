@@ -11,10 +11,16 @@
 // Includes
 #include "WorldView.h"
 
-WorldView::WorldView(WorldContainer* WorldData)
+WorldView::WorldView(WorldContainer* WorldData, DesignationsView* Designations, ItemsView* Items, StructsView* Structs, Entities* EntitiesList)
 {
-    // Save the world data
+    // Save the world data and all other renderables
     this->WorldData = WorldData;
+    
+    // Save all the references, but only used for rendering data
+    this->Designations = Designations;
+    this->Items = Items;
+    this->Structs = Structs;
+    this->EntitiesList = EntitiesList;
     
     // How many chunks are there for the x dimension
     ChunkCount = WorldData->GetWorldWidth() / WorldData->GetColumnWidth();
@@ -34,7 +40,7 @@ WorldView::~WorldView()
     delete[] Chunks;
 }
 
-void WorldView::Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int LayerCutoff)
+void WorldView::Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int LayerCutoff, float CameraAngle)
 {
     // Ignore y components
     CameraPos.y = 0;
@@ -100,11 +106,21 @@ void WorldView::Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int
             glPopMatrix();
         }
     }
+    
+    // Render all items
+    Items->Render(LayerCutoff, CameraAngle);
+    Designations->Render(LayerCutoff);
+    Structs->Render();
+    EntitiesList->Render(LayerCutoff, CameraAngle);
 }
 
 void WorldView::Update(float dT)
 {
-    // Nothing to do yet...
+    // Update all sub-renderables
+    Items->Update(dT);
+    Designations->Update(dT);
+    Structs->Update(dT);
+    EntitiesList->Update(dT);
 }
 
 void WorldView::GenerateColumnVBO(int ChunkX, int ChunkZ)

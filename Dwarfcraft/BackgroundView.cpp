@@ -26,6 +26,12 @@ BackgroundView::~BackgroundView()
     
 }
 
+void BackgroundView::SetCameraAngle(float CameraAngle, float CameraPitch)
+{
+    this->CameraAngle = CameraAngle;
+    this->CameraPitch = CameraPitch;
+}
+
 void BackgroundView::Render()
 {
     /*** Colored Background ***/
@@ -59,19 +65,32 @@ void BackgroundView::Render()
     
     /*** Sun, Moon, Stars ***/
     
+    // Little offsets to make the background look paralax-like
+    while(CameraAngle > 2.0f * UtilPI)
+        CameraAngle -= 2.0f * UtilPI;
+    while(CameraAngle < 0.0f)
+        CameraAngle += 2.0f * UtilPI;
+    
+    float Theta = 1.0f;
+    float OffsetX = WindowWidth * ((CameraAngle - (UtilPI - Theta)) / (2.0f * Theta));
+    float OffsetY = -((WindowHeight / 2) * CameraPitch + WindowHeight / 4);
+    
+    // Forward time so the sun and moon preceed color changes slightly
+    float SunTime = TotalTime - 1000.0f;
+    
     // Draw sun moving across the sky during the day
-    float SunProgress = (BackgroundView_TimeRanges[1][1] - TotalTime) / (BackgroundView_TimeRanges[1][1] - BackgroundView_TimeRanges[1][0]);
+    float SunProgress = (BackgroundView_TimeRanges[1][1] - SunTime) / (BackgroundView_TimeRanges[1][1] - BackgroundView_TimeRanges[1][0]);
     
     // If within [0, 1],it should be on-creen
     if(SunProgress >= 0 && SunProgress <= 1)
-        RenderScreenTexture(WindowWidth / 2 + (WindowWidth / 3) * cos(SunProgress * UtilPI), WindowHeight / 2 - (WindowHeight / 2) * sin(SunProgress * UtilPI), 64, 64, SunTextureID);
+        RenderScreenTexture(OffsetX + WindowWidth / 2 + (WindowWidth / 3) * cos(SunProgress * UtilPI), OffsetY+ WindowHeight / 2 - (WindowHeight / 2) * sin(SunProgress * UtilPI), 64, 64, SunTextureID);
     
     // Draw moon moving across the sky during the night
-    float MoonProgress = (BackgroundView_TimeRanges[3][1] - TotalTime) / (BackgroundView_TimeRanges[3][1] - BackgroundView_TimeRanges[3][0]);
+    float MoonProgress = (BackgroundView_TimeRanges[3][1] - SunTime) / (BackgroundView_TimeRanges[3][1] - BackgroundView_TimeRanges[3][0]);
     
     // If within [0, 1],it should be on-creen
     if(MoonProgress >= 0 && MoonProgress <= 1)
-        RenderScreenTexture(WindowWidth / 2 + (WindowWidth / 3) * cos(MoonProgress * UtilPI), WindowHeight / 2 - (WindowHeight / 2) * sin(MoonProgress * UtilPI), 64, 64, MoonTextureID);
+        RenderScreenTexture(OffsetX + WindowWidth / 2 + (WindowWidth / 3) * cos(MoonProgress * UtilPI), OffsetY + WindowHeight / 2 - (WindowHeight / 2) * sin(MoonProgress * UtilPI), 64, 64, MoonTextureID);
     
     /*** Done ***/
     

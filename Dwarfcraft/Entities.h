@@ -24,12 +24,12 @@
 #include "Entity.h"
 #include "Queue.h"
 
-class Entities : public GrfxObject
+class Entities
 {
 public:
     
     // Standard constructor and destructor
-    Entities(GrfxObject *Parent, WorldContainer* MainWorld, DesignationsView* MainDesignations, ItemsView* MainItems);
+    Entities(WorldContainer* MainWorld, DesignationsView* MainDesignations, ItemsView* MainItems);
     ~Entities();
     
     // Add a new entity; gives the main world reference
@@ -48,28 +48,16 @@ public:
     // Returns null if not found
     Entity* IntersectEntities(Vector3<float> RayPos, Vector3<float> RayDir, int CutoffLayer);
     
-    /*** Updates by Game World ***/
-    
-    // Post any rotational changes from the world's camera
-    // This is done so that we can keep the entity visible
-    // Angle is internally normalized to [0, 2*Pi)
-    void SetCameraAngle(float Theta);
-    
-    // Set the current level that we last render
-    void SetLayerCutoff(int Level);
-    
-protected:
-    
     // Update all entities
     void Update(float dT);
     
     // Render all entities
-    void Render();
+    void Render(int LayerCutoff, float CameraAngle);
     
 private:
     
     // List of all entities
-    Queue< Entity* > EntitiesQueue;
+    List< Entity* > EntitiesList;
     
     // World data handle
     WorldContainer* MainWorld;

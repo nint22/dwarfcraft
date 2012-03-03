@@ -10,11 +10,7 @@
 
 #include "Entities.h"
 
-// Note the positive preference to render; this is done because
-// we want to render entities AFTER the main view's push the camera's
-// view-matrix
-Entities::Entities(GrfxObject* Parent, WorldContainer* MainWorld, DesignationsView* MainDesignations, ItemsView* MainItems)
-: GrfxObject(Parent, 1)
+Entities::Entities(WorldContainer* MainWorld, DesignationsView* MainDesignations, ItemsView* MainItems)
 {
     Theta = 0.0f;
     this->MainWorld = MainWorld;
@@ -22,7 +18,7 @@ Entities::Entities(GrfxObject* Parent, WorldContainer* MainWorld, DesignationsVi
     this->MainItems = MainItems;
     
     // Default to not rendering the path
-    RenderablePath = false;
+    RenderablePath = true;
 }
 
 Entities::~Entities()
@@ -36,12 +32,16 @@ void Entities::AddEntity(Entity* NewEntity)
     NewEntity->MainWorld = MainWorld;
     NewEntity->Designations = MainDesignations;
     NewEntity->Items = MainItems;
-    NewEntity->SetCameraAngle(Theta);
-    EntitiesQueue.Enqueue(NewEntity);
+    EntitiesList.Resize(EntitiesList.GetSize() + 1);
+    EntitiesList[EntitiesList.GetSize() - 1] = NewEntity;
 }
 
 Queue< Entity* > Entities::GetEntities()
 {
+    Queue< Entity* > EntitiesQueue;
+    int EntityCount = EntitiesList.GetSize();
+    for(int i = 0; i < EntityCount; i++)
+        EntitiesQueue.Enqueue(EntitiesList[i]);
     return EntitiesQueue;
 }
 
@@ -61,11 +61,11 @@ Entity* Entities::IntersectEntities(Vector3<float> RayPos, Vector3<float> RayDir
     Queue<Entity*> Intersections;
     
     // For each entity
-    int EntityCount = EntitiesQueue.GetSize();
+    int EntityCount = EntitiesList.GetSize();
     for(int i = 0; i < EntityCount; i++)
     {
         // Get the entity
-        Entity* Obj = EntitiesQueue.Dequeue();
+        Entity* Obj = EntitiesList[i];
         
         // Make some variables arrays for easy access (index maps to x,y,z)
         float _BoxPos[3] = { Obj->GetPosition().x, Obj->GetPosition().y, Obj->GetPosition().z };
@@ -111,9 +111,6 @@ Entity* Entities::IntersectEntities(Vector3<float> RayPos, Vector3<float> RayDir
         // This is layer we are coliding with and it isn't air
         if(IsValid)
             Intersections.Enqueue(Obj);
-        
-        // Push entity back
-        EntitiesQueue.Enqueue(Obj);
     }
     
     // Find the closest intersection
@@ -137,58 +134,20 @@ Entity* Entities::IntersectEntities(Vector3<float> RayPos, Vector3<float> RayDir
     return Closest;
 }
 
-void Entities::SetCameraAngle(float Theta)
-{
-    // Bounds angle
-    while(Theta <= 0.0f)
-        Theta += UtilPI * 2.0f;
-    while(Theta > UtilPI * 2.0f)
-        Theta -= UtilPI * 2.0f;
-    
-    // Save given angle
-    this->Theta = Theta;
-    
-    // Apply angle change to all entities
-    int EntitiesCount = EntitiesQueue.GetSize();
-    for(int i = 0; i < EntitiesCount; i++)
-    {
-        Entity* Obj = EntitiesQueue.Dequeue();
-        Obj->SetCameraAngle(Theta);
-        EntitiesQueue.Enqueue(Obj);
-    }
-}
-
-void Entities::SetLayerCutoff(int Level)
-{
-    // Keep for self, as we should only
-    // render those under the cutoff in this class
-    this->LayerCutoff = Level;
-}
-
 void Entities::Update(float dT)
 {
     // Update all
-    int EntitiesCount = EntitiesQueue.GetSize();
+    int EntitiesCount = EntitiesList.GetSize();
     for(int i = 0; i < EntitiesCount; i++)
-    {
-        Entity* Obj = EntitiesQueue.Dequeue();
-        Obj->__Update(dT);
-        EntitiesQueue.Enqueue(Obj);
-    }
+        EntitiesList[i]->__Update(dT);
 }
 
-void Entities::Render()
+void Entities::Render(int LayerCutoff, float CameraAngle)
 {
     // Render those below the cutoff
-    int EntitiesCount = EntitiesQueue.GetSize();
+    int EntitiesCount = EntitiesList.GetSize();
     for(int i = 0; i < EntitiesCount; i++)
-    {
-        // Note we still render a layer above
-        Entity* Obj = EntitiesQueue.Dequeue();
-        if(Obj->GetPosition().y <= LayerCutoff + 1)
-            Obj->__Render();
-        EntitiesQueue.Enqueue(Obj);
-    }
+        EntitiesList[i]->__Render(CameraAngle);
     
     // Define line properties
     glLineWidth(3.0f);
@@ -198,7 +157,7 @@ void Entities::Render()
     for(int i = 0; i < EntitiesCount; i++)
     {
         // Get entity
-        Entity* Obj = EntitiesQueue.Dequeue();
+        Entity* Obj = EntitiesList[i];
         
         // Only render if we are rendering the global paths OR if we are rendering this entities path
         if(RenderablePath || Obj->GetPathRender())
@@ -264,9 +223,6 @@ void Entities::Render()
             }
             glEnd();
         }
-        
-        // Put back entity
-        EntitiesQueue.Enqueue(Obj);
     }
     
     // Done rendering paths

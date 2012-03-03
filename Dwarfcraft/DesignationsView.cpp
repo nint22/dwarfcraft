@@ -179,10 +179,10 @@ void DesignationsView::GetDesignationsStrings(List< DesignationType >** Designat
 
 void DesignationsView::Update(float dT)
 {
-    
+    // Do nothing...
 }
 
-void DesignationsView::Render(bool Draw)
+void DesignationsView::Render(int LayerCutoff, bool Draw)
 {
     // If we are drawing..
     if(Draw)
@@ -228,7 +228,7 @@ void DesignationsView::Render(bool Draw)
             for(int x = Area.Origin.x; x < Area.Origin.x + Area.Volume.x; x++)
             {
                 // Only render on this block if it is solid and above is air
-                if(y <= GetLayerCutoff() && dIsSolid(WorldData->GetBlock(x, y, z)) && WorldData->GetBlock(x, y + 1, z).GetType() == dBlockType_Air)
+                if(y <= LayerCutoff && dIsSolid(WorldData->GetBlock(x, y, z)) && WorldData->GetBlock(x, y + 1, z).GetType() == dBlockType_Air)
                 {
                     // Move down 0.5f if half block
                     float VerticalOffset = 0.0f;
@@ -259,16 +259,6 @@ void DesignationsView::Render(bool Draw)
         SavedDesignationTypes.Resize(0);
         SavedScreenPositions.Resize(0);
     }
-}
-
-void DesignationsView::SetLayerCutoff(int Cutoff)
-{
-    this->Cutoff = Cutoff;
-}
-
-int DesignationsView::GetLayerCutoff()
-{
-    return Cutoff;
 }
 
 void DesignationsView::SetWindowSize(int Width, int Height)

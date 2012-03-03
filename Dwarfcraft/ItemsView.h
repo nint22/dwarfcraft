@@ -20,6 +20,7 @@
 #include "List.h"
 #include "dBlocks.h"
 #include "Vector3.h"
+#include "WorldContainer.h"
 
 // Renderable item structure
 struct ItemsView_Item // Renderable item
@@ -36,12 +37,12 @@ struct ItemsView_Item // Renderable item
     float dT;
 };
 
-class ItemsView : public GrfxObject
+class ItemsView
 {
 public:
     
     // Standard constructor and desctructor
-    ItemsView(GrfxObject* Parent, int WorldDepth);
+    ItemsView(WorldContainer* WorldData);
     ~ItemsView();
     
     // Add an item to the world at the given position
@@ -50,22 +51,8 @@ public:
     // Remove an item from the world
     void RemoveItem(Vector3<int> Pos);
     
-    // Needs to update; sets the camera angle
-    void SetCameraAngle(float Theta);
-    
-    // Gets the camera angle
-    float GetCameraAngle();
-    
-    // Needs to update; makes sure no above-surface items are rendered
-    void SetLayerCutoff(int Cutoff);
-    
-    // Get the current cutoff
-    int GetLayerCutoff();
-    
-protected:
-    
     // Standard render and update functions from GrfxObject
-    void Render();
+    void Render(int LayerCutoff, float CameraAngle);
     void Update(float dT);
     
 private:
@@ -76,20 +63,17 @@ private:
     // Render a circle beneath the item
     void RenderShadow(Vector3<float> pos, float radius);
     
-    // World depth
-    int WorldDepth;
+    // World data
+    WorldContainer* WorldData;
     
     // List of items (a list per each level)
     List< ItemsView_Item >* ItemLevels;
     
-    // Texture ID
+    // Texture ID of the items texture atlas
     GLuint TextureID;
     
     // World camera angle
-    float CameraTheta;
-    
-    // World cutoff
-    int Cutoff;
+    float CameraAngle;
 };
 
 #endif

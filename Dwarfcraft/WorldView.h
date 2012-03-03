@@ -23,6 +23,11 @@
 #include "VBuffer.h"
 #include "Stack.h"
 
+#include "DesignationsView.h"
+#include "ItemsView.h"
+#include "Entities.h"
+#include "StructsView.h"
+
 // A column's layer VBO representation
 struct WorldView_Plane
 {
@@ -51,14 +56,15 @@ class WorldView
 public:
     
     // Constructor and destructor
-    WorldView(WorldContainer* WorldData);
+    WorldView(WorldContainer* WorldData, DesignationsView* Designations, ItemsView* Items, StructsView* Structs, Entities* EntitiesList);
     ~WorldView();
     
     // Render the world (no projection changes)
     // Only renders the foward facing chunks; positions are global coordinates, not chunk coordinates
     // The "CameraRight.." variable is the right-facing vector on the x-z plane of the camera
     // The y components are always ignored
-    void Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int LayerCutoff);
+    // The camera angle is commonly used when making the 2D sprites face the camera
+    void Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int LayerCutoff, float CameraAngle);
     
     // Update the world (mostly used for textures, world effects, etc.)
     void Update(float dT);
@@ -91,6 +97,22 @@ private:
     
     // An array of columns, each column being a renderable structure
     WorldView_Column* Chunks;
+    
+    /*** Secondary Rendering Elements ***/
+    
+    // Note: The below references are stringly for rendering only
+    
+    // Designations list
+    DesignationsView* Designations;
+    
+    // Items list
+    ItemsView* Items;
+    
+    // Structs list
+    StructsView* Structs;
+    
+    // Entity list
+    Entities* EntitiesList;
 };
 
 // End of inclusion guard

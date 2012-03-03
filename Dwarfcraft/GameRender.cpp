@@ -26,7 +26,7 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     char* WorldSeed = NULL;
     WorldConfig.GetValue("World", "seed", &WorldSeed);
     
-    /*** Prepare the scene ***/
+    /*** Generate the world ***/
     
     // Start with a background
     Background = new BackgroundView(this, -100);
@@ -47,8 +47,16 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     Clock.Stop();
     printf(" Total time: %.3fs\n", Clock.GetTime());
     
+    /*** Prepare the renderables ***/
+    
+    // Create all of the special views
+    Items = new ItemsView(WorldData);
+    Designations = new DesignationsView(WorldData);
+    Structs = new StructsView(WorldData);
+    EntitiesList = new Entities(WorldData, Designations, Items);
+    
     // Create the world renderer mechanism
-    WorldRender = new WorldView(WorldData);
+    WorldRender = new WorldView(WorldData, Designations, Items, Structs, EntitiesList);
     
     // Allocate the GUI
     WorldUI = new UserInterface(this, GluiHandle);
@@ -84,10 +92,7 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     WorldUI->GetDepthSlider()->SetProgress(0.0f);
     WorldUI->SetDepth(LayerCutoff);
     
-    /*** Place Entities ***/
-    /*
-    // Initialize
-    EntitiesList = new Entities(this, WorldData, Designations, Items);
+    /*** TESTING: Place Entities ***/
     
     // Select one of four skin colors
     char Skins[4][32] = 
@@ -100,17 +105,13 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     
     // Add a dozen entities purely for testing...
     Clock.Start();
-    static const int EntityCount = 16;
+    static const int EntityCount = 3;
     for(int i = 0; i < EntityCount; i++)
     {
         // Randomly choose a position
-        int x = WorldView_WorldWidth / 2 + i; //rand() % WorldView_WorldWidth;
-        int z = WorldView_WorldWidth / 2 + rand() % EntityCount; //rand() % WorldView_WorldWidth;
+        int x = WorldData->GetWorldWidth() / 2 + i; //rand() % WorldView_WorldWidth;
+        int z = WorldData->GetWorldWidth() / 2 + rand() % EntityCount; //rand() % WorldView_WorldWidth;
         int y = WorldData->GetSurfaceDepth(x, z) + 1;
-        
-        // If this is a half-block, go down one more
-        while(!WorldData->GetBlock(x, y, z).IsWhole())
-            y--;
         
         // Create a "dumb" AI for test
         DwarfEntity* SampleDwarf = new DwarfEntity(Skins[0]);// Debugging: always same skin for now Skins[i % 4]);
@@ -126,7 +127,6 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     }
     Clock.Stop();
     printf("Time to generate AI: %.3fs\n", Clock.GetTime());
-    */
 }
 
 GameRender::~GameRender()
@@ -145,6 +145,10 @@ void GameRender::Render()
     Vector3<float> CameraSource = GetCameraSource();
     gluLookAt(CameraSource.x, CameraSource.y, CameraSource.z, CameraTarget.x, CameraTarget.y, CameraTarget.z, 0.0f, 1.0f, 0.0f);
     
+    // Camera angle
+    float CameraAngle = -CameraRotation + UtilPI;
+    Background->SetCameraAngle(CameraAngle, CameraPitchOffset);
+    
     // Change the render style
     glColor3f(1.0f, 1.0f, 1.0f);
     if(RenderStyle == GameRender_RenderStyle_Point)
@@ -161,7 +165,7 @@ void GameRender::Render()
     
     // Draw the world about the camera (note that we move the camera further away a little more)
     Vector3<float> RightDirection(cos(CameraRotation - UtilPI / 2.0f), 0, sin(CameraRotation - UtilPI / 2.0f));
-    WorldRender->Render(CameraSource, RightDirection, LayerCutoff);
+    WorldRender->Render(CameraSource, RightDirection, LayerCutoff, CameraAngle);
     
     /*** Render Breaking Blocks ***/
     /*
@@ -209,19 +213,7 @@ void GameRender::Render()
         }
     }
     */
-    /*** Render Designations ***/
-    /*
-    // Draw/update each designation
-    Designations->SetLayerCutoff(GetLayerCutoff());
-    Designations->SetWindowSize(WindowWidth, WindowHeight);
-    Designations->Render(RenderDesignationsFlag);
     
-    // Update items (misc.)
-    Items->SetLayerCutoff(GetLayerCutoff());
-    
-    // Update structs
-    Structs->SetLayerCutoff(GetLayerCutoff());
-    */
     /*** Render Selections ***/
     /*
     // Draw selection
@@ -341,17 +333,8 @@ void GameRender::Update(float dT)
     
     /*** Data Updates ***/
     
-    // Commit camera rotations for AI & Items; note that the angle
-    // is given as negative since we are pointing to, not away,
-    // the entities
-    //EntitiesList->SetCameraAngle(-CameraRotation);
-    //Items->SetCameraAngle(-CameraRotation);
-    
     // Update renderer if needed
     WorldRender->Update(dT);
-    
-    // Update designations
-    Designations->Update(dT);
 }
 
 void GameRender::WindowResizeEvent(int NewWidth, int NewHeight)

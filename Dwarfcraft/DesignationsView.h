@@ -112,16 +112,10 @@ public:
     void Update(float dT);
     
     // Render this Volume (does all translations internally)
-    void Render(bool Draw = true);
+    void Render(int LayerCutoff, bool Draw = true);
     
     // Need to explicitly set the window size over time
     void SetWindowSize(int Width, int Height);
-    
-    // Need to explicitly set the layer cutoff
-    void SetLayerCutoff(int Cutoff);
-    
-    // Get layer cutoff
-    int GetLayerCutoff();
     
 private:
     

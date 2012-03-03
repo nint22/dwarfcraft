@@ -212,10 +212,6 @@ public:
     // Get the current facing of the mob
     float GetFacingAngle();
     
-    // Post any rotational changes from the world's camera
-    // This is done so that we can keep the entity visible
-    void SetCameraAngle(float Theta);
-    
     // Get the current angle
     float GetCameraAngle();
     
@@ -256,7 +252,7 @@ protected:
     void __Update(float dT);
     
     // Render object
-    void __Render();
+    void __Render(float CameraAngle);
     
     // Execute as many commandas as possible, or stall if needed
     void Execute(float dT);

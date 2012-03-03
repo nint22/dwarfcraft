@@ -22,6 +22,7 @@
 #include "dBlocks.h"
 #include "Vector3.h"
 #include "VBuffer.h"
+#include "WorldContainer.h"
 
 // Renderable item structure
 struct StructsView_Struct
@@ -39,12 +40,12 @@ struct StructsView_Struct
     VBuffer* ModelData;
 };
 
-class StructsView : public GrfxObject
+class StructsView
 {
 public:
     
     // Standard constructor and desctructor
-    StructsView(GrfxObject* Parent, int WorldDepth);
+    StructsView(WorldContainer* WorldData);
     ~StructsView();
     
     // Add a struct to the world at the given position
@@ -58,8 +59,6 @@ public:
     
     // Get the current cutoff
     int GetLayerCutoff();
-    
-protected:
     
     // Standard render and update functions from GrfxObject
     void Render();
@@ -78,6 +77,9 @@ private:
     
     // World cutoff
     int Cutoff;
+    
+    // World data
+    WorldContainer* WorldData;
 };
 
 #endif

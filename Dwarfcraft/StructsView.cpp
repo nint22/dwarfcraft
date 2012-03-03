@@ -10,9 +10,11 @@
 
 #include "StructsView.h"
 
-StructsView::StructsView(GrfxObject* Parent, int WorldDepth)
-: GrfxObject(Parent, 1) // Render AFTER the main content
+StructsView::StructsView(WorldContainer* WorldData)
 {
+    // Save world data
+    this->WorldData = WorldData;
+    
     // Allocate an array of item levels
     Structs = new List< StructsView_Struct >[WorldDepth];
     this->WorldDepth = WorldDepth;

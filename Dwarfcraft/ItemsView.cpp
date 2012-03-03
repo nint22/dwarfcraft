@@ -10,15 +10,13 @@
 
 #include "ItemsView.h"
 
-ItemsView::ItemsView(GrfxObject* Parent, int WorldDepth)
-    : GrfxObject(Parent, 1) // Render AFTER the main content
+ItemsView::ItemsView(WorldContainer* WorldData)
 {
-    // Allocate an array of item levels
-    ItemLevels = new List< ItemsView_Item >[WorldDepth];
-    this->WorldDepth = WorldDepth;
+    // Save data
+    this->WorldData = WorldData;
     
-    // Set the camera angle to 0
-    SetCameraAngle(0.0f);
+    // Allocate an array of item levels
+    ItemLevels = new List< ItemsView_Item >[WorldData->GetWorldHeight()];
     
     // Load the terrain texture
     TextureID = dGetItemTextureID();
@@ -78,30 +76,13 @@ void ItemsView::RemoveItem(Vector3<int> Pos)
     }
 }
 
-void ItemsView::SetCameraAngle(float Theta)
+void ItemsView::Render(int LayerCutoff, float CameraAngle)
 {
-    CameraTheta = Theta;
-}
-
-float ItemsView::GetCameraAngle()
-{
-    return CameraTheta;
-}
-
-void ItemsView::SetLayerCutoff(int Cutoff)
-{
-    this->Cutoff = Cutoff;
-}
-
-int ItemsView::GetLayerCutoff()
-{
-    return Cutoff;
-}
-
-void ItemsView::Render()
-{
+    // Save camera angle
+    this->CameraAngle = CameraAngle;
+    
     // For each layer (bottom to top)
-    for(int LayerIndex = 0; LayerIndex < WorldDepth; LayerIndex++)
+    for(int LayerIndex = 0; LayerIndex <= LayerCutoff; LayerIndex++)
     {
         // For each item
         int ItemCount = ItemLevels[LayerIndex].GetSize();
@@ -112,10 +93,6 @@ void ItemsView::Render()
             Vector3<float> Pos = ItemLevels[LayerIndex][ItemIndex].Pos;
             Vector3<float> fPos(Pos.x, Pos.y, Pos.z);
             Vector3<float> fShadowPos(Pos.x, LayerIndex, Pos.z);
-            
-            // Ignore if above the cutoff
-            if(Pos.y > GetLayerCutoff() + 1)
-                continue;
             
             // Get item information
             float x, y, width, height;
@@ -137,7 +114,7 @@ void ItemsView::Update(float dT)
     static const float AnimationSpeed = 2.0f;
     
     // For each layer
-    for(int LayerIndex = 0; LayerIndex < WorldDepth; LayerIndex++)
+    for(int LayerIndex = 0; LayerIndex < WorldData->GetWorldHeight(); LayerIndex++)
     {
         // For each item
         int ItemCount = ItemLevels[LayerIndex].GetSize();
@@ -180,7 +157,7 @@ void ItemsView::RenderBillboard(Vector3<float> pos, float srcx, float srcy, floa
     static const float outheight = 0.4f;
     
     // Compute the view-ray offsets (so we can order textures)
-    Vector2<float> Offset(cos(-GetCameraAngle()), sin(-GetCameraAngle()));
+    Vector2<float> Offset(cos(-CameraAngle), sin(-CameraAngle));
     if(doffset >= 0.001f || doffset <= -0.001f)
         Offset *= doffset;
     else
@@ -198,7 +175,7 @@ void ItemsView::RenderBillboard(Vector3<float> pos, float srcx, float srcy, floa
         
         // Center position
         glTranslatef(pos.x + 0.5f + Offset.x, pos.y, pos.z + 0.5f + Offset.y);
-        glRotatef(UtilRadToDeg * (GetCameraAngle()  - UtilPI / 2.0f), 0, 1, 0);
+        glRotatef(UtilRadToDeg * (CameraAngle  - UtilPI / 2.0f), 0, 1, 0);
         
         // Front facing sprite
         glBegin(GL_QUADS);
