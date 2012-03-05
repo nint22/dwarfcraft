@@ -25,6 +25,11 @@ WorldView::WorldView(WorldContainer* WorldData, DesignationsView* Designations, 
     // How many chunks are there for the x dimension
     ChunkCount = WorldData->GetWorldWidth() / WorldData->GetColumnWidth();
     
+    // Get the max render distance
+    int ViewDist;
+    GetUserSetting("General", "ViewDistance", &ViewDist, 10000);
+    MaxRenderDist = ViewDist;
+    
     // Allocate the chunks
     Chunks = new WorldView_Column[ChunkCount * ChunkCount];
     for(int i = 0; i < ChunkCount * ChunkCount; i++)
@@ -48,9 +53,6 @@ void WorldView::Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int
     
     // Helpful short-hand variable
     int ChunkWidth = WorldData->GetColumnWidth();
-    
-    // Max render distance
-    const float MaxRenderDist = 10000.0f;
     
     // For each chunk...
     for(int ChunkZ = 0; ChunkZ < ChunkCount; ChunkZ++)

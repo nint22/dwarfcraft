@@ -26,13 +26,24 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     char* WorldSeed = NULL;
     WorldConfig.GetValue("World", "seed", &WorldSeed);
     
+    // User settings
+    int Setting;
+    
+    GetUserSetting("General", "MouseSensitivity", &Setting, 1000);
+    MouseSensitivy = 1.0f / float(Setting);
+    
+    GetUserSetting("General", "ScrollSpeed", &Setting, 1000);
+    MoveSensitivity = float(Setting);
+    
     /*** Generate the world ***/
     
     // Start with a background
     Background = new BackgroundView(this, -100);
     
     // Create the world buffer (For now, just do an 8x8 column)
-    WorldData = new WorldContainer(WorldWidth, WorldHeight, 16);
+    int ChunkSize;
+    GetUserSetting("General", "ChunkSize", &ChunkSize, 16);
+    WorldData = new WorldContainer(WorldWidth, WorldHeight, ChunkSize);
     
     // Create a clock for performance measuring
     UtilHighresClock Clock;
@@ -105,7 +116,7 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     
     // Add a dozen entities purely for testing...
     Clock.Start();
-    static const int EntityCount = 3;
+    int EntityCount = 3; // Any variable count while testing the code
     for(int i = 0; i < EntityCount; i++)
     {
         // Randomly choose a position
@@ -249,9 +260,6 @@ void GameRender::Render()
 
 void GameRender::Update(float dT)
 {
-    // Update camera based on depth
-    const float SpeedRatio = 2000.0f;
-    
     /*** User Control Updates ***/
     
     // Compute the direction (note that the ViewDirection.y is an alias to z);
@@ -264,8 +272,8 @@ void GameRender::Update(float dT)
     
     // Compute movement speed
     const float Fovy = 60;
-    float MoveFrontRatio = ((float(WindowHeight) / float(WindowWidth)) / float(Fovy)) * SpeedRatio;
-    float MoveSideRatio = ((float(WindowWidth) / float(WindowHeight)) / float(Fovy)) * SpeedRatio;
+    float MoveFrontRatio = ((float(WindowHeight) / float(WindowWidth)) / float(Fovy)) * MoveSensitivity;
+    float MoveSideRatio = ((float(WindowWidth) / float(WindowHeight)) / float(Fovy)) * MoveSensitivity;
     
     // Update camera movement
     if(KeyUp)
@@ -489,7 +497,6 @@ void GameRender::PassiveMouseEvent(int x, int y)
     if(MouseDragging && MouseRotation)
     {
         // Change ratio and mouse delta
-        static const float SpeedRatio = 0.001f;
         int dx = x - MouseStartX;
         int dy = y - MouseStartY;
         /*
@@ -502,10 +509,10 @@ void GameRender::PassiveMouseEvent(int x, int y)
         }
         */
         // Apply rotation and then re-center mouse
-        CameraRotation += float(dx) * SpeedRatio;
+        CameraRotation += float(dx) * MouseSensitivy;
         
         // Apply pitch change; but bounded to [-1, 1]
-        CameraPitchOffset += float(dy) * SpeedRatio;
+        CameraPitchOffset += float(dy) * MouseSensitivy;
         if(CameraPitchOffset > 1.0f)
             CameraPitchOffset = 1.0f;
         else if(CameraPitchOffset < -1.0f)

@@ -69,6 +69,14 @@ private:
     // Which is based on the target, rotation angle, and pitch angle
     Vector3<float> GetCameraSource();
     
+    /*** User Settings ***/
+    
+    // Multiplier against mouse delta
+    float MouseSensitivy;
+    
+    // Multiplier against camera movement
+    float MoveSensitivity;
+    
     /*** World Data & Renderables ***/
     
     // World size and height

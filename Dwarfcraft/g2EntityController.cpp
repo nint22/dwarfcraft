@@ -153,7 +153,7 @@ void g2EntityController::Update(float dT)
     SetHealth(Dwarf->GetHealth(), Dwarf->GetMaxHealth());
     SetHappiness(Dwarf->GetHappiness(), Dwarf->GetFatigue());
     SetBreathHungerThirst(Dwarf->GetBreath(), Dwarf->GetMaxBreath(), Dwarf->GetHunger(), Dwarf->GetThirst());
-    SetJobs(Dwarf->GetJob(), Dwarf->GetMinorJob());
+    //SetJobs(Dwarf->GetJob(), Dwarf->GetMinorJob());
     
     // Set the active instruction based on the string explanations
     EntityInstruction Instruction;
@@ -235,7 +235,7 @@ void g2EntityController::WorkPrefSet(g2Controller* Caller)
     
     // Set dwarf's work pref.
     DwarfEntity* Dwarf = self->GetDwarf();
-    Dwarf->SetJob((DwarfJobs)controller->GetSelectionIndex());
+    //Dwarf->SetJob((DwarfJobs)controller->GetSelectionIndex());
 }
 
 void g2EntityController::SubWorkPrefSet(g2Controller* Caller)
@@ -246,7 +246,7 @@ void g2EntityController::SubWorkPrefSet(g2Controller* Caller)
     
     // Set dwarf's work pref.
     DwarfEntity* Dwarf = self->GetDwarf();
-    Dwarf->SetMinorJob((DwarfMinorJobs)controller->GetSelectionIndex());
+    //Dwarf->SetMinorJob((DwarfMinorJobs)controller->GetSelectionIndex());
 }
 
 void g2EntityController::PathToggle(g2Controller* Caller)

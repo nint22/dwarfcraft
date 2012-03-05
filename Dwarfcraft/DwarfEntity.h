@@ -31,7 +31,6 @@ enum DwarfJobs
     DwarfJobs_Farmer,
     DwarfJobs_Miner,
     DwarfJobs_Crafter,
-    DwarfJobs_None, // No job - not indexed
 };
 
 // Define the secondary class (temporary jobs; does not gain exp.)
@@ -41,6 +40,15 @@ enum DwarfMinorJobs
     DwarfMinorJobs_Combat,
     DwarfMinorJobs_Medic,
     DwarfMinorJobs_Clerk,
+};
+
+// Priority of each job or minor job (ranges from low, mid, high)
+static const int DwarfJobPriorityCount = 3;
+enum DwarfJobPriority
+{
+    DwarfJobPriority_Low,
+    DwarfJobPriority_Medium,
+    DwarfJobPriority_High,
 };
 
 // Dwarf rank
@@ -93,6 +101,8 @@ public:
     // Custom preview-drawing function so that we can render all armor & tools
     void RenderPreview(int x, int y, int width, int height);
     
+    /*** Dwarf Status ***/
+    
     // Overloaded; Get the max health count of the dwarf
     int GetMaxHealth();
     
@@ -132,17 +142,13 @@ public:
     // Get rank
     DwarfRank GetRank();
     
-    // Set job preference
-    void SetJob(DwarfJobs Job);
+    /*** Job preferences ***/
     
-    // Get job preference
-    DwarfJobs GetJob();
+    // Get job priority array
+    DwarfJobPriority* GetJobPriority();
     
-    // Set minor job preference
-    void SetMinorJob(DwarfMinorJobs Job);
-    
-    // Get minor job preference
-    DwarfMinorJobs GetMinorJob();
+    // Get the minor job priority
+    DwarfJobPriority* GetMinorJobPriority();
     
 protected:
     
@@ -175,12 +181,11 @@ private:
     /*** Dwarf Properties ***/
     
     // Job level & exp
-    int JobLevel[DwarfJobsCount];
     int JobExperiance[DwarfJobsCount];
     
     // Job preferences
-    DwarfJobs MainJob;
-    DwarfMinorJobs MinorJob;
+    DwarfJobPriority MainJobs[DwarfJobsCount];
+    DwarfJobPriority MinorJobs[DwarfMinorJobsCount];
     
     // Gender
     bool IsMale;

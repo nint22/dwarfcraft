@@ -16,10 +16,7 @@ DwarfEntity::DwarfEntity(const char* ConfigName)
 {
     // Default values to level 1
     for(int i = 0; i < DwarfJobsCount; i++)
-    {
-        JobLevel[i] = 1;
         JobExperiance[i] = 0;
-    }
     
     // Default gender and age to male and 32
     IsMale = true;
@@ -35,8 +32,11 @@ DwarfEntity::DwarfEntity(const char* ConfigName)
     Hunger = 1.0f;
     Thirst = 1.0f;
     
-    MainJob = DwarfJobs_None;
-    MinorJob = (DwarfMinorJobs)(rand() % 3); // Cast to proper type
+    // Default main and minor jobs to medium priority
+    for(int i = 0; i < DwarfJobsCount; i++)
+        MainJobs[i] = DwarfJobPriority_Medium;
+    for(int i = 0; i < DwarfMinorJobsCount; i++)
+        MinorJobs[i] = DwarfJobPriority_Medium;
     
     // No inventory
     Items[0] = dItem();
@@ -172,24 +172,14 @@ DwarfRank DwarfEntity::GetRank()
     return Rank;
 }
 
-void DwarfEntity::SetJob(DwarfJobs Job)
+DwarfJobPriority* DwarfEntity::GetJobPriority()
 {
-    MainJob = Job;
+    return MainJobs;
 }
 
-DwarfJobs DwarfEntity::GetJob()
+DwarfJobPriority* DwarfEntity::GetMinorJobPriority()
 {
-    return MainJob;
-}
-
-void DwarfEntity::SetMinorJob(DwarfMinorJobs Job)
-{
-    MinorJob = Job;
-}
-
-DwarfMinorJobs DwarfEntity::GetMinorJob()
-{
-    return MinorJob;
+    return MinorJobs;
 }
 
 void DwarfEntity::Update(float dT)
@@ -404,8 +394,8 @@ void* DwarfEntity::ComputeTask(void* data)
         
         // Path was not found, thus we flag self as an idle proc
         // Fail out if empty
-        if(!PathFound)
-            Job = DwarfJobs_None;
+        //if(!PathFound)
+        //    Job = DwarfJobs_None;
     }
     
     // If crafting...
@@ -418,7 +408,7 @@ void* DwarfEntity::ComputeTask(void* data)
     
     // Else, just idle, doing nothing...
     // Note: we don't do an "else" because it an assigned job fails, we get caught here)
-    if(Job == DwarfJobs_None)
+    if(true)//Job == DwarfJobs_None)
     {
         // Switch between either pausing (idle for a few seconds) or pathing
         static int Count = 0;

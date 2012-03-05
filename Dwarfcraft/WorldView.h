@@ -93,6 +93,9 @@ private:
     // Number of chunks in the X dimension (same as Z dimension)
     int ChunkCount;
     
+    // How far we render objects up to
+    float MaxRenderDist;
+    
     /*** Graphical Data ***/
     
     // An array of columns, each column being a renderable structure

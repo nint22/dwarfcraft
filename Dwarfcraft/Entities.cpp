@@ -18,7 +18,7 @@ Entities::Entities(WorldContainer* MainWorld, DesignationsView* MainDesignations
     this->MainItems = MainItems;
     
     // Default to not rendering the path
-    RenderablePath = true;
+    RenderablePath = false;
 }
 
 Entities::~Entities()
@@ -147,7 +147,10 @@ void Entities::Render(int LayerCutoff, float CameraAngle)
     // Render those below the cutoff
     int EntitiesCount = EntitiesList.GetSize();
     for(int i = 0; i < EntitiesCount; i++)
-        EntitiesList[i]->__Render(CameraAngle);
+    {
+        if(EntitiesList[i]->GetPosition().y <= LayerCutoff)
+            EntitiesList[i]->__Render(CameraAngle);
+    }
     
     // Define line properties
     glLineWidth(3.0f);

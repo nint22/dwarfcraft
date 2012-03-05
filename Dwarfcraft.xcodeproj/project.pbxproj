@@ -76,6 +76,8 @@
 		0614F74514FDFB4600842808 /* terrain_mc.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0614F74414FDFB3C00842808 /* terrain_mc.png */; };
 		0614F75114FF0F2F00842808 /* MainView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0614F74F14FF0F2D00842808 /* MainView.cpp */; };
 		0614F75414FF0F5900842808 /* BackgroundView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0614F75214FF0F5800842808 /* BackgroundView.cpp */; };
+		0668FDE81502A6BE00751B5E /* Jobs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0668FDE71502A6BE00751B5E /* Jobs.cpp */; };
+		0668FDEC1502BB6900751B5E /* Settings.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0668FDEB1502B61C00751B5E /* Settings.cfg */; };
 		06C497BE1500474000456F34 /* moon.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06C497BB1500468700456F34 /* moon.png */; };
 		06C497BF1500474000456F34 /* sun.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06C497BC1500468700456F34 /* sun.png */; };
 /* End PBXBuildFile section */
@@ -87,6 +89,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
+				0668FDEC1502BB6900751B5E /* Settings.cfg in CopyFiles */,
 				06C497BE1500474000456F34 /* moon.png in CopyFiles */,
 				06C497BF1500474000456F34 /* sun.png in CopyFiles */,
 				0614F74514FDFB4600842808 /* terrain_mc.png in CopyFiles */,
@@ -239,6 +242,9 @@
 		0614F75214FF0F5800842808 /* BackgroundView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BackgroundView.cpp; path = Dwarfcraft/BackgroundView.cpp; sourceTree = "<group>"; };
 		0614F75314FF0F5900842808 /* BackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackgroundView.h; path = Dwarfcraft/BackgroundView.h; sourceTree = "<group>"; };
 		0614F75514FF108900842808 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Globals.h; path = Dwarfcraft/Globals.h; sourceTree = "<group>"; };
+		0668FDE71502A6BE00751B5E /* Jobs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Jobs.cpp; path = Dwarfcraft/Jobs.cpp; sourceTree = "<group>"; };
+		0668FDEA1502A6C900751B5E /* Jobs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Jobs.h; path = Dwarfcraft/Jobs.h; sourceTree = "<group>"; };
+		0668FDEB1502B61C00751B5E /* Settings.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Settings.cfg; path = "Resources/Configuration files/Settings.cfg"; sourceTree = "<group>"; };
 		06C497BB1500468700456F34 /* moon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = moon.png; path = Resources/Background/moon.png; sourceTree = "<group>"; };
 		06C497BC1500468700456F34 /* sun.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sun.png; path = Resources/Background/sun.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -390,6 +396,7 @@
 			isa = PBXGroup;
 			children = (
 				060EE2EC14FC66B400D0A08C /* World.cfg */,
+				0668FDEB1502B61C00751B5E /* Settings.cfg */,
 			);
 			name = Configuration;
 			sourceTree = "<group>";
@@ -428,6 +435,8 @@
 				060EE2F514FC683900D0A08C /* DwarfEntity.h */,
 				060EE2EE14FC683900D0A08C /* AnimalEntity.cpp */,
 				060EE2EF14FC683900D0A08C /* AnimalEntity.h */,
+				0668FDE71502A6BE00751B5E /* Jobs.cpp */,
+				0668FDEA1502A6C900751B5E /* Jobs.h */,
 			);
 			name = Entities;
 			sourceTree = "<group>";
@@ -577,6 +586,7 @@
 				060EE34A14FC737100D0A08C /* MUtil.cpp in Sources */,
 				0614F75114FF0F2F00842808 /* MainView.cpp in Sources */,
 				0614F75414FF0F5900842808 /* BackgroundView.cpp in Sources */,
+				0668FDE81502A6BE00751B5E /* Jobs.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

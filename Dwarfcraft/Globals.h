@@ -16,6 +16,29 @@
 #define __GLOBALS_H__
 
 #include "VBuffer.h"
+#include <Glui2/glui2.h>
+
+/*** User Keys ***/
+
+// Get the given key settings and set it to the DataOut integer buffer
+// If the key is not set, a false is returned, else if valid a true is returned
+// If the key is not found, the data is set to the given dafault value
+static inline bool GetUserSetting(const char* Group, const char* Key, int* DataOut, int DataDefault)
+{
+    static bool Initialized = false;
+    static g2Config Config;
+    if(!Initialized)
+        Config.LoadFile("Settings.cfg");
+    
+    // Set the key and return success state
+    if(Config.GetValue(Group, Key, DataOut))
+        return true;
+    else
+    {
+        *DataOut = DataDefault;
+        return false;
+    }
+}
 
 /*** Initial Values ***/
 
