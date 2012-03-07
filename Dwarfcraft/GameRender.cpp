@@ -11,9 +11,14 @@
 // Includes
 #include "GameRender.h"
 
-GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
+GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
 : GrfxObject(Parent)
 {
+    // Save parent handle and default to isometric perspective transform
+    MainWindow = Parent;
+    IsIsometric = true;
+    MainWindow->Use3DPerspective(false);
+    
     /*** Load Configuration ***/
     
     g2Config WorldConfig;
@@ -38,7 +43,7 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     /*** Generate the world ***/
     
     // Start with a background
-    Background = new BackgroundView(this, -100);
+    Background = new BackgroundView(this, -1);
     
     // Create the world buffer (For now, just do an 8x8 column)
     int ChunkSize;
@@ -79,7 +84,7 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     
     // Turn off all keys
     KeyUp = KeyDown = KeyLeft = KeyRight = false;
-    MouseDragging = MouseRotation = ShiftRotating = CtrlRotating = false;
+    MouseDragging = MouseRotation = false;
     KeyZoomIn = KeyZoomOut = false;
     
     // Make sure backface culling is on
@@ -116,7 +121,7 @@ GameRender::GameRender(GrfxObject* Parent, Glui2* GluiHandle)
     
     // Add a dozen entities purely for testing...
     Clock.Start();
-    int EntityCount = 3; // Any variable count while testing the code
+    int EntityCount = 1; // Any variable count while testing the code
     for(int i = 0; i < EntityCount; i++)
     {
         // Randomly choose a position
@@ -153,7 +158,23 @@ void GameRender::Render()
     /*** Camera & Render Style ***/
     
     // Compute a view-direction vector (normalized)
-    Vector3<float> CameraSource = GetCameraSource();
+    // If we are in projection mode (not isometric), then we change distance
+    // for zooming, otherwise we change Fovy
+    Vector3<float> CameraSource, CameraBacked;
+    if(!IsIsometric)
+    {
+        MainWindow->SetFovy(60);
+        CameraSource = GetCameraSource(CameraZoom);
+        CameraBacked = GetCameraSource(CameraZoom + 8);
+    }
+    else
+    {
+        MainWindow->SetFovy(90 - CameraZoom * 1.5f);
+        CameraSource = GetCameraSource(WorldView_CameraDist * 5);
+        CameraBacked = GetCameraSource(CameraZoom + 16);
+    }
+    
+    // Change projection matrix to look from the source to the target; up vector is y+
     gluLookAt(CameraSource.x, CameraSource.y, CameraSource.z, CameraTarget.x, CameraTarget.y, CameraTarget.z, 0.0f, 1.0f, 0.0f);
     
     // Camera angle
@@ -176,7 +197,7 @@ void GameRender::Render()
     
     // Draw the world about the camera (note that we move the camera further away a little more)
     Vector3<float> RightDirection(cos(CameraRotation - UtilPI / 2.0f), 0, sin(CameraRotation - UtilPI / 2.0f));
-    WorldRender->Render(CameraSource, RightDirection, LayerCutoff, CameraAngle);
+    WorldRender->Render(CameraBacked, RightDirection, LayerCutoff, CameraAngle);
     
     /*** Render Breaking Blocks ***/
     /*
@@ -298,7 +319,7 @@ void GameRender::Update(float dT)
     }
     
     // If there were any movement changes, bounds check so that the target is always within world bounds
-    if(KeyUp || KeyDown || KeyLeft || KeyRight)
+    if(KeyUp || KeyDown || KeyLeft || KeyRight || MouseDragging)
     {
         CameraTarget.x = fmax(fmin(CameraTarget.x, WorldData->GetWorldWidth() - 1), 0);
         CameraTarget.z = fmax(fmin(CameraTarget.z, WorldData->GetWorldWidth() - 1), 0);
@@ -420,34 +441,22 @@ void GameRender::MouseEvent(int button, int state, int x, int y)
             MouseStartX = WindowWidth / 2;
             MouseStartY = WindowHeight / 2;
             MouseRotation = true;
-            //MouseFirstDrag = true;
-            
-            // Rotate about the mouse's selection
-            Vector3<int> Hit;
-            /*if(WorldData->IntersectWorld(ViewOrigin, ViewDirection, LayerCutoff, &Hit))
-            {
-                // Convert the hit point into a float for easier maths
-                Vector3<float> fHit(Hit.x, Hit.y, Hit.z);
-                
-                // Distance from current camera target to where we hit
-                float Distance = Vector3<float>(fHit - GetCameraPos()).GetLength();
-                
-                // Based on the look vector, compute a new camera target
-                Vector3<float> CamDir = (CameraTarget - GetCameraPos());
-                CamDir.Normalize();
-                CameraTarget = GetCameraPos() + CamDir * Distance;
-            }*/
+            MouseFirstDrag = true;
             
             // Only go into perspective if active ctrl
-            //if((Modifiers & GLUT_ACTIVE_CTRL) == GLUT_ACTIVE_CTRL)
-            //    MainWindow->Use3DPerspective(true);
+            if((Modifiers & GLUT_ACTIVE_CTRL) == GLUT_ACTIVE_CTRL)
+            {
+                IsIsometric = false;
+                MainWindow->Use3DPerspective(true);
+            }
         }
     }
     else if(button == GLUT_RIGHT_BUTTON && state == GLUT_UP)
     {
         MouseDragging = false;
         MouseRotation = false;
-        //MainWindow->Use3DPerspective(false);
+        IsIsometric = true;
+        MainWindow->Use3DPerspective(false);
     }
     /*
     // World or entity selection started by user
@@ -499,7 +508,7 @@ void GameRender::PassiveMouseEvent(int x, int y)
         // Change ratio and mouse delta
         int dx = x - MouseStartX;
         int dy = y - MouseStartY;
-        /*
+        
         // The mouse pisition jumps when we do the initial drag
         if(MouseFirstDrag)
         {
@@ -507,24 +516,23 @@ void GameRender::PassiveMouseEvent(int x, int y)
             dy = 0;
             MouseFirstDrag = false;
         }
-        */
+        
         // Apply rotation and then re-center mouse
         CameraRotation += float(dx) * MouseSensitivy;
         
         // Apply pitch change; but bounded to [-1, 1]
         CameraPitchOffset += float(dy) * MouseSensitivy;
-        if(CameraPitchOffset > 1.0f)
-            CameraPitchOffset = 1.0f;
-        else if(CameraPitchOffset < -1.0f)
-            CameraPitchOffset = -1.0f;
+        
+        // Bounds check the pitch
+        if(CameraPitchOffset > 0.15f)
+            CameraPitchOffset = 0.15f;
+        else if(CameraPitchOffset < -0.25f)
+            CameraPitchOffset = -0.25f;
     }
-    /*
+    
     // Translate
     else if(MouseDragging)
     {
-        // Change ratio (Note: May need change based on dept of camera)
-        static const float SpeedRatio = 2.5f;
-        
         // Compute the direction (note that the ViewDirection.y is an alias to z);
         Vector2<float> FrontDirection(cos(CameraRotation), sin(CameraRotation));
         FrontDirection.Normalize();
@@ -537,28 +545,28 @@ void GameRender::PassiveMouseEvent(int x, int y)
         const float Fovy = MainWindow->GetFovy();
         
         // Move left/right
-        float MoveRatio = float(x - MouseX) * ((float(WindowHeight) / float(WindowWidth)) / float(Fovy)) * SpeedRatio;
-        CameraTarget.x += LeftDirection.x * MoveRatio;
-        CameraTarget.z += LeftDirection.y * MoveRatio;
+        float MoveRatio = float(x - MouseStartX) * ((float(WindowHeight) / float(WindowWidth)) / float(Fovy)) * MoveSensitivity * 0.002f;
+        CameraTarget.x -= LeftDirection.x * MoveRatio;
+        CameraTarget.z -= LeftDirection.y * MoveRatio;
         
         // Move up/down
-        MoveRatio = float(y - MouseY) * ((float(WindowWidth) / float(WindowHeight)) / float(Fovy)) * SpeedRatio;
-        CameraTarget.x += FrontDirection.x * MoveRatio;
-        CameraTarget.z += FrontDirection.y * MoveRatio;
+        MoveRatio = float(y - MouseStartY) * ((float(WindowWidth) / float(WindowHeight)) / float(Fovy)) * MoveSensitivity * 0.002f;
+        CameraTarget.x -= FrontDirection.x * MoveRatio;
+        CameraTarget.z -= FrontDirection.y * MoveRatio;
     }
     
     // Note that we do the collision detection in the update
-    */
+    
     // Save the mouse drags for the next movement
     MouseStartX = x;
     MouseStartY = y;
 }
 
-Vector3<float> GameRender::GetCameraSource()
+Vector3<float> GameRender::GetCameraSource(float Dist)
 {
     // Create a vector that is rotated about the center
     Vector3<float> CameraSource(cos(CameraRotation), 0.7f + CameraPitchOffset, sin(CameraRotation));
     
     // Grow the vector away
-    return CameraTarget + CameraSource * CameraZoom;
+    return CameraTarget + CameraSource * Dist;
 }

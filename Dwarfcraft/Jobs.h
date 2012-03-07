@@ -28,7 +28,7 @@ public:
     Jobs(WorldContainer* MainWorld, DesignationsView* MainDesignations, ItemsView* MainItems);
     ~Jobs();
     
-    // Given an entity, give it a job
+    // Given an entity, find a job / task that is needed
     void GetJob(DwarfEntity* Dwarf);
     
 protected:

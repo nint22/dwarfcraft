@@ -19,6 +19,9 @@
 
 #include <Glui2/glui2.h>
 
+// Included for access to the designations type and names
+#include "DesignationsView.h"
+
 static const int g2DashboardController_SideWidth = 4;
 
 class g2DashboardController : public g2Controller
@@ -39,7 +42,8 @@ public:
     int GetHeight();
     
     // Set the user interface's time; day, season, time (time is based on a 24-hour, 60 minute fraction)
-    void SetTime(int Season, int Day, float Time);
+    // If any of the elements are negative, ignore and just reposition as needed
+    void SetTime(int Season = -1, int Day = -1, float Time = -1);
     
     // Set the output size
     void SetSize(int Width, int Height);
@@ -49,11 +53,20 @@ protected:
     // Render the controller
     void Render(int x, int y);
     
+    // Render the bottom controller icons
+    void Render(int x, int y, DesignationType* Types, int TypeCount);
+    
     // Update the controller
     void Update(float dT);
     
     // Catch any window resize event
     void WindowResizeEvent(int NewWidth, int NewHeight);
+    
+    // When the mouse hovers over any of the buttons, make a selection
+    void MouseHover(int x, int y);
+    
+    // Mouse click event
+    void MouseClick(g2MouseButton button, g2MouseClick state, int x, int y);
     
 private:
     
@@ -69,6 +82,40 @@ private:
     // Depth and zoom sliders
     g2Slider* DepthSlider;
     g2Slider* FovySlider;
+    
+    // Custom text that is only manually rendered
+    g2Label* CustomText;
+    
+    // Current mouse position
+    int MouseX, MouseY;
+    
+    /*** Current Designations ***/
+    
+    // Current designation groups:
+    // 0: Main, 1: Construction, 2: storage, 3: Collections, 4: Military
+    int DesignationGroup;
+    
+    // Allocated list of designations
+    DesignationType Types[DesignationCount];
+    int TypeCount;
+    
+    /*** Icon Constants ***/
+    
+    // Icon and button sizes
+    int IconW, IconH;
+    int ButtonW, ButtonH;
+    
+    // Offset from the origin of the controller
+    int IconOffsetX, IconOffsetY;
+    
+    // Difference between icon and button volumes
+    int dx, dy;
+    
+    // Space between each icon
+    int IconSpaceY, IconSpaceX;
+    
+    // Total number of icons drawn in a row
+    int IconColCount;
 };
 
 #endif

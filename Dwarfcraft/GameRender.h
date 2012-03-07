@@ -35,7 +35,7 @@ class GameRender : public GrfxObject
 public:
     
     // Constructor takes the window we will be bound to, and the Glui handle
-    GameRender(GrfxObject* Parent, Glui2* GluiHandle);
+    GameRender(GrfxWindow* Parent, Glui2* GluiHandle);
     ~GameRender();
     
 protected:
@@ -67,7 +67,7 @@ private:
     
     // Given a target we want to point to, return the camera source position
     // Which is based on the target, rotation angle, and pitch angle
-    Vector3<float> GetCameraSource();
+    Vector3<float> GetCameraSource(float Dist);
     
     /*** User Settings ***/
     
@@ -108,6 +108,9 @@ private:
     
     /*** Camera Position and User Controls ***/
     
+    // What rendering sytle? If true, uses isometric (i.e. ortho-projection)
+    bool IsIsometric;
+    
     // Where the camera is pointing from (source) and to (target)
     // Note that the target is what actually moves, while camera source
     // is just the rotated & pitched distance from the target
@@ -130,12 +133,15 @@ private:
     bool KeyZoomIn, KeyZoomOut;
     
     // User's mouse dragging states
-    bool MouseDragging, MouseRotation, ShiftRotating, CtrlRotating;
+    bool MouseDragging, MouseFirstDrag, MouseRotation;
     
     // The initial dragging position of a mouse-click event
     int MouseStartX, MouseStartY;
     
     /*** Misc. ***/
+    
+    // The window that owns this object (i.e. the root parent)
+    GrfxWindow* MainWindow;
     
     // Active render style
     GameRender_RenderStyle RenderStyle;

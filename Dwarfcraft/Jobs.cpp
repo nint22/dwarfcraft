@@ -74,5 +74,8 @@ bool Jobs::GetFarmerJob(DwarfEntity* Dwarf)
 
 bool Jobs::GetCrafterJob(DwarfEntity* Dwarf)
 {
+    // Get a list of all the crafting tables, etc..
     
+    // Not yet implemented
+    return false;
 }

@@ -95,7 +95,12 @@ void UserInterface::SetDepth(int LayerCutoff)
 
 void UserInterface::Update(float dT)
 {
-    // Nothing to do...
+    // Total time
+    static float TotalTime = 0.0f;
+    TotalTime += dT;
+    
+    // Update clock
+    DashboardController->SetTime(1, 1 + dT / 24000, 1 + dT);
 }
 
 void UserInterface::WindowResizeEvent(int NewWidth, int NewHeight)

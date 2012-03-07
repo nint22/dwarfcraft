@@ -25,48 +25,50 @@ static const int DesignationCount = 16;
 // Enumeration of designations
 enum DesignationType
 {
-    // World manipulation
+    // Construction
     DesignationType_Mine = 0,
     DesignationType_Fill,
     DesignationType_Flood,
     
-    // Item placement
+    // Storage
     DesignationType_Rubbish,
     DesignationType_Food,
     DesignationType_Crafted,
-    DesignationType_Stones,
-    DesignationType_Ores,
+    DesignationType_RawResources, // Wood, stones, etc.
     DesignationType_Ingots,
+    DesignationType_Grave,
+    
+    // Collection
     DesignationType_Farm,
     DesignationType_Wood,
-    DesignationType_Barracks,
-    DesignationType_Hall,
-    DesignationType_Armory,
-    DesignationType_Grave,
+    DesignationType_Forage,
     
     // Military flags
     DesignationType_Protect,
+    DesignationType_Barracks,
+    DesignationType_Hall,
+    DesignationType_Armory,
 };
 
 // Human readable names
 static const char DesignationNames[DesignationCount][32] =
 {
-    "Mine Area",
-    "Fill Area",
-    "Flood Area",
-    "Rubbish Pile",
-    "Food Pile",
-    "Goods & Crafts Pile",
-    "Stones Pile",
-    "Ores Pile",
-    "Ingots Pile",
-    "Farm Land",
-    "Wood Pile",
-    "Barracks Room",
-    "Hall Room",
-    "Armory Room",
-    "Grave Room",
-    "Protect Area",
+    "Mine",
+    "Fill",
+    "Flood",
+    "Rubbish",
+    "Food",
+    "Crafted",
+    "RawResources",
+    "Ingots",
+    "Grave",
+    "Farm",
+    "Wood",
+    "Forage",
+    "Protect",
+    "Barracks",
+    "Hall",
+    "Armory",
 };
 
 // A designation data type
