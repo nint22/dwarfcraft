@@ -138,6 +138,9 @@ private:
     // The initial dragging position of a mouse-click event
     int MouseStartX, MouseStartY;
     
+    // Activelly selecting in the graphical world
+    bool IsSelecting;
+    
     /*** Misc. ***/
     
     // The window that owns this object (i.e. the root parent)
@@ -154,6 +157,9 @@ private:
     
     // World cutoff: the last floor that we render, everything including it and below is rendered
     int LayerCutoff;
+    
+    // Selection volume
+    Vector3<int> SelectStart, SelectEnd;
 };
 
 // End of inclusion guard

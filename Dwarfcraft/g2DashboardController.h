@@ -48,6 +48,12 @@ public:
     // Set the output size
     void SetSize(int Width, int Height);
     
+    // Are we in selection mode?
+    bool IsSelecting();
+    
+    // Update the selection text
+    void SetSelectionVolume(Vector3<int> SelectStart, Vector3<int> SelectEnd, bool IsDone);
+    
 protected:
     
     // Render the controller
@@ -98,6 +104,10 @@ private:
     // Allocated list of designations
     DesignationType Types[DesignationCount];
     int TypeCount;
+    
+    // True if selecting a volume
+    bool Selecting;
+    DesignationType SelectingType;
     
     /*** Icon Constants ***/
     

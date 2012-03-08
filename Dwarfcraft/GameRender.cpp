@@ -108,6 +108,9 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     WorldUI->GetDepthSlider()->SetProgress(0.0f);
     WorldUI->SetDepth(LayerCutoff);
     
+    // Default to not selecting anything
+    IsSelecting = false;
+    
     /*** TESTING: Place Entities ***/
     
     // Select one of four skin colors
@@ -247,23 +250,23 @@ void GameRender::Render()
     */
     
     /*** Render Selections ***/
-    /*
+    
     // Draw selection
-    if(AllowSelection && (IsSelecting || HasSelection))
+    if(WorldUI->GetDashboardController()->IsSelecting())
     {
         // Flip around the first and last selections so that first is always the smalest variables
-        Vector3<float> P1((FirstSelection.x <= LastSelection.x) ? FirstSelection.x : LastSelection.x,
-                          (FirstSelection.y <= LastSelection.y) ? FirstSelection.y : LastSelection.y,
-                          (FirstSelection.z <= LastSelection.z) ? FirstSelection.z : LastSelection.z);
-        Vector3<float> P2((FirstSelection.x > LastSelection.x) ? FirstSelection.x : LastSelection.x,
-                          (FirstSelection.y > LastSelection.y) ? FirstSelection.y : LastSelection.y,
-                          (FirstSelection.z > LastSelection.z) ? FirstSelection.z : LastSelection.z);
+        Vector3<float> P1((SelectStart.x <= SelectEnd.x) ? SelectStart.x : SelectEnd.x,
+                          (SelectStart.y <= SelectEnd.y) ? SelectStart.y : SelectEnd.y,
+                          (SelectStart.z <= SelectEnd.z) ? SelectStart.z : SelectEnd.z);
+        Vector3<float> P2((SelectStart.x > SelectEnd.x) ? SelectStart.x : SelectEnd.x,
+                          (SelectStart.y > SelectEnd.y) ? SelectStart.y : SelectEnd.y,
+                          (SelectStart.z > SelectEnd.z) ? SelectStart.z : SelectEnd.z);
         
         // Compute the size of the volume
         Vector3<float> Volume(fabs(P1.x - P2.x) + 1, fabs(P1.y - P2.y) + 1, fabs(P1.z - P2.z) + 1);
         
         // Pulse for the color
-        float Pulse = 0.1f * sin(PulseTime * 2.0f);
+        float Pulse = 1.0f;//0.1f * sin(PulseTime * 2.0f);
         
         // Draw the cube
         glPushMatrix();
@@ -276,7 +279,6 @@ void GameRender::Render()
         
         glPopMatrix();
     }
-    */
 }
 
 void GameRender::Update(float dT)
@@ -458,46 +460,28 @@ void GameRender::MouseEvent(int button, int state, int x, int y)
         IsIsometric = true;
         MainWindow->Use3DPerspective(false);
     }
-    /*
-    // World or entity selection started by user
-    else if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-    {
-        // Start the world selection (if in volume selection mode)
-        if(AllowSelection)
-        {
-            // Attempt to find in the main world data
-            if(WorldData->IntersectWorld(ViewOrigin, ViewDirection, LayerCutoff, &FirstSelection))
-            {
-                LastSelection = FirstSelection;
-                IsSelecting = true;
-            }
-        }
-        // Entity selection since we aren't doing volue selection
-        else
-            SelectedEntity = EntitiesList->IntersectEntities(ViewOrigin, ViewDirection, LayerCutoff);
-    }
     
-    // Done selecting
-    else if(button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+    // Selection
+    if(WorldUI->GetDashboardController()->IsSelecting() && button == GLUT_LEFT_BUTTON)
     {
-        // If we are doing world selection
-        if(AllowSelection && IsSelecting)
+        // Starting selection
+        if(state == GLUT_DOWN)
         {
-            // Done selecting
+            Vector3<float> CameraSource = GetCameraSource(CameraZoom);
+            Vector3<float> ViewDirection = CameraTarget - CameraSource;
+            IsSelecting = true;
+            WorldData->IntersectWorld(CameraSource, ViewDirection, LayerCutoff, &SelectStart);
+            printf("Selection Start..\n");
+        }
+        
+        // Done with selection
+        else if(state == GLUT_UP && IsSelecting)
+        {
             IsSelecting = false;
-            
-            // If this last point is valid, save it
-            Vector3<int> Collision;
-            if(WorldData->IntersectWorld(ViewOrigin, ViewDirection, LayerCutoff, &Collision))
-            {
-                LastSelection = Collision;
-                HasSelection = true;
-            }
-            else
-                HasSelection = false;
+            WorldUI->GetDashboardController()->SetSelectionVolume(SelectStart, SelectEnd, false);
+            printf("Selection End..\n");
         }
     }
-    */
 }
 
 void GameRender::PassiveMouseEvent(int x, int y)
@@ -555,7 +539,14 @@ void GameRender::PassiveMouseEvent(int x, int y)
         CameraTarget.z -= FrontDirection.y * MoveRatio;
     }
     
-    // Note that we do the collision detection in the update
+    // If we are actively selecting, update some information
+    if(WorldUI->GetDashboardController()->IsSelecting() && IsSelecting)
+    {
+        Vector3<float> CameraSource = GetCameraSource(CameraZoom);
+        Vector3<float> ViewDirection = CameraTarget - CameraSource;
+        WorldData->IntersectWorld(CameraSource, ViewDirection, LayerCutoff, &SelectEnd);
+        WorldUI->GetDashboardController()->SetSelectionVolume(SelectStart, SelectEnd, false);
+    }
     
     // Save the mouse drags for the next movement
     MouseStartX = x;

@@ -1,3 +1,5 @@
 build/
 Dwarfcraft.xcodeproj/xcuserdata/
 Dwarfcraft.xcodeproj/project.xcworkspace/
+.gitignore~
+.netrc

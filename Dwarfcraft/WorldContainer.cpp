@@ -38,6 +38,11 @@ WorldContainer::WorldContainer(int Width, int Height, int ColumnWidth)
             Levels[y].Data.PlaneType = dBlockType_Air;
         }
     }
+    
+    // Get camera render distance
+    int ViewDist;
+    GetUserSetting("General", "ViewDistance", &ViewDist, 10000);
+    MaxRenderDist = ViewDist;
 }
 
 WorldContainer::~WorldContainer()
@@ -254,26 +259,35 @@ int WorldContainer::GetSurfaceDepth(int x, int y, int z)
 
 bool WorldContainer::IntersectWorld(Vector3<float> RayPos, Vector3<float> RayDir, int CutoffLayer, Vector3<int>* CollisionBox)
 {
-    /*
-    // Queue of layers that are intersected
-    Queue< int > Intersections;
-    if(CutoffLayer >= WorldHeight)
-        CutoffLayer = WorldHeight - 1;
+    // Queue of chunks that are intersected
+    Queue< Vector3<int> > IntersectedChunks;
     
-    // We search each plane, from bottom to top (at the cutoff)
-    for(int y = CutoffLayer; y >= 0; y--)
+    // For each chunk
+    for(int z = 0; z < ChunkCount; z++)
+    for(int x = 0; x < ChunkCount; x++)
     {
-        // Ignore layer if it is just air
-        dBlockType LayerType;
-        if(IsFilledChunk(y, &LayerType) && LayerType == dBlockType_Air)
+        // Only test chunks that are close enough
+        // What is the vector from our camera to the chunk (global pos)
+        // Note we are measuring from the middle of the chunk
+        Vector3<float> ChunkVector = Vector3<float>(x * ColumnWidth + ColumnWidth / 2, 0, z * ColumnWidth + ColumnWidth / 2) - RayPos;
+        
+        // What is the distance? (Don't square it)
+        if(ChunkVector.x * ChunkVector.x + ChunkVector.z * ChunkVector.z > MaxRenderDist)
+            continue;
+        
+        // Get the column
+        WorldContainer_Column* Chunk = GetChunk(x, z);
+        
+        // Ignore if not yet allocated
+        if(Chunk->Planes == NULL)
             continue;
         
         // Make some variables arrays for easy access (index maps to x,y,z)
-        float _BoxPos[3] = { 0, y, 0 };
+        float _BoxPos[3] = { x * ColumnWidth, 0, z * ColumnWidth };
         float _RayPos[3] = { RayPos.x, RayPos.y, RayPos.z };
         float _RayDir[3] = { RayDir.x, RayDir.y, RayDir.z };
         
-        // Are we in this chunk?
+        // Defaulted to limits as an "invalid" flag
         float Near = -INFINITY;
         float Far = INFINITY;
         
@@ -287,7 +301,7 @@ bool WorldContainer::IntersectWorld(Vector3<float> RayPos, Vector3<float> RayDir
             // Calculate x-plane intersections
             // Terenary operator is to make clear that x and z are world width, while y is just 1 in height
             float MinX = (_BoxPos[i] - _RayPos[i]) / _RayDir[i];
-            float MaxX = ((_BoxPos[i] + ((i != 1) ? WorldWidth : 1)) - _RayPos[i]) / _RayDir[i];
+            float MaxX = ((_BoxPos[i] + ((i == 1) ? WorldHeight : ColumnWidth)) - _RayPos[i]) / _RayDir[i];
             
             // Swap min/max values
             if(MinX > MaxX)
@@ -312,19 +326,27 @@ bool WorldContainer::IntersectWorld(Vector3<float> RayPos, Vector3<float> RayDir
         
         // This is layer we are coliding with
         if(IsValid)
-            Intersections.Enqueue(y);
+            IntersectedChunks.Enqueue(Vector3<int>(x, 0, z));
     }
     
     // Search per-cube now
-    while(!Intersections.IsEmpty())
+    while(!IntersectedChunks.IsEmpty())
     {
         // Get an intersected level
-        int y = Intersections.Dequeue();
-        for(int x = 0; x < WorldWidth; x++)
-        for(int z = 0; z < WorldWidth; z++)
+        Vector3<int> ChunkPos = IntersectedChunks.Dequeue();
+        
+        // The start of the global chunk position
+        const int gx = ColumnWidth * ChunkPos.x;
+        const int gy = 0; // Just for consistencies sake
+        const int gz = ColumnWidth * ChunkPos.z;
+        
+        // For each cube in this chunk, from top (cutoff) to bottom
+        for(int y = CutoffLayer; y >= 0; y--)
+        for(int x = 0; x < ColumnWidth; x++)
+        for(int z = 0; z < ColumnWidth; z++)
         {
             // Make some variables arrays for easy access (index maps to x,y,z)
-            float _BoxPos[3] = { x, y, z };
+            float _BoxPos[3] = { gx + x, gy + y, gz + z };
             float _RayPos[3] = { RayPos.x, RayPos.y, RayPos.z };
             float _RayDir[3] = { RayDir.x, RayDir.y, RayDir.z };
             
@@ -365,7 +387,7 @@ bool WorldContainer::IntersectWorld(Vector3<float> RayPos, Vector3<float> RayDir
             }
             
             // This is layer we are coliding with and it isn't air
-            if(IsValid && GetBlock(x, y, z).GetType() != dBlockType_Air)
+            if(IsValid && GetBlock(gx + x, gy + y, gz + z).GetType() != dBlockType_Air)
             {
                 // Post and stop
                 *CollisionBox = Vector3<int>(x, y, z);
@@ -375,9 +397,5 @@ bool WorldContainer::IntersectWorld(Vector3<float> RayPos, Vector3<float> RayDir
     }
     
     // Else, no collisions ever found
-    return false;
-    */
-    
-    // Need to redo
     return false;
 }

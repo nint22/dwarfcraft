@@ -48,6 +48,7 @@
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Queue.h"
+#include "Globals.h"
 
 // Plane structure, representing a plane within a column
 struct WorldContainer_Plane
@@ -136,6 +137,9 @@ private:
     
     // List of all chunks (just 2D array of size [Width / ColumnWidth][Width / ColumnWidth])
     WorldContainer_Column* WorldChunks;
+    
+    // Max render distance
+    float MaxRenderDist;
 };
 
 #endif

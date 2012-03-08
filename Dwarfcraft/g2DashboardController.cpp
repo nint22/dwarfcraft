@@ -60,6 +60,9 @@ g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainT
     // No initial list or group type
     TypeCount = 0;
     DesignationGroup = 0;
+    
+    // Not currently selecting
+    Selecting = false;
 }
 
 g2DashboardController::~g2DashboardController()
@@ -82,6 +85,28 @@ void g2DashboardController::SetSize(int Width, int Height)
     // Save size
     this->Width = Width;
     this->Height = Height;
+}
+
+bool g2DashboardController::IsSelecting()
+{
+    return Selecting;
+}
+
+void g2DashboardController::SetSelectionVolume(Vector3<int> SelectStart, Vector3<int> SelectEnd, bool IsDone)
+{
+    // Compute the delta
+    Vector3<int> Delta = SelectEnd - SelectStart;
+    
+    // Update the string in the panel
+    char Text[128];
+    sprintf(Text, "Volume: %d (%d, %d, %d)", abs(Delta.x * Delta.y * Delta.z), abs(Delta.x), abs(Delta.y), abs(Delta.z));
+    
+    // If done, go back to main selection
+    if(IsDone)
+    {
+        DesignationGroup = 0;
+        Selecting = false;
+    }
 }
 
 void g2DashboardController::SetTime(int Season, int Day, float Time)
@@ -172,6 +197,12 @@ void g2DashboardController::Render(int x, int y)
     {
         DesignationType Types[4] = {DesignationType_Protect, DesignationType_Barracks, DesignationType_Hall, DesignationType_Armory};
         Render(x, y, Types, 4);
+    }
+    // Actively selecting, only show a commit and reject button
+    else if(DesignationGroup == 5)
+    {
+        DesignationType Types[1] = {SelectingType};
+        Render(x, y, Types, 1);
     }
     // Else, no such group
     else
@@ -273,12 +304,18 @@ void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state,
         if(x >= ix && x < ix + ButtonW && y >= iy && y < iy + ButtonH)
         {
             // If in the root menu, just change the state, else, start selection
-            if(DesignationGroup == 0)
+            if(!Selecting && DesignationGroup == 0)
                 DesignationGroup = i + 1;
             // Else, if canceling
             else if(i == TypeCount - 1)
                 DesignationGroup = 0;
             // Else, actuallying doing some volume selection
+            else
+            {
+                SelectingType = Types[i];
+                DesignationGroup = 5;
+                Selecting = true;
+            }
         }
     }
 }
