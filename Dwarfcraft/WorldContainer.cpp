@@ -32,6 +32,7 @@ WorldContainer::WorldContainer(int Width, int Height, int ColumnWidth)
         // Allocate all the planes, but leave unallocated
         WorldContainer_Plane* Levels = new WorldContainer_Plane[WorldHeight];
         WorldChunks[z * ChunkCount + x].Planes = Levels;
+        WorldChunks[z * ChunkCount + x].NeedsUpdate = false;
         for(int y = 0; y < WorldHeight; y++)
         {
             Levels[y].Allocated = false;
@@ -137,6 +138,7 @@ void WorldContainer::SetBlock(int x, int y, int z, dBlock Block)
     int dz = z % ColumnWidth;
     
     // Target plane (ref variable)
+    WorldChunks[cz * ChunkCount + cx].NeedsUpdate = true;
     WorldContainer_Plane& Plane = WorldChunks[cz * ChunkCount + cx].Planes[y];
     
     // If allocated, just assign block
@@ -174,6 +176,7 @@ void WorldContainer::FillChunk(int x, int y, int z, dBlockType BlockType)
     int cz = z / ColumnWidth;
     
     // Target plane (ref variable)
+    WorldChunks[cz * ChunkCount + cx].NeedsUpdate = true;
     WorldContainer_Plane& Plane = WorldChunks[cz * ChunkCount + cx].Planes[y];
     
     // Release if needed
@@ -269,17 +272,10 @@ bool WorldContainer::IntersectWorld(Vector3<float> RayPos, Vector3<float> RayDir
         // Only test chunks that are close enough
         // What is the vector from our camera to the chunk (global pos)
         // Note we are measuring from the middle of the chunk
-        Vector3<float> ChunkVector = Vector3<float>(x * ColumnWidth + ColumnWidth / 2, 0, z * ColumnWidth + ColumnWidth / 2) - RayPos;
+        Vector3<float> ChunkVector = Vector3<float>(x * ColumnWidth, 0, z * ColumnWidth) - RayPos;
         
         // What is the distance? (Don't square it)
         if(ChunkVector.x * ChunkVector.x + ChunkVector.z * ChunkVector.z > MaxRenderDist)
-            continue;
-        
-        // Get the column
-        WorldContainer_Column* Chunk = GetChunk(x, z);
-        
-        // Ignore if not yet allocated
-        if(Chunk->Planes == NULL)
             continue;
         
         // Make some variables arrays for easy access (index maps to x,y,z)
@@ -299,7 +295,7 @@ bool WorldContainer::IntersectWorld(Vector3<float> RayPos, Vector3<float> RayDir
         for(int i = 0; i < 3 && IsValid; i++)
         {
             // Calculate x-plane intersections
-            // Terenary operator is to make clear that x and z are world width, while y is just 1 in height
+            // Terenary operator is to make clear that x and z are chunk sizes while y is world height
             float MinX = (_BoxPos[i] - _RayPos[i]) / _RayDir[i];
             float MaxX = ((_BoxPos[i] + ((i == 1) ? WorldHeight : ColumnWidth)) - _RayPos[i]) / _RayDir[i];
             
@@ -329,70 +325,77 @@ bool WorldContainer::IntersectWorld(Vector3<float> RayPos, Vector3<float> RayDir
             IntersectedChunks.Enqueue(Vector3<int>(x, 0, z));
     }
     
-    // Search per-cube now
-    while(!IntersectedChunks.IsEmpty())
+    // From top (cutoff) to bottom
+    for(int y = CutoffLayer; y >= 0; y--)
     {
-        // Get an intersected level
-        Vector3<int> ChunkPos = IntersectedChunks.Dequeue();
-        
-        // The start of the global chunk position
-        const int gx = ColumnWidth * ChunkPos.x;
-        const int gy = 0; // Just for consistencies sake
-        const int gz = ColumnWidth * ChunkPos.z;
-        
-        // For each cube in this chunk, from top (cutoff) to bottom
-        for(int y = CutoffLayer; y >= 0; y--)
-        for(int x = 0; x < ColumnWidth; x++)
-        for(int z = 0; z < ColumnWidth; z++)
+        // For each chunk
+        const int ChunkCount = IntersectedChunks.GetSize();
+        for(int c = 0; c < ChunkCount; c++)
         {
-            // Make some variables arrays for easy access (index maps to x,y,z)
-            float _BoxPos[3] = { gx + x, gy + y, gz + z };
-            float _RayPos[3] = { RayPos.x, RayPos.y, RayPos.z };
-            float _RayDir[3] = { RayDir.x, RayDir.y, RayDir.z };
+            // Get an intersected level
+            Vector3<int> ChunkPos = IntersectedChunks.Dequeue();
             
-            // Are we in this chunk?
-            float Near = -INFINITY;
-            float Far = INFINITY;
+            // The start of the global chunk position
+            const int gx = ChunkPos.x * ColumnWidth;
+            const int gy = 0; // Just for consistencies sake
+            const int gz = ChunkPos.z * ColumnWidth;
             
-            // Default to valid
-            bool IsValid = true;
-            
-            // For each dimension's surface planes
-            // For example x means the + and - surface parallel to the yz plane
-            for(int i = 0; i < 3 && IsValid; i++)
+            // For each cube in this chunk's layer
+            for(int x = 0; x < ColumnWidth; x++)
+            for(int z = 0; z < ColumnWidth; z++)
             {
-                // Calculate x-plane intersections (cubes are always 1^3)
-                float MinX = (_BoxPos[i] - _RayPos[i]) / _RayDir[i];
-                float MaxX = ((_BoxPos[i] + 1) - _RayPos[i]) / _RayDir[i];
+                // Make some variables arrays for easy access (index maps to x,y,z)
+                float _BoxPos[3] = { gx + x, gy + y, gz + z };
+                float _RayPos[3] = { RayPos.x, RayPos.y, RayPos.z };
+                float _RayDir[3] = { RayDir.x, RayDir.y, RayDir.z };
                 
-                // Swap min/max values
-                if(MinX > MaxX)
+                // Are we in this chunk?
+                float Near = -INFINITY;
+                float Far = INFINITY;
+                
+                // Default to valid
+                bool IsValid = true;
+                
+                // For each dimension's surface planes
+                // For example x means the + and - surface parallel to the yz plane
+                for(int i = 0; i < 3 && IsValid; i++)
                 {
-                    float temp = MinX;
-                    MinX = MaxX;
-                    MaxX = temp;
+                    // Calculate x-plane intersections (cubes are always 1^3)
+                    float MinX = (_BoxPos[i] - _RayPos[i]) / _RayDir[i];
+                    float MaxX = ((_BoxPos[i] + 1) - _RayPos[i]) / _RayDir[i];
+                    
+                    // Swap min/max values
+                    if(MinX > MaxX)
+                    {
+                        float temp = MinX;
+                        MinX = MaxX;
+                        MaxX = temp;
+                    }
+                    
+                    // Bounds set
+                    if(MinX > Near)
+                        Near = MinX;
+                    if(MaxX < Far)
+                        Far = MaxX;
+                    
+                    // Box was missed
+                    if(Near > Far)
+                        IsValid = false;
+                    else if(Far < 0)
+                        IsValid = false;
                 }
                 
-                // Bounds set
-                if(MinX > Near)
-                    Near = MinX;
-                if(MaxX < Far)
-                    Far = MaxX;
-                
-                // Box was missed
-                if(Near > Far)
-                    IsValid = false;
-                else if(Far < 0)
-                    IsValid = false;
+                // This is layer we are coliding with and it isn't air
+                if(IsValid && GetBlock(gx + x, gy + y, gz + z).GetType() != dBlockType_Air)
+                {
+                    // Post and stop
+                    *CollisionBox = Vector3<int>(gx + x, gy + y, gz + z);
+                    return true;
+                }
             }
             
-            // This is layer we are coliding with and it isn't air
-            if(IsValid && GetBlock(gx + x, gy + y, gz + z).GetType() != dBlockType_Air)
-            {
-                // Post and stop
-                *CollisionBox = Vector3<int>(x, y, z);
-                return true;
-            }
+            // Enqueue the chunk we are testing back
+            IntersectedChunks.Enqueue(ChunkPos);
         }
     }
     

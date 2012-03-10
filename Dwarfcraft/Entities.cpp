@@ -18,7 +18,7 @@ Entities::Entities(WorldContainer* MainWorld, DesignationsView* MainDesignations
     this->MainItems = MainItems;
     
     // Default to not rendering the path
-    RenderablePath = false;
+    RenderablePath = true;
 }
 
 Entities::~Entities()

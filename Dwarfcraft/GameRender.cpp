@@ -77,6 +77,9 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     // Allocate the GUI
     WorldUI = new UserInterface(this, GluiHandle);
     
+    // Pass our designations list explicitly
+    WorldUI->GetDashboardController()->SetDesignationsList(Designations);
+    
     // Default to full-style rendering
     RenderStyle = GameRender_RenderStyle_Fill;
     
@@ -352,7 +355,7 @@ void GameRender::Update(float dT)
     /*** UI Updates ***/
     
     // If there were any movements, update the position text
-    if(KeyUp || KeyDown || KeyLeft || KeyRight || DepthChanged)
+    if(KeyUp || KeyDown || KeyLeft || KeyRight || MouseDragging || DepthChanged)
         WorldUI->SetPos((int)CameraTarget.x, (int)CameraTarget.y, (int)CameraTarget.z);
     
     // Change depth based on slider
@@ -421,12 +424,14 @@ void GameRender::KeyboardEventUp(unsigned char key, int x, int y)
 
 void GameRender::MouseEvent(int button, int state, int x, int y)
 {
+    // Ignore all mouse presses that touch the UI
+    int gx, gy;
+    WorldUI->GetDashboardController()->GetPos(&gx, &gy);
+    if(state == GLUT_DOWN && WorldUI->GetDashboardController()->InController(x - gx, y - gy))
+        return;
+    
     // Save modifiers
     int Modifiers = glutGetModifiers();
-    
-    // Get the user's selection ray
-    Vector3<float> ViewOrigin, ViewDirection;
-    //GetUserSelectionRay(x, y, &ViewOrigin, &ViewDirection);
     
     // If the right mouse button is pressing down, we are dragging
     if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
@@ -464,22 +469,23 @@ void GameRender::MouseEvent(int button, int state, int x, int y)
     // Selection
     if(WorldUI->GetDashboardController()->IsSelecting() && button == GLUT_LEFT_BUTTON)
     {
+        // Get the user's selection ray
+        Vector3<float> ViewOrigin, ViewDirection;
+        GetUserSelectionRay(Vector2<int>(x, y), &ViewOrigin, &ViewDirection);
+        
         // Starting selection
         if(state == GLUT_DOWN)
         {
-            Vector3<float> CameraSource = GetCameraSource(CameraZoom);
-            Vector3<float> ViewDirection = CameraTarget - CameraSource;
             IsSelecting = true;
-            WorldData->IntersectWorld(CameraSource, ViewDirection, LayerCutoff, &SelectStart);
-            printf("Selection Start..\n");
+            WorldData->IntersectWorld(ViewOrigin, ViewDirection, LayerCutoff, &SelectStart);
+            SelectEnd = SelectStart;
         }
         
         // Done with selection
         else if(state == GLUT_UP && IsSelecting)
         {
             IsSelecting = false;
-            WorldUI->GetDashboardController()->SetSelectionVolume(SelectStart, SelectEnd, false);
-            printf("Selection End..\n");
+            WorldUI->GetDashboardController()->SetSelectionVolume(SelectStart, SelectEnd);
         }
     }
 }
@@ -522,16 +528,16 @@ void GameRender::PassiveMouseEvent(int x, int y)
         FrontDirection.Normalize();
         
         // Computer the left direction (right is the same, just multiplied by -1, since that flips it 180-degrees)
-        Vector2<float> LeftDirection(cos(CameraRotation - UtilPI / 2.0f), sin(CameraRotation - UtilPI / 2.0f));
-        LeftDirection.Normalize();
+        Vector2<float> RightDirection(cos(CameraRotation - UtilPI / 2.0f), sin(CameraRotation - UtilPI / 2.0f));
+        RightDirection.Normalize();
         
         // Get fovy
         const float Fovy = MainWindow->GetFovy();
         
         // Move left/right
         float MoveRatio = float(x - MouseStartX) * ((float(WindowHeight) / float(WindowWidth)) / float(Fovy)) * MoveSensitivity * 0.002f;
-        CameraTarget.x -= LeftDirection.x * MoveRatio;
-        CameraTarget.z -= LeftDirection.y * MoveRatio;
+        CameraTarget.x -= RightDirection.x * MoveRatio;
+        CameraTarget.z -= RightDirection.y * MoveRatio;
         
         // Move up/down
         MoveRatio = float(y - MouseStartY) * ((float(WindowWidth) / float(WindowHeight)) / float(Fovy)) * MoveSensitivity * 0.002f;
@@ -542,10 +548,12 @@ void GameRender::PassiveMouseEvent(int x, int y)
     // If we are actively selecting, update some information
     if(WorldUI->GetDashboardController()->IsSelecting() && IsSelecting)
     {
-        Vector3<float> CameraSource = GetCameraSource(CameraZoom);
-        Vector3<float> ViewDirection = CameraTarget - CameraSource;
-        WorldData->IntersectWorld(CameraSource, ViewDirection, LayerCutoff, &SelectEnd);
-        WorldUI->GetDashboardController()->SetSelectionVolume(SelectStart, SelectEnd, false);
+        // Get the user's selection ray
+        Vector3<float> ViewOrigin, ViewDirection;
+        GetUserSelectionRay(Vector2<int>(x, y), &ViewOrigin, &ViewDirection);
+        
+        WorldData->IntersectWorld(ViewOrigin, ViewDirection, LayerCutoff, &SelectEnd);
+        WorldUI->GetDashboardController()->SetSelectionVolume(SelectStart, SelectEnd);
     }
     
     // Save the mouse drags for the next movement
@@ -560,4 +568,38 @@ Vector3<float> GameRender::GetCameraSource(float Dist)
     
     // Grow the vector away
     return CameraTarget + CameraSource * Dist;
+}
+
+void GameRender::GetUserSelectionRay(Vector2<int> MousePos, Vector3<float>* SelectionPos, Vector3<float>* SelectionRay)
+{
+    // Where the camera origin (center) is
+    Vector3<float> ViewOrigin = GetCameraSource(CameraZoom);
+    
+    // Compute camera face (for directional vector), left vector, and up vector
+    Vector3<float> ViewDirection = CameraTarget - ViewOrigin;
+    ViewDirection.Normalize();
+    
+    // Up is always y+
+    Vector3<float> UpViewDirection(0, 1, 0);
+    
+    // Getting left vector is easy:
+    Vector3<float> RightViewDirection = Vector3Cross<float>(ViewDirection, UpViewDirection);
+    RightViewDirection.Normalize();
+    
+    // Get the correct up vector (since the camera may be pitched)
+    UpViewDirection = Vector3Cross<float>(RightViewDirection, ViewDirection);
+    
+    // Compute the world mouse coordinates
+    // -SizeWidth / Fovy to SizeWidth / Fovy, -SizeHeight / Fovy to SizeHeight / Fovy
+    const float Fovy = MainWindow->GetFovy();
+    
+    // Apply y-selection change (has to be negative since y+ world is up, and y+ screen is down
+    ViewOrigin += UpViewDirection * ((-float(MousePos.y - WindowHeight / 2) / Fovy) * 2.0f);
+    
+    // Apply x-selection change
+    ViewOrigin += RightViewDirection * ((float(MousePos.x - WindowWidth / 2) / Fovy) * 2.0f);
+    
+    // Post data
+    *SelectionPos = ViewOrigin;
+    *SelectionRay = ViewDirection;
 }

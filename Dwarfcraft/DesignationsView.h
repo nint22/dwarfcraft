@@ -6,9 +6,15 @@
  This source file is developed and maintained by:
  + Jeremy Bridon jbridon@cores2.com
  
- File: Designations.h/cpp
+ File: DesignationsView.h/cpp
  Desc: Manages all game designations for the givn map. This
  is generally a container of all designations for a given world.
+ 
+ NOTE: This entire class is thread safe, with designation data
+ only being able to be manipulated one at a time. This is done
+ so that dwarfs can still manipulate the world data (as that is
+ too big and too important to lock) but the instruction generation
+ is relatively safe.
  
 ***************************************************************/
 
@@ -18,6 +24,36 @@
 #include "WorldContainer.h"
 #include "Vector3.h"
 #include "Queue.h"
+#include <pthread.h>
+
+// Necesary forward declarations
+class DwarfEntity;
+class Designation;
+
+// A simple "job" object, to handle our task
+struct JobTask
+{
+    // The designation volume we are working on
+    Designation* TargetDesignation;
+    
+    // The position we want to move the dwarf to
+    Vector3<int> TargetPosition;
+    
+    // The target block we are to modify (optional)
+    Vector3<int> TargetBlock;
+};
+
+// Total number of designation groups
+static const int DesignationGroupCount = 4;
+
+// Enumeration of designation groups
+enum DesignationGroup
+{
+    DesignationGroup_Construct,
+    DesignationGroup_Storage,
+    DesignationGroup_Collect,
+    DesignationGroup_Military,
+};
 
 // 16 total designations
 static const int DesignationCount = 16;
@@ -77,10 +113,13 @@ struct Designation
     DesignationType Type;
     Vector3<int> Origin;
     Vector3<int> Volume;
+    
+    // A list of positions in the volume that needs to be processed
+    Queue< Vector3<int> > TaskPositions;
 };
 
 // Returns the texture coordinates of a given designation; similar to the "dGetBlockTexture(...)" function
-void dGetDesignationTexture(DesignationType Type, float* x, float* y, float* width, float* height);
+void dGetDesignationTexture(DesignationType Type, float* x, float* y, float* width, float* height, GLuint* TerrainID);
 
 class DesignationsView
 {
@@ -90,23 +129,37 @@ public:
     DesignationsView(WorldContainer* MainWorld);
     ~DesignationsView();
     
+    /*** Designation Management ***/
+    
     // Add a new designation (takes any two points; will self-organize for origin and volume)
     void AddDesignation(DesignationType Type, Vector3<int> Origin, Vector3<int> Volume);
     
     // Remove a designation that contains the given point
     void RemoveDesignation(Vector3<int> Point);
     
-    // Given a designation, find all accesable blocks to work on. A queue of positions pairs is returned. The first
-    // element in the tuple is the block that can be manipulated in the designation volume, while the second value
-    // is a (possibly) accesable block by the dwarf (position to be in, not on). An empty list may be returned as
-    // well if nothing is accesable.
-    Queue< std::pair< Vector3<int>, Vector3<int> > > FindDesignation(DesignationType Type, Vector3<int> Origin);
+    // Returns a position within the designation that is adjacent to an air block, and thus assumed possible for access
+    // The position where the dwarf should go into is "TargetPosition" while "TargetBlock" is what is trying to be manipulated
+    bool FindDesignation(DesignationType Type, Designation** TargetDesignationOut, Vector3<int>* TargetPosition, Vector3<int>* TargetBlock);
     
     // Get a copy (not reference) of all designations
-    Queue< Designation > GetDesignations();
+    Queue< Designation* > GetDesignations();
     
-    // Posts two lists, each in parallel of the other, which represents the designation type and screen position
-    void GetDesignationsStrings(List< DesignationType >** DesignationTypes, List< Vector2<int> >** ScreenPositions);
+    /*** Job Management ***/
+    
+    // Given an entity, find a job that fits the dwarf's preferences and current world needs
+    bool GetJob(DwarfEntity* Dwarf, JobTask* JobOut);
+    
+    // Push back the job that was given to this dwarf
+    void PutBackJob(JobTask* JobOut);
+    
+private:
+    
+    // Job specific task management
+    bool GetMiningJob(DwarfEntity* Dwarf, JobTask* JobOut);
+    bool GetFarmerJob(DwarfEntity* Dwarf, JobTask* JobOut);
+    bool GetCrafterJob(DwarfEntity* Dwarf, JobTask* JobOut);
+    
+public:
     
     /*** Core Render & Update ***/
     
@@ -116,30 +169,17 @@ public:
     // Render this Volume (does all translations internally)
     void Render(int LayerCutoff, bool Draw = true);
     
-    // Need to explicitly set the window size over time
-    void SetWindowSize(int Width, int Height);
-    
 private:
     
-    // Take world positions and turn it into screen positions
-    Vector2<int> WorldToScreen(Vector3<float> Position);
-    
-    // Window height
-    int WindowHeight;
-    
-    // World cutoff
-    int Cutoff;
-    
     // List of all designations
-    Queue< Designation > DesignationsQueue;
+    Queue< Designation* > DesignationsQueue;
     
     // World handle
     WorldContainer* WorldData;
     
-    // Designation data used for saving label positions, rendered in UserInterface
-    List< DesignationType > SavedDesignationTypes;
-    List< Vector2<int> > SavedScreenPositions;
-    
+    // Designations data lock (to help us be thread safe)
+    static pthread_mutex_t DesignationsLock;
+    static bool DesignationsLock_Init;
 };
 
 #endif

@@ -70,6 +70,10 @@ struct WorldContainer_Column
     // if a floor is not allocated. Indexed from 0 (bottom)
     // to n-1 (top)
     WorldContainer_Plane* Planes;
+    
+    // True if the column has been updated and should
+    // be re-rendered
+    bool NeedsUpdate;
 };
 
 class WorldContainer

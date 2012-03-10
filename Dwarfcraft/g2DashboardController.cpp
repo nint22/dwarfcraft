@@ -59,7 +59,7 @@ g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainT
     
     // No initial list or group type
     TypeCount = 0;
-    DesignationGroup = 0;
+    State = DashboardState_Root;
     
     // Not currently selecting
     Selecting = false;
@@ -68,6 +68,11 @@ g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainT
 g2DashboardController::~g2DashboardController()
 {
     
+}
+
+void g2DashboardController::SetDesignationsList(DesignationsView* Designations)
+{
+    this->Designations = Designations;
 }
 
 int g2DashboardController::GetWidth()
@@ -92,21 +97,15 @@ bool g2DashboardController::IsSelecting()
     return Selecting;
 }
 
-void g2DashboardController::SetSelectionVolume(Vector3<int> SelectStart, Vector3<int> SelectEnd, bool IsDone)
+void g2DashboardController::SetSelectionVolume(Vector3<int> SelectStart, Vector3<int> SelectEnd)
 {
-    // Compute the delta
-    Vector3<int> Delta = SelectEnd - SelectStart;
-    
-    // Update the string in the panel
-    char Text[128];
-    sprintf(Text, "Volume: %d (%d, %d, %d)", abs(Delta.x * Delta.y * Delta.z), abs(Delta.x), abs(Delta.y), abs(Delta.z));
-    
-    // If done, go back to main selection
-    if(IsDone)
-    {
-        DesignationGroup = 0;
-        Selecting = false;
-    }
+    // Save the points
+    this->SelectStart = Vector3<int>((SelectStart.x <= SelectEnd.x) ? SelectStart.x : SelectEnd.x,
+                               (SelectStart.y <= SelectEnd.y) ? SelectStart.y : SelectEnd.y,
+                               (SelectStart.z <= SelectEnd.z) ? SelectStart.z : SelectEnd.z);
+    this->SelectEnd = Vector3<int>((SelectStart.x > SelectEnd.x) ? SelectStart.x : SelectEnd.x,
+                             (SelectStart.y > SelectEnd.y) ? SelectStart.y : SelectEnd.y,
+                             (SelectStart.z > SelectEnd.z) ? SelectStart.z : SelectEnd.z);
 }
 
 void g2DashboardController::SetTime(int Season, int Day, float Time)
@@ -169,39 +168,40 @@ void g2DashboardController::Render(int x, int y)
     /** Designations **/
     
     // Render default 4 designation types
-    if(DesignationGroup == 0)
+    if(State == DashboardState_Root)
     {
         DesignationType Types[4] = {DesignationType_Mine, DesignationType_RawResources, DesignationType_Farm, DesignationType_Protect};
         Render(x, y, Types, 4);
     }
-    // Construction
-    else if(DesignationGroup == 1)
+    // In a group
+    else if(State == DashboardState_Group)
     {
-        DesignationType Types[3] = {DesignationType_Mine, DesignationType_Fill, DesignationType_Flood};
-        Render(x, y, Types, 3);
-    }
-    // Storage
-    else if(DesignationGroup == 2)
-    {
-        DesignationType Types[6] = {DesignationType_Rubbish, DesignationType_Food, DesignationType_Crafted, DesignationType_RawResources, DesignationType_Ingots, DesignationType_Grave};
-        Render(x, y, Types, 6);
-    }
-    // Collection
-    else if(DesignationGroup == 3)
-    {
-        DesignationType Types[3] = {DesignationType_Farm, DesignationType_Wood, DesignationType_Forage};
-        Render(x, y, Types, 3);
-    }
-    // Military
-    else if(DesignationGroup == 4)
-    {
-        DesignationType Types[4] = {DesignationType_Protect, DesignationType_Barracks, DesignationType_Hall, DesignationType_Armory};
-        Render(x, y, Types, 4);
+        // Construction
+        if(StateGroup == DesignationGroup_Construct)
+        {
+            DesignationType Types[3] = {DesignationType_Mine, DesignationType_Fill, DesignationType_Flood};
+            Render(x, y, Types, 3);
+        }
+        else if(StateGroup == DesignationGroup_Storage)
+        {
+            DesignationType Types[6] = {DesignationType_Rubbish, DesignationType_Food, DesignationType_Crafted, DesignationType_RawResources, DesignationType_Ingots, DesignationType_Grave};
+            Render(x, y, Types, 6);
+        }
+        else if(StateGroup == DesignationGroup_Collect)
+        {
+            DesignationType Types[3] = {DesignationType_Farm, DesignationType_Wood, DesignationType_Forage};
+            Render(x, y, Types, 3);
+        }
+        else if(StateGroup == DesignationGroup_Military)
+        {
+            DesignationType Types[4] = {DesignationType_Protect, DesignationType_Barracks, DesignationType_Hall, DesignationType_Armory};
+            Render(x, y, Types, 4);
+        }
     }
     // Actively selecting, only show a commit and reject button
-    else if(DesignationGroup == 5)
+    else if(State == DashboardState_Selection)
     {
-        DesignationType Types[1] = {SelectingType};
+        DesignationType Types[1] = {StateType};
         Render(x, y, Types, 1);
     }
     // Else, no such group
@@ -228,11 +228,11 @@ void g2DashboardController::Render(int x, int y, DesignationType* Types, int Typ
         int iy = y + IconOffsetY + IconSpaceY * (i / IconColCount);
         
         // If we are at the end, and this is the default group, don't draw a "back" icon
-        if(DesignationGroup == 0 && i == TypeCount)
+        if(State == DashboardState_Root && i == TypeCount)
             continue;
         
         // If we are at the end, and this is not the default group, append a "back" icon
-        else if(DesignationGroup > 0 && i == TypeCount)
+        else if(i == TypeCount)
             strcpy(IconName, "IconCancel");
         
         // Else, regular icon
@@ -282,7 +282,7 @@ void g2DashboardController::MouseHover(int x, int y)
     MouseX = x;
     MouseY = y;
 }
-
+ 
 void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state, int x, int y)
 {
     // Only check on release of left mouse
@@ -290,7 +290,7 @@ void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state,
         return;
     
     // If we are not in the root menu, check +1 for the cancel button
-    if(DesignationGroup != 0)
+    if(State != DashboardState_Root)
         TypeCount++;
     
     // For each icon
@@ -303,19 +303,41 @@ void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state,
         // If the mouse is in this position, act as though the user is hovering over it
         if(x >= ix && x < ix + ButtonW && y >= iy && y < iy + ButtonH)
         {
-            // If in the root menu, just change the state, else, start selection
-            if(!Selecting && DesignationGroup == 0)
-                DesignationGroup = i + 1;
-            // Else, if canceling
-            else if(i == TypeCount - 1)
-                DesignationGroup = 0;
-            // Else, actuallying doing some volume selection
-            else
+            // Alyways go to the root screen when canceling and cancel any volume selection
+            if(State != DashboardState_Root && i == TypeCount - 1)
             {
-                SelectingType = Types[i];
-                DesignationGroup = 5;
+                State = DashboardState_Root;
+                Selecting = false;
+            }
+            // If in the root menu, just change the state, else, start selection
+            else if(State == DashboardState_Root)
+            {
+                State = DashboardState_Group;
+                StateGroup = (DesignationGroup)i;
+            }
+            // Else, actuallying doing some volume selection
+            else if(State == DashboardState_Group)
+            {
+                State = DashboardState_Selection;
+                StateType = Types[i];
                 Selecting = true;
+            }
+            // Else, user is commiting change
+            else if(State == DashboardState_Selection && i == 0)
+            {
+                State = DashboardState_Root;
+                Selecting = false;
+                
+                // Save into designations list
+                Designations->AddDesignation(StateType, SelectStart, SelectEnd - SelectStart + Vector3<int>(1, 1, 1));
             }
         }
     }
+}
+
+void g2DashboardController::GetCollisionRect(int* Width, int* Height)
+{
+    // Trivial, just to catch all UI inputs
+    *Width = GetWidth();
+    *Height = GetHeight();
 }

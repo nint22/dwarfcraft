@@ -268,6 +268,9 @@ void DwarfEntity::Update(float dT)
 
 void DwarfEntity::Render()
 {
+    // Render the target tile we are going to (i.e. the end of the path target)
+    RenderTargetPath();
+    
     // Working vars
     EntityFacing NewGlobalFacing = GetGlobalFacing();
     float x, y, width, height;
@@ -278,7 +281,7 @@ void DwarfEntity::Render()
     
     // Always render ontop
     glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.0f, -1.0f);
+    glPolygonOffset(-1.0f, -1.0f);
     
     /*** Render Armor ***/
     
@@ -314,6 +317,56 @@ void DwarfEntity::Render()
     glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
+void DwarfEntity::RenderTargetPath()
+{
+    // Ignore if no job
+    Stack< Vector3<int> > Path = GetMovingPath();
+    if(Path.IsEmpty())
+        return;
+    
+    // Get the last (target)
+    Vector3<int> TilePos;
+    while(!Path.IsEmpty())
+        TilePos = Path.Pop();
+    
+    // Go down a tile
+    TilePos.y--;
+    
+    // Only render if we are right below air
+    if(GetWorld()->IsWithinWorld(TilePos + Vector3<int>(0, 1, 0)) && GetWorld()->GetBlock(TilePos + Vector3<int>(0, 1, 0)).GetType() == dBlockType_Air)
+    {
+        // Get texture info
+        float srcx, srcy, srcwidth, srcheight; GLuint TextureID;
+        dGetDesignationTexture(DesignationType_Mine, &srcx, &srcy, &srcwidth, &srcheight, &TextureID);
+        glBindTexture(GL_TEXTURE_2D, TextureID);
+        
+        glEnable(GL_TEXTURE_2D);
+        
+        static float phase = 0.0f;
+        phase += 0.1f;
+        glColor4f(1, 0.8, 0.8, 0.9f + 0.1f * sin(phase));
+        
+        // Move down 0.5f if half block
+        float VerticalOffset = 0.0f;
+        if(!GetWorld()->GetBlock(TilePos).IsWhole())
+            VerticalOffset = -0.5f;
+
+        // Do a tiny oscilating offset
+        VerticalOffset += 0.01f + 0.005f * sin(phase * 0.5f + TilePos.z) + 0.01f + 0.005f * cos(phase * 0.5f + TilePos.x);
+        
+        // Render a mining tile
+        // Note the slight shift upwards because we want to render it ABOVE a block
+        glBegin(GL_QUADS);
+        glTexCoord2f(srcx + srcwidth, srcy); glVertex3f(TilePos.x + 0.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 0.0f);
+        glTexCoord2f(srcx, srcy); glVertex3f(TilePos.x + 0.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 1.0f);
+        glTexCoord2f(srcx, srcy + srcheight); glVertex3f(TilePos.x + 1.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 1.0f);
+        glTexCoord2f(srcx + srcwidth, srcy + srcheight); glVertex3f(TilePos.x + 1.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 0.0f);
+        glEnd();
+    }
+    
+    glDisable(GL_TEXTURE_2D);
+}
+
 void* DwarfEntity::ComputeTask(void* data)
 {
     /*** Initialize Thread ***/
@@ -332,35 +385,21 @@ void* DwarfEntity::ComputeTask(void* data)
     
     /*** Job / Task Generation ***/
     
-    // Random pick one of three jobs
-    // TODO: assign jobs based on need / priority
-    DwarfJobs Job = DwarfJobs_Miner;//DwarfJobs(rand() % DwarfJobsCount);
+    // Copy the job object
+    JobTask Job = self->Job;
     
-    // If farmer...
-    if(Job == DwarfJobs_Farmer)
-    {
-        // Go get wood
-        // TODO: more sub-tasks
-        Instruction.Operator = EntityOP_Break;
-        
-        // TODO: Some sort of function to help pick the first valid path...
-        self->GetDesignations()->FindDesignation(DesignationType_Wood, self->GetPositionBlock());
-    }
+    // Find a job
+    bool Success = self->GetDesignations()->GetJob(self, &Job);
+    Vector3<int> DwarfPosition = self->GetPositionBlock();
     
-    // If miner...
-    else if(Job == DwarfJobs_Miner)
+    // If success finding a job, see if we can path to it
+    if(Success)
     {
-        // Get a list of the best possible designations
-        Queue< std::pair< Vector3<int>, Vector3<int> > > MiningPosList = self->GetDesignations()->FindDesignation(DesignationType_Mine, self->GetPositionBlock());
-        
-        // For each source-target pair, make sure we can path plan to it!
-        // Give up if no other paths exist or we found a path
-        bool PathFound = false;
-        while(!MiningPosList.IsEmpty() && !PathFound)
+        // Do not compute path if trivial
+        if(DwarfPosition != Job.TargetPosition)
         {
-            // Attempt a path-plan to it
-            std::pair< Vector3<int>, Vector3<int> > MiningPos = MiningPosList.Dequeue();
-            EntityPath PathCheck(self->GetWorld(), self->GetPositionBlock(), MiningPos.second);
+            // Attempt a path-plan to target
+            EntityPath PathCheck(self->GetWorld(), self->GetPositionBlock(), Job.TargetPosition);
             PathCheck.ComputePath();
             
             // Can we reach this path? (Do a busy wait, not a busy stall)
@@ -375,40 +414,38 @@ void* DwarfEntity::ComputeTask(void* data)
             {
                 // Move to it
                 Instruction.Operator = EntityOp_MoveTo;
-                Instruction.Data.Pos.x = MiningPos.second.x;
-                Instruction.Data.Pos.y = MiningPos.second.y;
-                Instruction.Data.Pos.z = MiningPos.second.z;
+                Instruction.Data.Pos.x = Job.TargetPosition.x;
+                Instruction.Data.Pos.y = Job.TargetPosition.y;
+                Instruction.Data.Pos.z = Job.TargetPosition.z;
                 self->ThreadInstructions.Enqueue(Instruction);
-                
-                // Break it
-                Instruction.Operator = EntityOP_Break;
-                Instruction.Data.Pos.x = MiningPos.first.x;
-                Instruction.Data.Pos.y = MiningPos.first.y;
-                Instruction.Data.Pos.z = MiningPos.first.z;
-                self->ThreadInstructions.Enqueue(Instruction);
-                
-                // Path was found
-                PathFound = true;
             }
+            else
+                Success = false;
         }
         
-        // Path was not found, thus we flag self as an idle proc
-        // Fail out if empty
-        //if(!PathFound)
-        //    Job = DwarfJobs_None;
-    }
-    
-    // If crafting...
-    else if(Job == DwarfJobs_Crafter)
-    {
-        // TODO: Get all jobs from all designations and choose one...
+        // Break target block
+        if(Success)
+        {
+            Instruction.Operator = EntityOP_Break;
+            Instruction.Data.Pos.x = Job.TargetBlock.x;
+            Instruction.Data.Pos.y = Job.TargetBlock.y;
+            Instruction.Data.Pos.z = Job.TargetBlock.z;
+            self->ThreadInstructions.Enqueue(Instruction);
+        }
+        // On pathing failure
+        else
+        {
+            // Raise this error into the console (not yet implemented)
+            
+            // Put this job / task back into queue for another dwarf
+            self->GetDesignations()->PutBackJob(&Job);
+        }
     }
     
     /*** Idle ***/
     
-    // Else, just idle, doing nothing...
-    // Note: we don't do an "else" because it an assigned job fails, we get caught here)
-    if(true)//Job == DwarfJobs_None)
+    // If failed to either find a job or path to it...
+    if(!Success)
     {
         // Switch between either pausing (idle for a few seconds) or pathing
         static int Count = 0;

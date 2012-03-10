@@ -160,6 +160,9 @@ protected:
     
 private:
     
+    // Render the target of where we are going to
+    void RenderTargetPath();
+    
     // Threaded instruction computation function
     static void* ComputeTask(void* data);
     
@@ -177,6 +180,9 @@ private:
     pthread_mutex_t ThreadMutex;
     bool ThreadStart, ThreadDone;
     Queue< EntityInstruction > ThreadInstructions;
+    
+    // Current job for the dwarf
+    JobTask Job;
     
     /*** Dwarf Properties ***/
     

@@ -8,13 +8,27 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          isPathRelative = "1"
-         filePath = "Dwarfcraft/GameRender.cpp"
-         timestampString = "352860564.190488"
+         filePath = "Dwarfcraft/DwarfEntity.cpp"
+         timestampString = "353049883.426549"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "266"
-         endingLineNumber = "266"
-         landmarkName = "GameRender::Render()"
+         startingLineNumber = "441"
+         endingLineNumber = "441"
+         landmarkName = "DwarfEntity::ComputeTask(void* data)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         isPathRelative = "1"
+         filePath = "Dwarfcraft/DesignationsView.cpp"
+         timestampString = "353044591.121294"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "212"
+         endingLineNumber = "212"
+         landmarkName = "DesignationsView::PutBackJob(JobTask* JobOut)"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

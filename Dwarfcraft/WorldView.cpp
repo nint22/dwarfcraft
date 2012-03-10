@@ -76,8 +76,11 @@ void WorldView::Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int
         WorldView_Column* ChunkGraphics = &Chunks[ChunkZ * ChunkCount + ChunkX];
         
         // If this chunk is not yet built, build the chunk
-        if(ChunkGraphics->Planes == NULL)
+        if(ChunkGraphics->Planes == NULL || WorldData->GetChunk(ChunkX, ChunkZ)->NeedsUpdate)
+        {
             GenerateColumnVBO(ChunkX, ChunkZ);
+            WorldData->GetChunk(ChunkX, ChunkZ)->NeedsUpdate = false;
+        }
         
         // For this chunk's height
         for(int i = 0; i <= LayerCutoff; i++)
@@ -130,6 +133,22 @@ void WorldView::GenerateColumnVBO(int ChunkX, int ChunkZ)
     // Chunk we are working on and the world texture ID
     WorldView_Column* ChunkGraphics = &Chunks[ChunkZ * ChunkCount + ChunkX];
     GLuint WorldTextureID = dGetTerrainTextureID();
+    
+    // Release if already allocated
+    if(ChunkGraphics->Planes != NULL)
+    {
+        for(int j = 0; j < WorldData->GetWorldHeight(); j++)
+        {
+            if(ChunkGraphics->Planes[j].WorldGeometry != NULL)
+                ChunkGraphics->Planes[j].WorldGeometry->Clear();
+            
+            if(ChunkGraphics->Planes[j].HiddenGeometry != NULL)
+                ChunkGraphics->Planes[j].HiddenGeometry->Clear();
+            
+            if(ChunkGraphics->Planes[j].SideGeometry != NULL)
+                ChunkGraphics->Planes[j].SideGeometry->Clear();
+        }
+    }
     
     // Allocate all the layers (but default to NULL)
     ChunkGraphics->Planes = new WorldView_Plane[WorldData->GetWorldHeight()];

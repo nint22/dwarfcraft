@@ -69,6 +69,10 @@ private:
     // Which is based on the target, rotation angle, and pitch angle
     Vector3<float> GetCameraSource(float Dist);
     
+    // Given an on-screen pixel-position, return the user's camera position, and the selection ray
+    // This *only* works in isometric view, and not during perspective
+    void GetUserSelectionRay(Vector2<int> MousePos, Vector3<float>* SelectionPos, Vector3<float>* SelectionRay);
+    
     /*** User Settings ***/
     
     // Multiplier against mouse delta

@@ -22,7 +22,14 @@
 // Included for access to the designations type and names
 #include "DesignationsView.h"
 
-static const int g2DashboardController_SideWidth = 4;
+// The current state of icon selection
+// Root, group, then selection
+enum DashboardState
+{
+    DashboardState_Root,
+    DashboardState_Group,
+    DashboardState_Selection,
+};
 
 class g2DashboardController : public g2Controller
 {
@@ -31,6 +38,9 @@ public:
     // Standard constructor / destructor
     g2DashboardController(g2Controller* Owner, g2Theme* MainTheme);
     ~g2DashboardController();
+    
+    // Set designations list
+    void SetDesignationsList(DesignationsView* Designations);
     
     // Set target width
     void SetWidth(int Width);
@@ -52,7 +62,7 @@ public:
     bool IsSelecting();
     
     // Update the selection text
-    void SetSelectionVolume(Vector3<int> SelectStart, Vector3<int> SelectEnd, bool IsDone);
+    void SetSelectionVolume(Vector3<int> SelectStart, Vector3<int> SelectEnd);
     
 protected:
     
@@ -73,6 +83,9 @@ protected:
     
     // Mouse click event
     void MouseClick(g2MouseButton button, g2MouseClick state, int x, int y);
+    
+    // Catch all inputs
+    void GetCollisionRect(int* Width, int* Height);
     
 private:
     
@@ -97,17 +110,24 @@ private:
     
     /*** Current Designations ***/
     
-    // Current designation groups:
-    // 0: Main, 1: Construction, 2: storage, 3: Collections, 4: Military
-    int DesignationGroup;
+    // Designations list
+    DesignationsView* Designations;
     
-    // Allocated list of designations
+    // Current dashboard state and group
+    DashboardState State;
+    DesignationGroup StateGroup;
+    DesignationType StateType;
+    
+    // Allocated list of designations used between functions
     DesignationType Types[DesignationCount];
     int TypeCount;
     
     // True if selecting a volume
     bool Selecting;
     DesignationType SelectingType;
+    
+    // Selection volume
+    Vector3<int> SelectStart, SelectEnd;
     
     /*** Icon Constants ***/
     

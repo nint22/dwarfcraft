@@ -491,8 +491,10 @@ void Entity::Execute(float dT)
         }
         else
         {
-            // List of all directly adjacent blocks to check
-            static const Vector3<int> Offsets[6] = {
+            // We can only break blocks directly adjacent or within us
+            static const int OffsetCount = 7;
+            static const Vector3<int> Offsets[OffsetCount] = {
+                Vector3<int>(0, 0, 0),
                 Vector3<int>(1, 0, 0),
                 Vector3<int>(-1, 0, 0),
                 Vector3<int>(0, 1, 0),
@@ -506,7 +508,7 @@ void Entity::Execute(float dT)
             
             // Block we want to break has to be directly adjacent
             bool IsValid = false;
-            for(int i = 0; i < 6; i++)
+            for(int i = 0; i < OffsetCount; i++)
             {
                 if(GetPositionBlock() == (TargetBlock + Offsets[i]))
                 {

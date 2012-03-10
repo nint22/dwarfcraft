@@ -24,11 +24,6 @@ EntityPath::EntityPath(WorldContainer* WorldData, Vector3<int> Source, Vector3<i
     this->Source = Source;
     this->Sink = Sink;
     
-    // Make sure that the sink is an air block and above a solid block
-    dBlock SinkBlock = WorldData->GetBlock(Sink.x, Sink.y - 1, Sink.z);
-    // TODO: Need to verify / enable auto-fail to prevent full-computing thread
-    //UtilAssert(dIsSolid(SinkBlock), "Internal error: Cannot have a non-solid block as a sink for path-planning!");
-    
     // Allocate the mutex
     pthread_mutex_init(&PathComputed, NULL);
     IsComputed = false;
@@ -91,8 +86,8 @@ void* EntityPath::ComputePath(void* Data)
         TotalTime += ThreadClock.GetTime();
         ThreadClock.Start();
         
-        if(TotalTime > EntityPath_MaxThreadTime)
-            break;
+        //if(TotalTime > EntityPath_MaxThreadTime)
+        //    break;
         
         // If no nodes left, we were unable to find a solution
         if(ToVisit.size() <= 0)

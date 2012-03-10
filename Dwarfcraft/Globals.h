@@ -145,5 +145,16 @@ static const Vector2<int> WorldView_Grid3Offsets[9] =
     Vector2<int>(1, -1),
 };
 
+// A helper data structure that gives the offsets for an above/bottom/left/right/front/back set
+static const int AdjacentOffsetsCount = 6;
+static const Vector3<int> AdjacentOffsets[AdjacentOffsetsCount] = {
+    Vector3<int>(1, 0, 0),
+    Vector3<int>(-1, 0, 0),
+    Vector3<int>(0, 1, 0),
+    Vector3<int>(0, -1, 0),
+    Vector3<int>(0, 0, 1),
+    Vector3<int>(0, 0, -1),
+};
+
 // End of inclusion guard
 #endif
