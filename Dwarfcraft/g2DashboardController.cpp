@@ -11,11 +11,59 @@
 // Includes
 #include "g2DashboardController.h"
 
-// Internal helper function to give the coordinates of a given designation icon name
-static inline void GetDesignationIcon(DesignationType Type, char* DesignationName)
+// Helper function to map icons to designation types
+static inline DesignationType GetDesignationType(IconType Type)
 {
-    // Create the name
-    sprintf(DesignationName, "Icon%s", DesignationNames[Type]);
+    DesignationType Result = DesignationType_Armory; // Default
+    
+    // Case for fast mapping
+    switch(Type)
+    {
+        case IconType_Mine:
+            Result = DesignationType_Mine; break;
+        case IconType_Fill:
+            Result = DesignationType_Fill; break;
+        case IconType_Flood:
+            Result = DesignationType_Flood; break;
+        case IconType_Rubbish:
+            Result = DesignationType_Rubbish; break;
+        case IconType_Food:
+            Result = DesignationType_Food; break;
+        case IconType_Crafted:
+            Result = DesignationType_Crafted; break;
+        case IconType_RawResources:
+            Result = DesignationType_RawResources; break;
+        case IconType_Ingots:
+            Result = DesignationType_Ingots; break;
+        case IconType_Grave:
+            Result = DesignationType_Grave; break;
+        case IconType_Farm:
+            Result = DesignationType_Farm; break;
+        case IconType_Wood:
+            Result = DesignationType_Wood; break;
+        case IconType_Forage:
+            Result = DesignationType_Forage; break;
+        case IconType_Protect:
+            Result = DesignationType_Protect; break;
+        case IconType_Barracks:
+            Result = DesignationType_Barracks; break;
+        case IconType_Hall:
+            Result = DesignationType_Hall; break;
+        case IconType_Armory:
+            Result = DesignationType_Armory; break;
+        
+        // Incorect
+        case IconType_Construct:
+        case IconType_Storage:
+        case IconType_Collect:
+        case IconType_Military:
+        case IconType_Accept:
+        case IconType_Cancel:
+            UtilAbort("Unable to map the given IconType to a DesignationType!");
+    }
+    
+    // Designation found
+    return Result;
 }
 
 g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainTheme)
@@ -32,12 +80,8 @@ g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainT
     // Allocate a custom text renderer without management
     CustomText = new g2Label(NULL, MainTheme);
     
-    // Regular icon size
-    char IconName[64];
-    GetDesignationIcon(DesignationType_Mine, IconName);
-    
-    // Get the initial size of the icon
-    GetTheme()->GetComponentSize(IconName, &IconW, &IconH);
+    // Get the initial size of the icon (Armory is just one of any regular icon)
+    GetTheme()->GetComponentSize(GetIconName(IconType_Armory), &IconW, &IconH);
     GetTheme()->GetComponentSize("IconButton", &ButtonW, &ButtonH);
     
     // Double all icon sizes
@@ -170,7 +214,7 @@ void g2DashboardController::Render(int x, int y)
     // Render default 4 designation types
     if(State == DashboardState_Root)
     {
-        DesignationType Types[4] = {DesignationType_Mine, DesignationType_RawResources, DesignationType_Farm, DesignationType_Protect};
+        IconType Types[4] = {IconType_Construct, IconType_Storage, IconType_Collect, IconType_Military};
         Render(x, y, Types, 4);
     }
     // In a group
@@ -179,79 +223,89 @@ void g2DashboardController::Render(int x, int y)
         // Construction
         if(StateGroup == DesignationGroup_Construct)
         {
-            DesignationType Types[3] = {DesignationType_Mine, DesignationType_Fill, DesignationType_Flood};
-            Render(x, y, Types, 3);
+            IconType Types[4] = {IconType_Mine, IconType_Fill, IconType_Flood, IconType_Cancel};
+            Render(x, y, Types, 4);
         }
         else if(StateGroup == DesignationGroup_Storage)
         {
-            DesignationType Types[6] = {DesignationType_Rubbish, DesignationType_Food, DesignationType_Crafted, DesignationType_RawResources, DesignationType_Ingots, DesignationType_Grave};
-            Render(x, y, Types, 6);
+            IconType Types[7] = {IconType_Rubbish, IconType_Food, IconType_Crafted, IconType_RawResources, IconType_Ingots, IconType_Grave, IconType_Cancel};
+            Render(x, y, Types, 7);
         }
         else if(StateGroup == DesignationGroup_Collect)
         {
-            DesignationType Types[3] = {DesignationType_Farm, DesignationType_Wood, DesignationType_Forage};
-            Render(x, y, Types, 3);
+            IconType Types[4] = {IconType_Farm, IconType_Wood, IconType_Forage, IconType_Cancel};
+            Render(x, y, Types, 4);
         }
         else if(StateGroup == DesignationGroup_Military)
         {
-            DesignationType Types[4] = {DesignationType_Protect, DesignationType_Barracks, DesignationType_Hall, DesignationType_Armory};
-            Render(x, y, Types, 4);
+            IconType Types[5] = {IconType_Protect, IconType_Barracks, IconType_Hall, IconType_Armory, IconType_Cancel};
+            Render(x, y, Types, 5);
         }
     }
     // Actively selecting, only show a commit and reject button
     else if(State == DashboardState_Selection)
     {
-        DesignationType Types[1] = {StateType};
-        Render(x, y, Types, 1);
+        // We can cast directly from a DesignationType to an IconType, they are the same (initial) offsets
+        IconType Types[3] = {(IconType)StateType, IconType_Accept, IconType_Cancel};
+        Render(x, y, Types, 3);
     }
     // Else, no such group
     else
         UtilAbort("This sub-menu does not exist");
 }
 
-void g2DashboardController::Render(int x, int y, DesignationType* Types, int TypeCount)
+void g2DashboardController::Render(int x, int y, IconType* Types, int TypeCount)
 {
     // Copy the designations
-    //memcpy(this->Types, Types, sizeof(DesignationType) * TypeCount);
     for(int i = 0; i < TypeCount; i++)
         this->Types[i] = Types[i];
     this->TypeCount = TypeCount;
     
-    // Regular icon size
-    char IconName[64];
-    
-    // For each type
-    for(int i = 0; i <= TypeCount; i++)
+    // For each icon
+    for(int i = 0; i < TypeCount; i++)
     {
         // Positions for icon background, top-icon needs to do + <dx, dy>
         int ix = x + IconOffsetX + IconSpaceX * (i % IconColCount);
         int iy = y + IconOffsetY + IconSpaceY * (i / IconColCount);
         
-        // If we are at the end, and this is the default group, don't draw a "back" icon
-        if(State == DashboardState_Root && i == TypeCount)
-            continue;
-        
-        // If we are at the end, and this is not the default group, append a "back" icon
-        else if(i == TypeCount)
-            strcpy(IconName, "IconCancel");
-        
-        // Else, regular icon
-        else
-            GetDesignationIcon(Types[i], IconName);
-        
         // Background image
         DrawComponent("IconButton", ix, iy, ButtonW, ButtonH);
         
         // Draw icon
-        DrawComponent(IconName, ix + dx, iy + dy, IconW, IconH);
+        DrawComponent(GetIconName(Types[i]), ix + dx, iy + dy, IconW, IconH);
         
         // If the mouse is in this position, act as though the user is hovering over it
         // and draw a label of the text as well
         if(MouseX >= ix - x && MouseX < ix - x + ButtonW && MouseY >= iy - y && MouseY < iy - y + ButtonH)
         {
-            DrawComponent("IconButton_Hover", ix, iy, ButtonW, ButtonH);
-            if(i == TypeCount)
+            // Only draw the hover if not the designation type when in selection mode
+            if(State != DashboardState_Selection || i != 0)
+                DrawComponent("IconButton_Hover", ix, iy, ButtonW, ButtonH);
+            
+            // Button names:
+            
+            // Cancel button if non-root and last element
+            if(State != DashboardState_Root && i == TypeCount - 1)
                 ClockText->SetText("Cancel");
+            
+            // Commit button if selection and second-last element
+            else if(State == DashboardState_Selection && i == 1)
+                ClockText->SetText("Make Designation");
+            
+            // Root view
+            else if(State == DashboardState_Root)
+            {
+                if(i == 0)
+                    ClockText->SetText("Construct");
+                else if(i == 1)
+                    ClockText->SetText("Storage");
+                else if(i == 2)
+                    ClockText->SetText("Collect");
+                else
+                    ClockText->SetText("Military");
+            }
+            
+            // All other views are just diret icon names
             else
                 ClockText->SetText(DesignationNames[Types[i]]);
         }
@@ -289,10 +343,6 @@ void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state,
     if(button != g2MouseButton_Left || state != g2MouseClick_Up)
         return;
     
-    // If we are not in the root menu, check +1 for the cancel button
-    if(State != DashboardState_Root)
-        TypeCount++;
-    
     // For each icon
     for(int i = 0; i < TypeCount; i++)
     {
@@ -303,8 +353,12 @@ void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state,
         // If the mouse is in this position, act as though the user is hovering over it
         if(x >= ix && x < ix + ButtonW && y >= iy && y < iy + ButtonH)
         {
+            // Ignore clicking the first element if we are in selection mode
+            if(State == DashboardState_Selection && i == 0)
+                continue;
+            
             // Alyways go to the root screen when canceling and cancel any volume selection
-            if(State != DashboardState_Root && i == TypeCount - 1)
+            else if(State != DashboardState_Root && i == TypeCount - 1)
             {
                 State = DashboardState_Root;
                 Selecting = false;
@@ -319,11 +373,11 @@ void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state,
             else if(State == DashboardState_Group)
             {
                 State = DashboardState_Selection;
-                StateType = Types[i];
+                StateType = GetDesignationType(Types[i]);
                 Selecting = true;
             }
             // Else, user is commiting change
-            else if(State == DashboardState_Selection && i == 0)
+            else if(State == DashboardState_Selection && i == 1)
             {
                 State = DashboardState_Root;
                 Selecting = false;

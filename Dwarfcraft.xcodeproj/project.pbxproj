@@ -79,6 +79,10 @@
 		0668FDEC1502BB6900751B5E /* Settings.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0668FDEB1502B61C00751B5E /* Settings.cfg */; };
 		06C497BE1500474000456F34 /* moon.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06C497BB1500468700456F34 /* moon.png */; };
 		06C497BF1500474000456F34 /* sun.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06C497BC1500468700456F34 /* sun.png */; };
+		06CDAE08150EA9F000F0229E /* SampleDwarf.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06CDAE06150EA91300F0229E /* SampleDwarf.cfg */; };
+		06CDAE09150EA9F000F0229E /* character_sheet.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06CDAE07150EA92200F0229E /* character_sheet.png */; };
+		06CDAE0C150EADBD00F0229E /* NewDwarf.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06CDAE0B150EADB400F0229E /* NewDwarf.png */; };
+		06CDAE0D150EADBD00F0229E /* NewDwarf.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06CDAE0A150EAD6F00F0229E /* NewDwarf.cfg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -88,6 +92,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
+				06CDAE0C150EADBD00F0229E /* NewDwarf.png in CopyFiles */,
+				06CDAE0D150EADBD00F0229E /* NewDwarf.cfg in CopyFiles */,
+				06CDAE08150EA9F000F0229E /* SampleDwarf.cfg in CopyFiles */,
+				06CDAE09150EA9F000F0229E /* character_sheet.png in CopyFiles */,
 				0668FDEC1502BB6900751B5E /* Settings.cfg in CopyFiles */,
 				06C497BE1500474000456F34 /* moon.png in CopyFiles */,
 				06C497BF1500474000456F34 /* sun.png in CopyFiles */,
@@ -244,6 +252,10 @@
 		0668FDEB1502B61C00751B5E /* Settings.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Settings.cfg; path = "Resources/Configuration files/Settings.cfg"; sourceTree = "<group>"; };
 		06C497BB1500468700456F34 /* moon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = moon.png; path = Resources/Background/moon.png; sourceTree = "<group>"; };
 		06C497BC1500468700456F34 /* sun.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sun.png; path = Resources/Background/sun.png; sourceTree = "<group>"; };
+		06CDAE06150EA91300F0229E /* SampleDwarf.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = SampleDwarf.cfg; path = "Resources/Configuration files/SampleDwarf.cfg"; sourceTree = "<group>"; };
+		06CDAE07150EA92200F0229E /* character_sheet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = character_sheet.png; path = Resources/character_sheet.png; sourceTree = "<group>"; };
+		06CDAE0A150EAD6F00F0229E /* NewDwarf.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = NewDwarf.cfg; path = "Resources/Configuration files/NewDwarf.cfg"; sourceTree = "<group>"; };
+		06CDAE0B150EADB400F0229E /* NewDwarf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NewDwarf.png; path = Resources/NewDwarf.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -326,7 +338,11 @@
 		060EE2C414FC64C800D0A08C /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				06CDAE0B150EADB400F0229E /* NewDwarf.png */,
+				06CDAE0A150EAD6F00F0229E /* NewDwarf.cfg */,
+				06CDAE06150EA91300F0229E /* SampleDwarf.cfg */,
 				060EE2E414FC66B400D0A08C /* Lightest Dwarf.cfg */,
+				06CDAE07150EA92200F0229E /* character_sheet.png */,
 				060EE2E014FC66B400D0A08C /* BabyWolf.cfg */,
 				060EE2D614FC661C00D0A08C /* BabyWolf.png */,
 				060EE2D514FC661100D0A08C /* LightestDwarf.png */,

@@ -38,6 +38,11 @@
  immediate-mode rendering, which may be changed in the future
  based on performance hits.
  
+ Note: All paths are now floating point positions of either in
+ a block (if it is a half block) or an empty space (bellow is solid
+ block). This is all done to help the dwarves during run-time movements
+ and to simplify block look ups.
+ 
 ***************************************************************/
 
 // Inclusion guard
@@ -146,6 +151,7 @@ public:
     
     // Instantly move the entity to this location
     void SetPosition(Vector3<int> Pos);
+    void SetPosition(Vector3<float> Pos);
     
     // Returns location
     Vector3<float> GetPosition();
@@ -182,9 +188,6 @@ public:
     
     // Set the current breaking state, target, and time to break 
     void SetBreaking(Vector3<int> BreakTarget, float BreakTime);
-    
-    // Get the current number of pixels that the dwarf is jumping (i.e. offset from the bottom)
-    float GetAnimationJump();
     
     /*** Entity Processing Management ***/
     
@@ -254,6 +257,9 @@ protected:
     // Render object
     void __Render(float CameraAngle);
     
+    // Update the physics model of our dwarf (i.e. fall, be pushed, etc.)
+    void UpdatePhys(float dT);
+    
     // Execute as many commandas as possible, or stall if needed
     void Execute(float dT);
     
@@ -301,6 +307,11 @@ protected:
     int Health, MaxHealth;
     
 private:
+    
+    /*** Helper / Misc. Functions ***/
+    
+    // Turn a given block into a centered-position for an entity
+    bool LocalizePosition(Vector3<int> Pos, Vector3<float>* PosOut);;
     
     /*** Data ***/
     
@@ -376,9 +387,8 @@ private:
     // Previous "Source" path
     Vector3<float> AnimationSource;
     
-    // Total distance, from the default bottom, an entity moves up during a jump
-    // This changes over time and is not a "constant" but the effect's variable
-    float AnimationJump;
+    // If jumping, set to true
+    bool IsJumping;
     
     /*** AI / Control ***/
     

@@ -24,6 +24,11 @@
  meaning it is a series of blocks that are above solid blocks (or
  in the case of half-blocks, within such blocks).
  
+ Note: It is still critically important to look at all target
+ blocks during run-time so that if the world is manipulated after
+ path generation, the dwarves react correctly (i.e. computer new path,
+ give up, etc..)
+ 
 ***************************************************************/
 
 #ifndef __ENTITYPATH_H__
@@ -54,7 +59,7 @@ public:
     
     // Retrieve the currently computed path; the calling function must compute the path first
     // Returns true when the thread is done; Posts the path data into the given buffer, else
-    // returns an empty list
+    // returns an empty list.
     bool GetPath(Stack< Vector3<int> >* Path);
     
     // Define the type that is associated with a node

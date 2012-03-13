@@ -18,6 +18,7 @@
 #define __G2DASHBOARDCONTROLLER_H__
 
 #include <Glui2/glui2.h>
+#include "Globals.h" // For icon access
 
 // Included for access to the designations type and names
 #include "DesignationsView.h"
@@ -70,7 +71,7 @@ protected:
     void Render(int x, int y);
     
     // Render the bottom controller icons
-    void Render(int x, int y, DesignationType* Types, int TypeCount);
+    void Render(int x, int y, IconType* Types, int TypeCount);
     
     // Update the controller
     void Update(float dT);
@@ -119,7 +120,7 @@ private:
     DesignationType StateType;
     
     // Allocated list of designations used between functions
-    DesignationType Types[DesignationCount];
+    IconType Types[DesignationCount];
     int TypeCount;
     
     // True if selecting a volume

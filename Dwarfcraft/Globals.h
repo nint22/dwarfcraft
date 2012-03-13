@@ -156,5 +156,83 @@ static const Vector3<int> AdjacentOffsets[AdjacentOffsetsCount] = {
     Vector3<int>(0, 0, -1),
 };
 
+/** Icon Set for the GUI **/
+
+// Enumeration of all icons
+// Note that the first elements have the same index (i.e. parallel
+// to) the enumeration "DesignationType"
+static const int IconTypeCount = 22;
+enum IconType
+{
+    // Construction
+    IconType_Mine = 0, // Just start so we match "DesignationType_Mine = 0"
+    IconType_Fill,
+    IconType_Flood,
+    
+    // Storage
+    IconType_Rubbish,
+    IconType_Food,
+    IconType_Crafted,
+    IconType_RawResources, // Wood, stones, etc.
+    IconType_Ingots,
+    IconType_Grave,
+    
+    // Collection
+    IconType_Farm,
+    IconType_Wood,
+    IconType_Forage,
+    
+    // Military flags
+    IconType_Protect,
+    IconType_Barracks,
+    IconType_Hall,
+    IconType_Armory,
+    
+    // Not parallel to "DesignationType"
+    
+    // Global menu
+    IconType_Construct,
+    IconType_Storage,
+    IconType_Collect,
+    IconType_Military,
+    
+    // Accept or cancel
+    IconType_Accept,
+    IconType_Cancel,
+};
+
+// The names of each icon
+static const char IconTypeNames[IconTypeCount][32] =
+{
+    "IconMine",
+    "IconFill",
+    "IconFlood",
+    "IconRubbish",
+    "IconFood",
+    "IconCrafted",
+    "IconRawResources",
+    "IconIngots",
+    "IconGrave",
+    "IconFarm",
+    "IconWood",
+    "IconForage",
+    "IconProtect",
+    "IconBarracks",
+    "IconHall",
+    "IconArmory",
+    "IconConstruct",
+    "IconStorage",
+    "IconCollect",
+    "IconMilitary",
+    "IconAccept",
+    "IconCancel",
+};
+
+// Internal helper function to give the Glui2 name based on the icon type
+static inline const char* GetIconName(IconType Type)
+{
+    return IconTypeNames[(int)Type];
+}
+
 // End of inclusion guard
 #endif

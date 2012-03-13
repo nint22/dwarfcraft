@@ -71,8 +71,8 @@ Entity::Entity(const char* ConfigName)
     // Path planning starts invalid
     PathPlanner = NULL;
     
-    // No jumping offset yet
-    AnimationJump = 0.0f;
+    // Not jumping
+    IsJumping = false;
     
     // Generate an entity ID
     EntityID = __EntityCount++;
@@ -96,6 +96,11 @@ g2Config* Entity::GetConfigFile()
 void Entity::SetPosition(Vector3<int> Pos)
 {
     Location = Vector3<float>(Pos.x, Pos.y, Pos.z);
+}
+
+void Entity::SetPosition(Vector3<float> Pos)
+{
+    Location = Pos;
 }
 
 float Entity::GetSize()
@@ -163,11 +168,6 @@ void Entity::SetBreaking(Vector3<int> BreakTarget, float BreakTime)
     BreakingTarget = BreakTarget;
     BreakingTime = FullBreakingTime = BreakTime;
     BreakingCellIndex = 0;
-}
-
-float Entity::GetAnimationJump()
-{
-    return AnimationJump;
 }
 
 void Entity::AddInstruction(EntityInstruction Instruction)
@@ -315,6 +315,9 @@ void Entity::__Update(float dT)
     // Execute instruction update as needed
     Execute(dT);
     
+    // Update for the physics
+    UpdatePhys(dT);
+    
     /*** Sprite Animation ***/
     
     // Total time
@@ -382,16 +385,85 @@ void Entity::__Render(float CameraAngle)
     
     // Render the sprite (flip as needed)
     Vector2<float> WorldSize = GetWorldSize();
-    RenderBillboard(GetPosition() + Vector3<float>(0, AnimationJump, 0), WorldSize.x, WorldSize.y, x, y, width, height, 0.0f, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL));
+    RenderBillboard(GetPosition(), WorldSize.x, WorldSize.y, x, y, width, height, 0.0f, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL));
     
-    // Render shadow
-    RenderShadow(GetPosition(), ShadowRadius);
+    /*** Shadows ***/
+    
+    // We only care about the first solid block under this dwarf (including which block it is in)
+    dBlock SolidBlock(dBlockType_Air);
+    float ground;
+    
+    for(int y = Location.y; y >= 0; y--)
+    {
+        SolidBlock = GetWorld()->GetBlock(Location.x, y, Location.z);
+        if(SolidBlock.GetType() != dBlockType_Air)
+        {
+            // If solid block, the ground is 1 unit above
+            if(SolidBlock.IsWhole())
+                ground = y + 1;
+            else
+                ground = y + 0.5f;
+            break;
+        }
+    }
+    
+    // Render shadow (offset a little up)
+    RenderShadow(Vector3<float>(GetPosition().x, ground + 0.01f, GetPosition().z), ShadowRadius);
     
     /*** Custom Rendering ***/
     
     // Render any special entity-specific properties
     Render();
+}
+
+void Entity::UpdatePhys(float dT)
+{
+    // How fast we fall in a cycle
+    static const float fall_vel = 0.05f;
     
+    /*** In a block, pop up ***/
+    
+    // If in a solid whole block
+    dBlock CurrentBlock = GetWorld()->GetBlock(Location);
+    if(CurrentBlock.IsWhole() && CurrentBlock.GetType() != dBlockType_Air)
+    {
+        // Pop up and set to that location
+        CurrentBlock = GetWorld()->GetBlock(Location + Vector3<float>(0, 1, 0));
+        if(CurrentBlock.IsWhole())
+            Location.y = (int)Location.y + 1.0f;
+        else
+            Location.y = (int)Location.y + 0.5f;
+    }
+    // Or within but below a half block
+    else if(!CurrentBlock.IsWhole() && (Location.y - (int)Location.y) < 0.5f)
+       Location.y = (int)Location.y + 0.5f;
+    
+    /*** Falling while in the air ***/
+    
+    // We only care about the first solid block under this dwarf (including which block it is in)
+    dBlock SolidBlock(dBlockType_Air);
+    float ground;
+    
+    for(int y = Location.y; y >= 0; y--)
+    {
+        SolidBlock = GetWorld()->GetBlock(Location.x, y, Location.z);
+        if(SolidBlock.GetType() != dBlockType_Air)
+        {
+            // If solid block, the ground is 1 unit above
+            if(SolidBlock.IsWhole())
+                ground = y + 1;
+            else
+                ground = y + 0.5f;
+            break;
+        }
+    }
+    
+    // Fail out: dwarf is somehow under the world?
+    UtilAssert(SolidBlock.GetType() != dBlockType_Air, "Dwarf is falling out of the world");
+    
+    // If the dwarf's loction is above the ground plane, slowely bring it down, but never below the plane itself
+    if(Location.y > ground + fall_vel)
+        Location.y -= fall_vel;
 }
 
 void Entity::Execute(float dT)
@@ -456,7 +528,8 @@ void Entity::Execute(float dT)
                 
                 // Pop off the starting location, and ignore path movement if none left
                 Vector3<int> StartingPos = MovingPath.Pop();
-                AnimationSource = Vector3<float>(StartingPos.x, StartingPos.y, StartingPos.z);
+                if(!LocalizePosition(StartingPos, &AnimationSource))
+                    UtilAbort("Unable to localize a block position to path");
                 
                 // Trivial path: at self-location
                 if(MovingPath.IsEmpty())
@@ -556,7 +629,7 @@ void Entity::Execute(float dT)
     
     // Else, undefined op; internal error
     else
-        UtilAssert(false, "Unknown op \"%d\" entity \"%d\" attempted to execute", (int)ActiveInstruction.Operator, GetEntityID());
+        UtilAssert(false, "Unknown op \"%d\" from entity \"%d\" attempted to execute", (int)ActiveInstruction.Operator, GetEntityID());
 }
 
 void Entity::ExecuteMove(float dT)
@@ -567,14 +640,9 @@ void Entity::ExecuteMove(float dT)
         // Done moving; make sure we are at the precise right location
         State = EntityState_Idle;
         IsExecuting = false;
-        Location = Vector3<float>(MovingTarget.x, MovingTarget.y, MovingTarget.z);
         
-        // If half block, move up..
-        if(!GetWorld()->GetBlock(MovingTarget).IsWhole())
-            Location.y += 0.5f;
-        
-        // Make sure to reset the jumping animation
-        AnimationJump = 0.0f;
+        if(!LocalizePosition(MovingTarget, &Location))
+            UtilAbort("Unable to localize a block position to path");
     }
     // Commit to animation
     else
@@ -582,11 +650,9 @@ void Entity::ExecuteMove(float dT)
         /*** Walking Movement / Update ***/
         
         // Current target
-        Vector3<float> AnimationTarget = Vector3<float>(MovingPath.Peek().x, MovingPath.Peek().y, MovingPath.Peek().z);
-        
-        // If half block, move up..
-        if(!GetWorld()->GetBlock(MovingPath.Peek()).IsWhole())
-            AnimationTarget.y += 0.5f;
+        Vector3<float> AnimationTarget;
+        if(!LocalizePosition(MovingPath.Peek(), &AnimationTarget))
+            UtilAbort("Unable to localize a block position to path");
         
         // Find the vector / direction
         Vector3<float> Direction = AnimationTarget - Location;
@@ -599,13 +665,15 @@ void Entity::ExecuteMove(float dT)
         // Compute current location
         Location += Direction * 0.025f; // TODO: ENTITY SPEED HERE
         
+        /*** Jumping Animation ***/
+        
+        // Note: These distances are on the xz-plane, and does not include the y-component
+        
         // What is the distance to the target?
-        float CurrentDistance = (Location - AnimationSource).GetLength();
+        float CurrentDistance = (Vector2<float>(Location.x, Location.z) - Vector2<float>(AnimationSource.x, AnimationSource.z)).GetLength();
         
         // What is the distance from source to destination?
-        float TotalDistance = (AnimationTarget - AnimationSource).GetLength();
-        
-        /*** Jumping Animation ***/
+        float TotalDistance = (Vector2<float>(AnimationTarget.x, AnimationTarget.z) - Vector2<float>(AnimationSource.x, AnimationSource.z)).GetLength();
         
         // Current block we are on
         dBlock CurrentBlock = GetWorld()->GetBlock(Vector3ftoi(AnimationSource));
@@ -614,12 +682,18 @@ void Entity::ExecuteMove(float dT)
         dBlock NextBlock = GetWorld()->GetBlock(Vector3ftoi(AnimationTarget));
         
         // If the entity is near the middle of a transition
-        static const float AnimationJump_Threshold = 0.2f;
-        float TransitionDelta = fabs((TotalDistance / 2.0f) - CurrentDistance) / TotalDistance;
+        static const float AnimationJump_Threshold = 0.35f; // From the center
+        float TransitionDelta = fabs((TotalDistance / 2.0f) - CurrentDistance);// / TotalDistance;
         if(TransitionDelta <= AnimationJump_Threshold && (CurrentBlock.IsWhole() != NextBlock.IsWhole() || int(AnimationSource.y) != int(AnimationTarget.y)))
-            AnimationJump = 1.5f * (AnimationJump_Threshold - TransitionDelta);
+        {
+            IsJumping = true;
+            
+            // From start to end, not from middle
+            float Normalized = (CurrentDistance - (TotalDistance / 2.0f - AnimationJump_Threshold)) / (AnimationJump_Threshold * 2);
+            Location.y += 0.1f * sin(UtilPI / 2.0f + UtilPI * Normalized);
+        }
         else
-            AnimationJump = 0.0f;
+            IsJumping = false;
         
         /*** Reached Animation Sink ***/
         
@@ -629,11 +703,8 @@ void Entity::ExecuteMove(float dT)
         {
             // Save the new source position
             Vector3<int> StartingPos = MovingPath.Pop();
-            AnimationSource = Vector3<float>(StartingPos.x, StartingPos.y, StartingPos.z);
-            
-            // Update animation source so we know to level off corectly
-            if(!GetWorld()->GetBlock(StartingPos).IsWhole())
-                AnimationSource.y += 0.5f;
+            if(!LocalizePosition(StartingPos, &AnimationSource))
+                UtilAbort("Unable to localize a block position to path");
         }
     }
 }
@@ -650,14 +721,9 @@ void Entity::ExecuteBreak(float dT)
         State = EntityState_Idle;
         IsExecuting = false;
         
-        // TODO: Map the block to the item
         // Place the coal onto the ground now; then replace block to air
         GetItems()->AddItem(dItem(dItem_Coal), BreakingTarget);
         GetWorld()->SetBlock(BreakingTarget.x, BreakingTarget.y, BreakingTarget.z, dBlockType_Air);
-        
-        // Layer above, including, and below needs updates
-        //for(int i = BreakingTarget.y - 1; i <= BreakingTarget.y + 1; i++)
-        //    GetWorld()->SetUpdateState(i, true);
     }
     // Else, post the progress
     else
@@ -744,13 +810,6 @@ void Entity::RenderBillboard(Vector3<float> pos, float outwidth, float outheight
         TextureCoords[3][0] = temp;
     }
     
-    // Compute the view-ray offsets (so we can order textures)
-    Vector2<float> Offset(cos(-GetCameraAngle()), sin(-GetCameraAngle()));
-    if(doffset >= 0.001f || doffset <= -0.001f)
-        Offset *= doffset;
-    else
-        Offset = Vector2<float>(0.0f, 0.0f);
-    
     // Enable texture
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, TextureID);
@@ -761,7 +820,7 @@ void Entity::RenderBillboard(Vector3<float> pos, float outwidth, float outheight
         // Initialize color, rotation, and location
         glColor3f(1, 1, 1);
         
-        glTranslatef(pos.x + 0.5f + Offset.x, pos.y, pos.z + 0.5f + Offset.y);
+        glTranslatef(pos.x, pos.y, pos.z);
         glRotatef(UtilRadToDeg * (GetCameraAngle()  - UtilPI / 2.0f), 0, 1, 0);
         
         // Front facing sprite
@@ -791,8 +850,9 @@ void Entity::RenderShadow(Vector3<float> pos, float radius)
     static const int Segments = 12;
     
     // Start a circle at the face
+    // About the center, above ground
     glPushMatrix();
-    glTranslatef(pos.x + 0.5f, pos.y + 0.01f, pos.z + 0.5f);
+    glTranslatef(pos.x, pos.y + 0.01f, pos.z);
     glColor4f(0, 0, 0, 0.5f);
     
     glBegin(GL_TRIANGLE_FAN);
@@ -907,4 +967,28 @@ bool Entity::GetWearableSprite(dItemType ItemType, float* x, float* y, float* wi
     
     // Never found...
     return false;
+}
+
+bool Entity::LocalizePosition(Vector3<int> Pos, Vector3<float>* PosOut)
+{
+    // Target block we are moving into
+    dBlock InBlock = GetWorld()->GetBlock(Pos);
+    dBlock BottomBlock = GetWorld()->GetBlock(Pos + Vector3<int>(0, -1, 0));
+    
+    // Go into block if halfblock
+    if(!InBlock.IsWhole() && InBlock.GetType() != dBlockType_Air)
+    {
+        *PosOut = Vector3<float>(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f);
+        return true;
+    }
+    // Go ontop of block
+    else if(InBlock.IsWhole() && InBlock.GetType() == dBlockType_Air &&
+            BottomBlock.IsWhole() && BottomBlock.GetType() != dBlockType_Air)
+    {
+        *PosOut = Vector3<float>(Pos.x + 0.5f, Pos.y, Pos.z + 0.5f);
+        return true;
+    }
+    // Not valid
+    else
+        return false;
 }

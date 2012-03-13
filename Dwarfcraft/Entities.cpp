@@ -178,7 +178,7 @@ void Entities::Render(int LayerCutoff, float CameraAngle)
             glBegin(GL_LINE_STRIP);
             
             // Initial point is the entitie's current position
-            glVertex3f(EntityPos.x + 0.5f, EntityPos.y + 0.1f, EntityPos.z + 0.5f);
+            glVertex3f(EntityPos.x, EntityPos.y + 0.1f, EntityPos.z);
             
             // For each block we need to visit
             while(!MovingPath.IsEmpty())

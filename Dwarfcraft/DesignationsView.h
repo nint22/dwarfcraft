@@ -95,7 +95,7 @@ static const char DesignationNames[DesignationCount][32] =
     "Rubbish",
     "Food",
     "Crafted",
-    "RawResources",
+    "Raw Resources",
     "Ingots",
     "Grave",
     "Farm",

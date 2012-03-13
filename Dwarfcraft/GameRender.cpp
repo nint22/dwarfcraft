@@ -119,7 +119,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     // Select one of four skin colors
     char Skins[4][32] = 
     {
-        "Lightest Dwarf.cfg",
+        "Lightest Dwarf.cfg",//"NewDwarf.cfg",//"Lightest Dwarf.cfg",//"SampleDwarf.cfg",
         "Lighter Dwarf.cfg",
         "Darker Dwarf.cfg",
         "Darkest Dwarf.cfg"
@@ -137,12 +137,12 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
         
         // Create a "dumb" AI for test
         DwarfEntity* SampleDwarf = new DwarfEntity(Skins[0]);// Debugging: always same skin for now Skins[i % 4]);
-        SampleDwarf->SetPosition(Vector3<int>(x, y, z));
+        SampleDwarf->SetPosition(Vector3<float>(x + 0.5f, y - 0.5f, z + 0.5f)); // Center on the tile (dwarf will auto-fall if needed)
         
         // Explicitly set random armor (chest, pants)
         dItem Chest(dItemType(dItem_ArmorChest_Leather + rand() % 2));
         dItem Boots(dItemType(dItem_ArmorBoots_Leather + rand() % 2));
-        SampleDwarf->SetArmor(Chest, Boots);
+        //SampleDwarf->SetArmor(Chest, Boots);
         
         // Add to entities list
         EntitiesList->AddEntity(SampleDwarf);

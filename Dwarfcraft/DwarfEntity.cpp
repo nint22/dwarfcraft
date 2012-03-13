@@ -276,9 +276,6 @@ void DwarfEntity::Render()
     float x, y, width, height;
     GLuint TextID;
     
-    // Get the corrected position (after the jump)
-    Vector3<float> CorrectedPosition = GetPosition() + Vector3<float>(0, GetAnimationJump(), 0);
-    
     // Always render ontop
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(-1.0f, -1.0f);
@@ -295,7 +292,7 @@ void DwarfEntity::Render()
         
         // Render the sprite (flip as needed)
         Vector2<float> WorldSize = GetWorldSize();
-        RenderBillboard(CorrectedPosition, WorldSize.x, WorldSize.y, x, y, width, height, 0, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL), TextID);
+        RenderBillboard(GetPosition(), WorldSize.x, WorldSize.y, x, y, width, height, 0, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL), TextID);
     }
     
     /*** Render Boots ***/
@@ -310,7 +307,7 @@ void DwarfEntity::Render()
         
         // Render the sprite (flip as needed)
         Vector2<float> WorldSize = GetWorldSize();
-        RenderBillboard(CorrectedPosition, WorldSize.x, WorldSize.y, x, y, width, height, 0, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL), TextID);
+        RenderBillboard(GetPosition(), WorldSize.x, WorldSize.y, x, y, width, height, 0, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL), TextID);
     }
     
     // Render normal z-fighting render method
@@ -329,42 +326,24 @@ void DwarfEntity::RenderTargetPath()
     while(!Path.IsEmpty())
         TilePos = Path.Pop();
     
-    // Go down a tile
-    TilePos.y--;
+    // Push what we will work on
+    glPushMatrix();
     
-    // Only render if we are right below air
-    if(GetWorld()->IsWithinWorld(TilePos + Vector3<int>(0, 1, 0)) && GetWorld()->GetBlock(TilePos + Vector3<int>(0, 1, 0)).GetType() == dBlockType_Air)
-    {
-        // Get texture info
-        float srcx, srcy, srcwidth, srcheight; GLuint TextureID;
-        dGetDesignationTexture(DesignationType_Mine, &srcx, &srcy, &srcwidth, &srcheight, &TextureID);
-        glBindTexture(GL_TEXTURE_2D, TextureID);
-        
-        glEnable(GL_TEXTURE_2D);
-        
-        static float phase = 0.0f;
-        phase += 0.1f;
-        glColor4f(1, 0.8, 0.8, 0.9f + 0.1f * sin(phase));
-        
-        // Move down 0.5f if half block
-        float VerticalOffset = 0.0f;
-        if(!GetWorld()->GetBlock(TilePos).IsWhole())
-            VerticalOffset = -0.5f;
-
-        // Do a tiny oscilating offset
-        VerticalOffset += 0.01f + 0.005f * sin(phase * 0.5f + TilePos.z) + 0.01f + 0.005f * cos(phase * 0.5f + TilePos.x);
-        
-        // Render a mining tile
-        // Note the slight shift upwards because we want to render it ABOVE a block
-        glBegin(GL_QUADS);
-        glTexCoord2f(srcx + srcwidth, srcy); glVertex3f(TilePos.x + 0.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 0.0f);
-        glTexCoord2f(srcx, srcy); glVertex3f(TilePos.x + 0.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 1.0f);
-        glTexCoord2f(srcx, srcy + srcheight); glVertex3f(TilePos.x + 1.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 1.0f);
-        glTexCoord2f(srcx + srcwidth, srcy + srcheight); glVertex3f(TilePos.x + 1.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 0.0f);
-        glEnd();
-    }
+    // Move and scale as needed (shouldn't it scale first then translate?)
+    glTranslatef(TilePos.x + 0.5f, TilePos.y + 0.5f, TilePos.z + 0.5f);
+    glScalef(0.9f, 0.9f, 0.9f);
     
-    glDisable(GL_TEXTURE_2D);
+    // Set color
+    float r, g, b;
+    g2Label::GetTemplateColor(GetEntityID() % 16, &r, &g, &b);
+    glColor3f(r * 0.8f, g * 0.8f, b * 0.8f);
+    
+    // Draw cube
+    glLineWidth(2.0f);
+    glutWireCube(1.0f);
+    
+    // Pop this localized coordinate
+    glPopMatrix();
 }
 
 void* DwarfEntity::ComputeTask(void* data)
