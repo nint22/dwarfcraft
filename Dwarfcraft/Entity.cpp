@@ -347,6 +347,11 @@ void Entity::Render()
     // To be overloaded by the deriving class
 }
 
+void Entity::InstructionComplete(EntityInstruction Instr)
+{
+    // To be overloaded by the deriving class
+}
+
 void Entity::__Update(float dT)
 {
     /*** Get and Execute Instruction ***/
@@ -539,6 +544,9 @@ void Entity::Execute(float dT)
     // If generating path, but not already moving
     else if(ActiveInstruction.Operator == EntityOp_MoveTo)
     {
+        // Path s actually valid
+        bool IsValidPath;
+        
         // Actively moving
         if(State == EntityState_Moving)
         {
@@ -548,11 +556,8 @@ void Entity::Execute(float dT)
         // Not yet started computing
         else if(PathPlanner == NULL)
         {
-            // Save target
-            MovingTarget = Vector3<int>(ActiveInstruction.Data.Pos.x, ActiveInstruction.Data.Pos.y, ActiveInstruction.Data.Pos.z);
-            
             // Allocate and launch thread
-            PathPlanner = new EntityPath(MainWorld, GetPositionBlock(), MovingTarget);
+            PathPlanner = new EntityPath(MainWorld, GetPositionBlock(), Vector3<int>(ActiveInstruction.Data.Pos.x, ActiveInstruction.Data.Pos.y, ActiveInstruction.Data.Pos.z));
             PathPlanner->ComputePath();
             
             // Empty current paths
@@ -560,10 +565,10 @@ void Entity::Execute(float dT)
                 MovingPath.Pop();
         }
         // Else, attempt to get the path
-        else if(PathPlanner->GetPath(&MovingPath))
+        else if(PathPlanner->GetPath(&MovingPath, &IsValidPath))
         {
             // If empty, then it is an invalid path
-            if(MovingPath.GetSize() > 0)
+            if(MovingPath.GetSize() > 0 && IsValidPath)
             {
                 // Stop instruction execution and start movement
                 State = EntityState_Moving;
@@ -587,6 +592,38 @@ void Entity::Execute(float dT)
             // Regardless of success, release the path planner object
             delete PathPlanner;
             PathPlanner = NULL;
+        }
+    }
+    
+    // Path already generated, just execute movement
+    else if(ActiveInstruction.Operator == EntityOp_MovePath)
+    {
+        // Actively moving
+        if(State == EntityState_Moving)
+        {
+            // Interally, it will turn off "IsExecuting"
+            ExecuteMove(dT);
+        }
+        // Not yet started computing
+        else
+        {
+            // Copy given path into MovingPath
+            MovingPath = *ActiveInstruction.Data.Path;
+            
+            // Stop instruction execution and start movement
+            State = EntityState_Moving;
+            
+            // Pop off the starting location, and ignore path movement if none left
+            Vector3<int> StartingPos = MovingPath.Pop();
+            if(!LocalizePosition(StartingPos, &AnimationSource))
+                RaiseExecutionError(EntityError_Blocked);
+            
+            // Trivial path: at self-location
+            if(MovingPath.IsEmpty())
+            {
+                State = EntityState_Idle;
+                IsExecuting = false;
+            }
         }
     }
     
@@ -633,12 +670,9 @@ void Entity::Execute(float dT)
                 // TODO: need to pass correct content here
                 SetBreaking(TargetBlock, dGetBreakTime(0, dBlock(dBlockType_Dirt)));
             }
-            // Give up
+            // Give up by posting an error
             else
-            {
-                IsExecuting = false;
-                printf("WARNING: Unable to reach from source <%d, %d, %d> to target <%d, %d, %d> for EntityOP_Break!\n", GetPositionBlock().x, GetPositionBlock().y, GetPositionBlock().z, TargetBlock.x, TargetBlock.y, TargetBlock.z);
-            }
+                RaiseExecutionError(EntityError_NotReachable);
         }
     }
     
@@ -667,6 +701,10 @@ void Entity::Execute(float dT)
     // Else, undefined op; internal error
     else
         UtilAssert(false, "Unknown op \"%d\" from entity \"%d\" attempted to execute", (int)ActiveInstruction.Operator, GetEntityID());
+    
+    // If done executing, that means we are done with this instruction
+    if(IsExecuting == false && ExecutionError == EntityError_None)
+        InstructionComplete(ActiveInstruction);
 }
 
 void Entity::ExecuteMove(float dT)
@@ -677,8 +715,6 @@ void Entity::ExecuteMove(float dT)
         // Done moving; make sure we are at the precise right location
         State = EntityState_Idle;
         IsExecuting = false;
-        
-        LocalizePosition(MovingTarget, &Location);
     }
     // Commit to animation
     else
@@ -726,7 +762,7 @@ void Entity::ExecuteMove(float dT)
             
             // From start to end, not from middle
             float Normalized = (CurrentDistance - (TotalDistance / 2.0f - AnimationJump_Threshold)) / (AnimationJump_Threshold * 2);
-            Location.y += 0.1f * sin(UtilPI / 2.0f + UtilPI * Normalized);
+            Location.y += 0.15f * sin(UtilPI / 2.0f + UtilPI * Normalized);
         }
         else
             IsJumping = false;

@@ -297,6 +297,20 @@ void DwarfEntity::Render()
     glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
+void DwarfEntity::InstructionComplete(EntityInstruction Instr)
+{
+    // Skip completion check if no job or there is an error
+    if(!HasJob())
+        return;
+    
+    // Done with our mining job
+    if(Job.Type == JobType_Mine && Instr.Operator == EntityOP_Break)
+    {
+        GetDesignations()->CompleteJob(&Job);
+        HasJobFlag = false;
+    }
+}
+
 void DwarfEntity::RenderTargetPath()
 {
     // Ignore if no job
@@ -352,7 +366,7 @@ void* DwarfEntity::ComputeTask(void* data)
     for(int Attempt = 0; Attempt < MaxAttempts && !FoundJob; Attempt++)
     {
         // Find a job
-        bool FoundJob = self->GetDesignations()->GetJob(self, &Job);
+        FoundJob = self->GetDesignations()->GetJob(self, &Job);
         Vector3<int> DwarfPosition = self->GetPositionBlock();
         
         // If we didn't find a job, restart
@@ -379,18 +393,34 @@ void* DwarfEntity::ComputeTask(void* data)
                 // Can we reach this path? (Do a busy wait, not a busy stall)
                 // (Must like "pthread_yield" but sched_yield is posix) This gives
                 // up the thread's allocated proc. time and moves on
-                while(!PathCheck.GetPath(&self->JobPath))
+                bool IsSolved;
+                while(!PathCheck.GetPath(&self->JobPath, &IsSolved))
                     sched_yield();
+                
+                // DEBUG: Print the movement stack
+                if(IsSolved)
+                {
+                    printf("Start: %d %d %d\n", self->GetPositionBlock().x, self->GetPositionBlock().y, self->GetPositionBlock().z);
+                    Stack< Vector3<int> > MoveCopy = self->JobPath;
+                    while(!MoveCopy.IsEmpty())
+                    {
+                        Vector3<int> P = MoveCopy.Pop();
+                        printf("P: %d %d %d\n", P.x, P.y, P.z);
+                    }
+                }
+                else
+                    printf("Cannot path to: %d %d %d\n", TargetPosition.x, TargetPosition.y, TargetPosition.z);
                 
                 // This is the first valid path, take it
                 // Note: it is up to the dwarf to generate instructions for the job
-                if(self->JobPath.GetSize() > 0)
+                if(IsSolved)
                     FoundJob = true;
-                // Cannot do job
-                else
-                    self->GetDesignations()->ResignJob(&Job);
             }
         }
+        
+        // Job is not good, resign it
+        if(!FoundJob)
+            self->GetDesignations()->ResignJob(&Job);
     }
     
     // No job found, go idle

@@ -60,7 +60,7 @@ public:
     // Retrieve the currently computed path; the calling function must compute the path first
     // Returns true when the thread is done; Posts the path data into the given buffer, else
     // returns an empty list.
-    bool GetPath(Stack< Vector3<int> >* Path);
+    bool GetPath(Stack< Vector3<int> >* Path, bool* IsSolved);
     
     // Define the type that is associated with a node
     // It is both a position and a value; used so we can sort more easily
@@ -97,6 +97,7 @@ private:
     pthread_mutex_t PathComputed;
     bool IsComputed;
     Stack< Vector3<int> > ComputedPath;
+    bool SolvedPath;
     
     // Main thread handle
     pthread_t MainThread;

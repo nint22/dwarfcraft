@@ -63,8 +63,9 @@ class Entities;
 // Possible entity error states (i.e. can't move into block, 
 enum EntityError
 {
-    EntityError_None,       // No error
-    EntityError_Blocked,    // Cannot move into target (solid object)
+    EntityError_None,           // No error
+    EntityError_Blocked,        // Cannot move into target (solid object)
+    EntityError_NotReachable,   // Not adjacent, even though entity should
 };
 
 // Entity instruction set
@@ -266,6 +267,10 @@ protected:
     // Overloaded for special graphics
     virtual void Render();
     
+    // Special function called when an instruction has completed execution
+    // This is an optional function to overload
+    virtual void InstructionComplete(EntityInstruction Instr);
+    
     /*** Core Entity Functions (NEVER to be overloaded or ignored) ***/
     
     // Update object
@@ -432,9 +437,6 @@ private:
     
     // What is the dwarf's movement instructions?
     Stack< Vector3<int> > MovingPath;
-    
-    // Target we are attempting to move to
-    Vector3<int> MovingTarget;
     
     // Current path generation object
     EntityPath* PathPlanner;

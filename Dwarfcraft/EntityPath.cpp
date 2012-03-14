@@ -27,6 +27,7 @@ EntityPath::EntityPath(WorldContainer* WorldData, Vector3<int> Source, Vector3<i
     // Allocate the mutex
     pthread_mutex_init(&PathComputed, NULL);
     IsComputed = false;
+    SolvedPath = false;
 }
 
 EntityPath::~EntityPath()
@@ -41,13 +42,14 @@ void EntityPath::ComputePath()
     pthread_create(&MainThread, NULL, ComputePath, (void*)this);
 }
 
-bool EntityPath::GetPath(Stack< Vector3<int> >* Path)
+bool EntityPath::GetPath(Stack< Vector3<int> >* Path, bool* IsSolved)
 {
     // Get the current completion state
     bool Complete = false;
     
     pthread_mutex_lock(&PathComputed);
     Complete = IsComputed;
+    *IsSolved = SolvedPath;
     pthread_mutex_unlock(&PathComputed);
     
     // Post path if done
@@ -77,65 +79,77 @@ void* EntityPath::ComputePath(void* Data)
     int InitialDistance = self->GetDistance(self->Source, self->Sink);
     ToVisit.push_front(NodeType(self->Source, InitialDistance));
     
-    // Keep searching...
+    // Default to actively searching
     bool Solved = false;
-    while(!Solved)
-    {
-        // Check the total time for the hard limit
-        ThreadClock.Stop();
-        TotalTime += ThreadClock.GetTime();
-        ThreadClock.Start();
-        
-        //if(TotalTime > EntityPath_MaxThreadTime)
-        //    break;
-        
-        // If no nodes left, we were unable to find a solution
-        if(ToVisit.size() <= 0)
-            break;
-        
-        // Grab the highest-ranked node (already sorted) and mark as visited
-        NodeType Node = ToVisit.front();
-        ToVisit.pop_front();
-        Visited.push_front(Node);
-        
-        // Push all adjacent positions of this new position
-        // Notes: computes distance internally
-        self->AddAdjacent(Node.first, &ComesFrom, &ToVisit, &Visited);
-        
-        // Sort based on the distance function; from least to greatest
-        ToVisit.sort(compare_NodeType);
-        
-        // What we want to visit next
-        NodeType NextPos = ToVisit.front();
-        if(NextPos.second <= 0)
-            Solved = true;
-    }
-    
-    // Our final path
     Stack< Vector3<int> > Path;
-    Path.Push(self->Sink);
     
-    // If we found something...
-    if(Solved)
+    // If source is the dont compute, and just return
+    if(self->Source == self->Sink)
     {
-        // From the sink, go to the source (backtrace path)
-        while(Path.Peek() != self->Source)
+        // Solved by default, and just push the sink position
+        Solved = true;
+        Path.Push(self->Sink);
+    }
+    else
+    {
+        // Keep searching...
+        while(!Solved)
         {
-            // What comes from the current path's node?
-            bool FoundSource = false;
-            std::list<ComesFromType>::iterator Node;
-            for(Node = ComesFrom.begin(); Node != ComesFrom.end() && !FoundSource; Node++)
-            {
-                // Did we find a match?
-                if(Node->first == Path.Peek())
-                {
-                    FoundSource = true;
-                    Path.Push(Node->second);
-                }
-            }
+            // Check the total time for the hard limit
+            ThreadClock.Stop();
+            TotalTime += ThreadClock.GetTime();
+            ThreadClock.Start();
             
-            // If we never find a source, there is a consistency issue, fail out
-            UtilAssert(FoundSource, "Internal consistency failure with path planning");
+            //if(TotalTime > EntityPath_MaxThreadTime)
+            //    break;
+            
+            // If no nodes left, we were unable to find a solution
+            if(ToVisit.size() <= 0)
+                break;
+            
+            // Grab the highest-ranked node (already sorted) and mark as visited
+            NodeType Node = ToVisit.front();
+            ToVisit.pop_front();
+            Visited.push_front(Node);
+            
+            // Push all adjacent positions of this new position
+            // Notes: computes distance internally
+            self->AddAdjacent(Node.first, &ComesFrom, &ToVisit, &Visited);
+            
+            // Sort based on the distance function; from least to greatest
+            ToVisit.sort(compare_NodeType);
+            
+            // What we want to visit next
+            NodeType NextPos = ToVisit.front();
+            if(NextPos.second <= 0)
+                Solved = true;
+        }
+        
+        // Our final path
+        Path.Push(self->Sink);
+        
+        // If we found something...
+        if(Solved)
+        {
+            // From the sink, go to the source (backtrace path)
+            while(Path.Peek() != self->Source)
+            {
+                // What comes from the current path's node?
+                bool FoundSource = false;
+                std::list<ComesFromType>::iterator Node;
+                for(Node = ComesFrom.begin(); Node != ComesFrom.end() && !FoundSource; Node++)
+                {
+                    // Did we find a match?
+                    if(Node->first == Path.Peek())
+                    {
+                        FoundSource = true;
+                        Path.Push(Node->second);
+                    }
+                }
+                
+                // If we never find a source, there is a consistency issue, fail out
+                UtilAssert(FoundSource, "Internal consistency failure with path planning");
+            }
         }
     }
     
@@ -143,6 +157,7 @@ void* EntityPath::ComputePath(void* Data)
     pthread_mutex_lock(&self->PathComputed);
     self->IsComputed = true;
     self->ComputedPath = Path;
+    self->SolvedPath = Solved;
     pthread_mutex_unlock(&self->PathComputed);
     
     // Done!

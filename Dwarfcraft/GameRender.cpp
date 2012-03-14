@@ -127,7 +127,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     
     // Add a dozen entities purely for testing...
     Clock.Start();
-    int EntityCount = 1; // Any variable count while testing the code
+    int EntityCount = 3; // Any variable count while testing the code
     for(int i = 0; i < EntityCount; i++)
     {
         // Randomly choose a position

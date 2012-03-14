@@ -158,6 +158,9 @@ protected:
     // Custom drawing function so we render the armor on-top
     void Render();
     
+    // Overloaded to catch completed jobs
+    void InstructionComplete(EntityInstruction Instr);
+    
 private:
     
     // Render the target of where we are going to
