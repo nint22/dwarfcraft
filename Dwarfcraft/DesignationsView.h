@@ -23,12 +23,19 @@
 
 #include "WorldContainer.h"
 #include "Vector3.h"
-#include "Queue.h"
+#include "List.h"
 #include <pthread.h>
 
 // Necesary forward declarations
 class DwarfEntity;
 class Designation;
+
+// Define the job types that exist (closely related to designation types
+enum JobType
+{
+    JobType_Mine,
+    // Todo: All other job types
+};
 
 // A simple "job" object, to handle our task
 struct JobTask
@@ -36,10 +43,12 @@ struct JobTask
     // The designation volume we are working on
     Designation* TargetDesignation;
     
-    // The position we want to move the dwarf to
-    Vector3<int> TargetPosition;
+    // The job type
+    JobType Type;
     
     // The target block we are to modify (optional)
+    // Note: this may or may not be a block we want to go into, it
+    // all depends on the job type and if it is a half step or not
     Vector3<int> TargetBlock;
 };
 
@@ -134,23 +143,27 @@ public:
     // Add a new designation (takes any two points; will self-organize for origin and volume)
     void AddDesignation(DesignationType Type, Vector3<int> Origin, Vector3<int> Volume);
     
-    // Remove a designation that contains the given point
-    void RemoveDesignation(Vector3<int> Point);
+    // Remove a designation of the given address
+    void RemoveDesignation(Designation* TargetDesignation);
     
-    // Returns a position within the designation that is adjacent to an air block, and thus assumed possible for access
-    // The position where the dwarf should go into is "TargetPosition" while "TargetBlock" is what is trying to be manipulated
-    bool FindDesignation(DesignationType Type, Designation** TargetDesignationOut, Vector3<int>* TargetPosition, Vector3<int>* TargetBlock);
+    // Returns a position that needs to have the associated task complete within, based on the oldest designation created
+    // Note that this target block is what is to be manipulated, and may or may not be where the dwarf wants to be in
+    bool FindDesignation(DesignationType Type, Designation** TargetDesignationOut, Vector3<int>* TargetBlock);
     
     // Get a copy (not reference) of all designations
-    Queue< Designation* > GetDesignations();
+    List< Designation* > GetDesignations();
     
     /*** Job Management ***/
     
     // Given an entity, find a job that fits the dwarf's preferences and current world needs
     bool GetJob(DwarfEntity* Dwarf, JobTask* JobOut);
     
-    // Push back the job that was given to this dwarf
-    void PutBackJob(JobTask* JobOut);
+    // Unable to complete job
+    void ResignJob(JobTask* Job);
+    
+    // Completed a job
+    // Note: this puts the designation to the front of the list as it is confirmed "accesible"
+    void CompleteJob(JobTask* Job);
     
 private:
     
@@ -172,7 +185,7 @@ public:
 private:
     
     // List of all designations
-    Queue< Designation* > DesignationsQueue;
+    List< Designation* > DesignationsList;
     
     // World handle
     WorldContainer* WorldData;

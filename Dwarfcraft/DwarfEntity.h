@@ -166,23 +166,23 @@ private:
     // Threaded instruction computation function
     static void* ComputeTask(void* data);
     
-    // Returns true if the thread has started or launched or is currently running
-    bool ThreadStarted();
+    // Is the thread currently running? (Thread safe)
+    bool ThreadRunning();
     
-    // Returns true if the computing thread has computed a set of instructions
-    // posted via the "ThreadInstructions" queue
-    bool ThreadComplete();
+    // Do we have a job? (Thread safe)
+    bool HasJob();
     
-    // The thread handle
+    // The thread handle and data mutex
+    bool ThreadRunningFlag;
     pthread_t ThreadHandle;
-    
-    // Thread mutex, state lock, and temporary instruction queue
     pthread_mutex_t ThreadMutex;
-    bool ThreadStart, ThreadDone;
-    Queue< EntityInstruction > ThreadInstructions;
     
     // Current job for the dwarf
     JobTask Job;
+    bool HasJobFlag;
+    
+    // Active job path
+    Stack<Vector3<int> > JobPath;
     
     /*** Dwarf Properties ***/
     

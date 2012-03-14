@@ -74,46 +74,49 @@ void DesignationsView::AddDesignation(DesignationType Type, Vector3<int> Origin,
     
     // Add to queue
     pthread_mutex_lock(&DesignationsLock);
-    DesignationsQueue.Enqueue(ToInsert);
+    int Length = DesignationsList.GetSize();
+    DesignationsList.Resize(Length + 1);
+    DesignationsList[Length] = ToInsert;
     pthread_mutex_unlock(&DesignationsLock);
 }
 
-void DesignationsView::RemoveDesignation(Vector3<int> Point)
+void DesignationsView::RemoveDesignation(Designation* TargetDesignation)
 {
     // Lock while searching
     pthread_mutex_lock(&DesignationsLock);
     
     // Keep cycling through until we find the one we want to remove
-    int DesignationsCount = DesignationsQueue.GetSize();
+    int DesignationsCount = DesignationsList.GetSize();
     for(int i = 0; i < DesignationsCount; i++)
     {
-        // Pop off to peek
-        Designation* Area = DesignationsQueue.Dequeue();
-        
-        // If this is the target point, don't add back
-        if(Area->Origin != Point)
-            DesignationsQueue.Enqueue(Area);
+        // If this is the target point, remove
+        if(DesignationsList[i] == TargetDesignation)
+        {
+            delete DesignationsList[i];
+            DesignationsList.Remove(i);
+            break;
+        }
     }
     
     // Done!
     pthread_mutex_unlock(&DesignationsLock);
 }
 
-bool DesignationsView::FindDesignation(DesignationType Type, Designation** TargetDesignationOut, Vector3<int>* TargetPosition, Vector3<int>* TargetBlock)
+bool DesignationsView::FindDesignation(DesignationType Type, Designation** TargetDesignationOut, Vector3<int>* TargetBlock)
 {
     // Lock and copy
     pthread_mutex_lock(&DesignationsLock);
-    Queue< Designation* > DesignationQueue = GetDesignations();
     
     // True if a position was found
     bool Found = false;
     
     // Keep cycling through until we find the one we want to remove
     // Note: We attempt to do designations in order of addition
-    while(!DesignationQueue.IsEmpty() && !Found)
+    int DesignationsCount = DesignationsList.GetSize();
+    for(int dIndex = 0; dIndex < DesignationsCount; dIndex++)
     {
         // Pop off to peek
-        Designation* Area = DesignationQueue.Dequeue();
+        Designation* Area = DesignationsList[dIndex];
         *TargetDesignationOut = Area;
         
         // If filtered type
@@ -126,25 +129,14 @@ bool DesignationsView::FindDesignation(DesignationType Type, Designation** Targe
                 // Get the task block
                 *TargetBlock = Area->TaskPositions.Dequeue();
                 
-                // If it is a half block, we can be both on it and break it
-                if(WorldData->IsWithinWorld(*TargetBlock) && !WorldData->GetBlock(*TargetBlock).IsWhole())
-                {
-                    // We can break the block we are on
-                    Found = true;
-                    *TargetPosition = *TargetBlock;
-                }
-                
-                // Is this position next to air?
+                // Is this position next to air? (This is to attempt to give a possibley accesable block)
                 for(int j = 0; j < AdjacentOffsetsCount && !Found; j++)
                 {
-                    *TargetPosition = *TargetBlock + AdjacentOffsets[j];
-                    if(WorldData->IsWithinWorld(*TargetPosition) && WorldData->GetBlock(*TargetPosition).GetType() == dBlockType_Air)
+                    Vector3<int> TargetPosition = *TargetBlock + AdjacentOffsets[j];
+                    dBlock BlockCheck = WorldData->GetBlock(TargetPosition);
+                    if(WorldData->IsWithinWorld(TargetPosition) && (BlockCheck.GetType() == dBlockType_Air || !BlockCheck.IsWhole()))
                         Found = true;
                 }
-                
-                // Push it back only if this isn't a solution
-                if(!Found)
-                    Area->TaskPositions.Enqueue(*TargetBlock);
             }
         }
     }
@@ -156,10 +148,10 @@ bool DesignationsView::FindDesignation(DesignationType Type, Designation** Targe
     return Found;
 }
 
-Queue< Designation* > DesignationsView::GetDesignations()
+List< Designation* > DesignationsView::GetDesignations()
 {
     // Returns a copy
-    return DesignationsQueue;
+    return DesignationsList;
 }
 
 bool DesignationsView::GetJob(DwarfEntity* Dwarf, JobTask* JobOut)
@@ -182,7 +174,7 @@ bool DesignationsView::GetJob(DwarfEntity* Dwarf, JobTask* JobOut)
             break;
     }
     
-    // TESTING: Default to mine
+    // TESTING: Default to just mine
     DwarfJobs TargetJob = DwarfJobs_Miner;
     // Randomly select a job
     /*int Random = rand() % TopJobs.GetSize();
@@ -193,6 +185,7 @@ bool DesignationsView::GetJob(DwarfEntity* Dwarf, JobTask* JobOut)
     */
     
     // Given a job..
+    // Note: Each one does a lock internally
     if(TargetJob == DwarfJobs_Miner)
         return GetMiningJob(Dwarf, JobOut);
     
@@ -206,27 +199,46 @@ bool DesignationsView::GetJob(DwarfEntity* Dwarf, JobTask* JobOut)
     return false;
 }
 
-void DesignationsView::PutBackJob(JobTask* JobOut)
+void DesignationsView::ResignJob(JobTask* Job)
 {
-    // Simply put back the targetBlock into the designations queue
+    // Failed the job, so let us place it back into the queue
     pthread_mutex_lock(&DesignationsLock);
-    JobOut->TargetDesignation->TaskPositions.Enqueue(JobOut->TargetBlock);
+    Job->TargetDesignation->TaskPositions.Enqueue(Job->TargetBlock);
     pthread_mutex_unlock(&DesignationsLock);
+}
+
+void DesignationsView::CompleteJob(JobTask* Job)
+{
+    // No need to do anything, the item is off the queue already
+    
+    // If this was the last item, delete the designation
+    pthread_mutex_lock(&DesignationsLock);
+    bool IsEmpty = Job->TargetDesignation->TaskPositions.IsEmpty();
+    pthread_mutex_unlock(&DesignationsLock);
+    
+    // Perform delete outside of lock, as we actually already have a lock
+    if(IsEmpty)
+        RemoveDesignation(Job->TargetDesignation);
 }
 
 bool DesignationsView::GetMiningJob(DwarfEntity* Dwarf, JobTask* JobOut)
 {
-    return FindDesignation(DesignationType_Mine, &JobOut->TargetDesignation, &JobOut->TargetPosition, &JobOut->TargetBlock);
+    JobOut->Type = JobType_Mine;
+    return FindDesignation(DesignationType_Mine, &JobOut->TargetDesignation, &JobOut->TargetBlock);
 }
 
 bool DesignationsView::GetFarmerJob(DwarfEntity* Dwarf, JobTask* JobOut)
 {
-    return FindDesignation(DesignationType_Farm, &JobOut->TargetDesignation, &JobOut->TargetPosition, &JobOut->TargetBlock);
+    // TODO...
+    JobOut->Type = JobType_Mine;
+    return FindDesignation(DesignationType_Farm, &JobOut->TargetDesignation, &JobOut->TargetBlock);
 }
 
 bool DesignationsView::GetCrafterJob(DwarfEntity* Dwarf, JobTask* JobOut)
 {
-    return FindDesignation(DesignationType_Hall, &JobOut->TargetDesignation, &JobOut->TargetPosition, &JobOut->TargetBlock);
+    // TODO...
+    JobOut->Type = JobType_Mine;
+    return FindDesignation(DesignationType_Hall, &JobOut->TargetDesignation, &JobOut->TargetBlock);
 }
 
 void DesignationsView::Update(float dT)
@@ -238,13 +250,13 @@ void DesignationsView::Render(int LayerCutoff, bool Draw)
 {
     // Lock to copy date
     pthread_mutex_lock(&DesignationsLock);
-    Queue< Designation* > DesignationQueue = GetDesignations();
     
     // For each designations
-    for(int i = 0; !DesignationQueue.IsEmpty(); i++)
+    int DesignationsCount = DesignationsList.GetSize();
+    for(int dIndex = 0; dIndex < DesignationsCount; dIndex++)
     {
-        // Get active area
-        Designation* Area = DesignationQueue.Dequeue();
+        // Pop off to peek
+        Designation* Area = DesignationsList[dIndex];
         
         // Push what we will work on
         glPushMatrix();

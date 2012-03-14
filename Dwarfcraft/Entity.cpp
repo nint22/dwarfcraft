@@ -74,6 +74,12 @@ Entity::Entity(const char* ConfigName)
     // Not jumping
     IsJumping = false;
     
+    // Default to no execution errors
+    ExecutionError = EntityError_None;
+    
+    // Instructions lock
+    pthread_mutex_init(&InstructionsLock, NULL);
+    
     // Generate an entity ID
     EntityID = __EntityCount++;
     
@@ -85,6 +91,7 @@ Entity::Entity(const char* ConfigName)
 
 Entity::~Entity()
 {
+    pthread_mutex_destroy(&InstructionsLock);
     delete ConfigFile;
 }
 
@@ -172,38 +179,73 @@ void Entity::SetBreaking(Vector3<int> BreakTarget, float BreakTime)
 
 void Entity::AddInstruction(EntityInstruction Instruction)
 {
+    pthread_mutex_lock(&InstructionsLock);
     InstructionQueue.Enqueue(Instruction);
+    pthread_mutex_unlock(&InstructionsLock);
 }
 
 void Entity::ClearInstructions()
 {
+    pthread_mutex_lock(&InstructionsLock);
     while(!InstructionQueue.IsEmpty())
         InstructionQueue.Dequeue();
+    pthread_mutex_unlock(&InstructionsLock);
 }
 
 bool Entity::GetInstruction(EntityInstruction* Instruction)
 {
-    if(InstructionQueue.IsEmpty())
-        return false;
-    else
+    pthread_mutex_lock(&InstructionsLock);
+    bool success = false;
+    if(!InstructionQueue.IsEmpty())
     {
         *Instruction = InstructionQueue.Dequeue();
-        return true;
+        success = true;
     }
+    pthread_mutex_unlock(&InstructionsLock);
+    
+    return success;
 }
 
 bool Entity::GetActiveInstruction(EntityInstruction* Instruction)
 {
+    pthread_mutex_lock(&InstructionsLock);
     *Instruction = ActiveInstruction;
+    pthread_mutex_unlock(&InstructionsLock);
     return IsExecuting;
 }
 
 bool Entity::HasInstructions()
 {
-    if(InstructionQueue.GetSize() <= 0 && !IsExecuting)
-        return false;
-    else
-        return true;
+    pthread_mutex_lock(&InstructionsLock);
+    bool success = false;
+    if(InstructionQueue.GetSize() > 0 || IsExecuting)
+        success = true;
+    pthread_mutex_unlock(&InstructionsLock);
+    
+    return success;
+}
+
+void Entity::RaiseExecutionError(EntityError Error)
+{
+    // Save the error
+    ExecutionError = Error;
+    
+    // Release all instructions
+    IsExecuting = false;
+    ClearInstructions();
+    
+    // Push a stall instruction
+    EntityInstruction Instr;
+    Instr.Operator = EntityOp_Idle;
+    Instr.Data.Idle = 1.0f;
+    AddInstruction(Instr);
+}
+
+EntityError Entity::GetExecutionError()
+{
+    EntityError Error = ExecutionError;
+    ExecutionError = EntityError_None;
+    return Error;
 }
 
 void Entity::SetFacingAngle(float Theta)
@@ -529,7 +571,7 @@ void Entity::Execute(float dT)
                 // Pop off the starting location, and ignore path movement if none left
                 Vector3<int> StartingPos = MovingPath.Pop();
                 if(!LocalizePosition(StartingPos, &AnimationSource))
-                    UtilAbort("Unable to localize a block position to path");
+                    RaiseExecutionError(EntityError_Blocked);
                 
                 // Trivial path: at self-location
                 if(MovingPath.IsEmpty())
@@ -540,12 +582,7 @@ void Entity::Execute(float dT)
             }
             // Error out
             else
-            {
-                g2ChatController::printf(this, "\\04Warning: \\0Dwarf \"%s\" cannot get to target!", GetName());
-                g2ChatController::printf(GetPositionBlock(), "    From position: %d %d %d", GetPositionBlock().x, GetPositionBlock().y, GetPositionBlock().z);
-                g2ChatController::printf(MovingTarget, "    Target position: %d %d %d", MovingTarget.x, MovingTarget.y, MovingTarget.z);
-                IsExecuting = false;
-            }
+                RaiseExecutionError(EntityError_Blocked);
             
             // Regardless of success, release the path planner object
             delete PathPlanner;
@@ -641,8 +678,7 @@ void Entity::ExecuteMove(float dT)
         State = EntityState_Idle;
         IsExecuting = false;
         
-        if(!LocalizePosition(MovingTarget, &Location))
-            UtilAbort("Unable to localize a block position to path");
+        LocalizePosition(MovingTarget, &Location);
     }
     // Commit to animation
     else
@@ -652,7 +688,7 @@ void Entity::ExecuteMove(float dT)
         // Current target
         Vector3<float> AnimationTarget;
         if(!LocalizePosition(MovingPath.Peek(), &AnimationTarget))
-            UtilAbort("Unable to localize a block position to path");
+            RaiseExecutionError(EntityError_Blocked);
         
         // Find the vector / direction
         Vector3<float> Direction = AnimationTarget - Location;
@@ -704,7 +740,7 @@ void Entity::ExecuteMove(float dT)
             // Save the new source position
             Vector3<int> StartingPos = MovingPath.Pop();
             if(!LocalizePosition(StartingPos, &AnimationSource))
-                UtilAbort("Unable to localize a block position to path");
+                RaiseExecutionError(EntityError_Blocked);
         }
     }
 }

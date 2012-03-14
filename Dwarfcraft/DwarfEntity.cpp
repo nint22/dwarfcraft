@@ -47,15 +47,18 @@ DwarfEntity::DwarfEntity(const char* ConfigName)
     Armor[1] = dItem();
     
     // Initialize the mutex
+    ThreadRunningFlag = false;
     pthread_mutex_init(&ThreadMutex, NULL);
-    ThreadStart = false;
-    ThreadDone = false;
+    
+    // Start with no job
+    HasJobFlag = false;
 }
 
 DwarfEntity::~DwarfEntity()
 {
-    // Kill the thread
+    // Kill the thread and data mutex
     pthread_kill(ThreadHandle, 0);
+    pthread_mutex_destroy(&ThreadMutex);
 }
 
 void DwarfEntity::SetArmor(dItem Chest, dItem Legs)
@@ -190,79 +193,59 @@ void DwarfEntity::Update(float dT)
     static float TotalTime = 0.0f;
     TotalTime += dT;
     
-    // Decreass hunger & thirst over time
-    Hunger -= 0.003f * dT;
-    Thirst -= 0.001f * dT;
+    // TODO... Update thirst, hunger, etc..
     
-    // If breathing underwater
-    // TODO: is in water block? Decrease breath
+    /*** Job Error Checking ***/
     
-    // Only do hunger, thurst, and drowning damage every five second
-    if(TotalTime >= 5.0f)
+    // Get the error type and reset the error flag (if raised)
+    EntityError Error = GetExecutionError();
+    
+    // If current execution failed, deal with the error
+    if(Error != EntityError_None)
     {
-        TotalTime -= 5.0f;
+        // State on the console there was a failure
+        printf("Unable to complete assigned task!\n");
         
-        // Starving (1 damage)
-        if(Hunger <= 0.0f)
-            Health -= 1;
-        
-        // Thirst (1 damage)
-        if(Thirst <= 0.0f)
-            Health -= 1;
-        
-        // Drowning (10 damage a second)
-        if(BreathTime <= 0.0f)
-            Health -= 10;
-    }
-    
-    // Is dead?
-    if(Health <= 0)
-    {
-        // TODO: Flag as dead!
-    }
-    
-    /*** Medical Emergency ***/
-    
-    if(Hunger <= 0.1f)
-    {
-        // TODO: Go to nearest food
-    }
-    else if(Thirst <= 0.1f)
-    {
-        // TODO: Go to nearest water
-    }
-    else if(BreathTime <= 0.0f)
-    {
-        // TODO: Go to nearest air
-    }
-    
-    /*** Ignore Orders if Low Happiness ***/
-    
-    else if(Happiness <= 0.1f)
-    {
-        // TODO: Ignore orders
+        // Give job back
+        GetDesignations()->ResignJob(&Job);
+        HasJobFlag = false;
     }
     
     /*** Jobs / Tasks Updates ***/
     
-    // If not computing, we need to launch the thread
-    else if(!HasInstructions() && !ThreadStarted() && !ThreadComplete())
+    // If we have no running instructions, but have a job to do, queue up the next steps
+    if(!HasInstructions() && HasJob())
     {
-        // Launch thread
-        pthread_create(&ThreadHandle, NULL, ComputeTask, (void*)this);
-    }
-    
-    // Post instructions if complete
-    else if(ThreadComplete())
-    {
-        // Post instructions
-        while(!ThreadInstructions.IsEmpty())
-            AddInstruction(ThreadInstructions.Dequeue());
+        // Build instructions for the given job (i.e. path to it, etc..)
+        if(Job.Type == JobType_Mine)
+        {
+            // Goto adjacent
+            EntityInstruction Instr;
+            Instr.Operator = EntityOp_MovePath;
+            Instr.Data.Path = &JobPath;
+            AddInstruction(Instr);
+            
+            // Break
+            Instr.Operator = EntityOP_Break;
+            Instr.Data.Pos.x = Job.TargetBlock.x;
+            Instr.Data.Pos.y = Job.TargetBlock.y;
+            Instr.Data.Pos.z = Job.TargetBlock.z;
+            AddInstruction(Instr);
+        }
         
-        // Flag thread as restartable (both not started and not done)
+        // TODO: Other jobs...
+        
+    }
+    // If has no instructions and has no job and there is no thread running...
+    else if(!ThreadRunning() && !HasInstructions() && !HasJob())
+    {
+        // Lock the running state
         pthread_mutex_lock(&ThreadMutex);
-        ThreadDone = false;
+        ThreadRunningFlag = true;
         pthread_mutex_unlock(&ThreadMutex);
+        
+        // Start execution
+        pthread_create(&ThreadHandle, NULL, ComputeTask, (void*)this);
     }
 }
 
@@ -353,78 +336,65 @@ void* DwarfEntity::ComputeTask(void* data)
     // Get the entity handle
     DwarfEntity* self = (DwarfEntity*)data;
     
-    // Lock the running state
-    pthread_mutex_lock(&self->ThreadMutex);
-    self->ThreadStart = true;
-    self->ThreadDone = false;
-    pthread_mutex_unlock(&self->ThreadMutex);
+    // Max number of times we attempt to find a task
+    static const int MaxAttempts = 3;
     
-    // Start building an instruction
+    // Job object; only gets copied at the end
+    JobTask Job;
+    
+    // Instruction holder, gets pushed as needed
     EntityInstruction Instruction;
     
     /*** Job / Task Generation ***/
     
-    // Copy the job object
-    JobTask Job = self->Job;
-    
-    // Find a job
-    bool Success = self->GetDesignations()->GetJob(self, &Job);
-    Vector3<int> DwarfPosition = self->GetPositionBlock();
-    
-    // If success finding a job, see if we can path to it
-    if(Success)
+    // Try a finite amount of times for a job
+    bool FoundJob = false;
+    for(int Attempt = 0; Attempt < MaxAttempts && !FoundJob; Attempt++)
     {
-        // Do not compute path if trivial
-        if(DwarfPosition != Job.TargetPosition)
-        {
-            // Attempt a path-plan to target
-            EntityPath PathCheck(self->GetWorld(), self->GetPositionBlock(), Job.TargetPosition);
-            PathCheck.ComputePath();
-            
-            // Can we reach this path? (Do a busy wait, not a busy stall)
-            // (Must like "pthread_yield" but sched_yield is posix) This gives
-            // up the thread's allocated proc. time and moves on
-            Stack<Vector3<int> > Path;
-            while(!PathCheck.GetPath(&Path))
-                sched_yield();
-            
-            // This is the first valid path, take it
-            if(Path.GetSize() > 0)
-            {
-                // Move to it
-                Instruction.Operator = EntityOp_MoveTo;
-                Instruction.Data.Pos.x = Job.TargetPosition.x;
-                Instruction.Data.Pos.y = Job.TargetPosition.y;
-                Instruction.Data.Pos.z = Job.TargetPosition.z;
-                self->ThreadInstructions.Enqueue(Instruction);
-            }
-            else
-                Success = false;
-        }
+        // Find a job
+        bool FoundJob = self->GetDesignations()->GetJob(self, &Job);
+        Vector3<int> DwarfPosition = self->GetPositionBlock();
         
-        // Break target block
-        if(Success)
-        {
-            Instruction.Operator = EntityOP_Break;
-            Instruction.Data.Pos.x = Job.TargetBlock.x;
-            Instruction.Data.Pos.y = Job.TargetBlock.y;
-            Instruction.Data.Pos.z = Job.TargetBlock.z;
-            self->ThreadInstructions.Enqueue(Instruction);
-        }
-        // On pathing failure
+        // If we didn't find a job, restart
+        if(!FoundJob)
+            continue;
+        // Else, we need to confirm a path ot it (reset flag)
         else
+            FoundJob = false;
+        
+        // Attempt to find a path to it
+        for(int i = 0; i < AdjacentOffsetsCount && !FoundJob; i++)
         {
-            // Raise this error into the console (not yet implemented)
+            // Path into the target or directly adjacent to it if that target is air or a half block
+            Vector3<int> TargetPosition = Job.TargetBlock + AdjacentOffsets[i];
+            dBlock BlockCheck = self->GetWorld()->GetBlock(TargetPosition);
             
-            // Put this job / task back into queue for another dwarf
-            self->GetDesignations()->PutBackJob(&Job);
+            // Is the offset (Job target + adjacent) an open space?
+            if(self->GetWorld()->IsWithinWorld(TargetPosition) && (BlockCheck.GetType() == dBlockType_Air || !BlockCheck.IsWhole()))
+            {
+                // Attempt a path-plan to target
+                EntityPath PathCheck(self->GetWorld(), self->GetPositionBlock(), TargetPosition);
+                PathCheck.ComputePath();
+                
+                // Can we reach this path? (Do a busy wait, not a busy stall)
+                // (Must like "pthread_yield" but sched_yield is posix) This gives
+                // up the thread's allocated proc. time and moves on
+                while(!PathCheck.GetPath(&self->JobPath))
+                    sched_yield();
+                
+                // This is the first valid path, take it
+                // Note: it is up to the dwarf to generate instructions for the job
+                if(self->JobPath.GetSize() > 0)
+                    FoundJob = true;
+                // Cannot do job
+                else
+                    self->GetDesignations()->ResignJob(&Job);
+            }
         }
     }
     
-    /*** Idle ***/
-    
-    // If failed to either find a job or path to it...
-    if(!Success)
+    // No job found, go idle
+    if(!FoundJob)
     {
         // Switch between either pausing (idle for a few seconds) or pathing
         static int Count = 0;
@@ -433,10 +403,9 @@ void* DwarfEntity::ComputeTask(void* data)
             // Just pause for a few seconds (from 1 to 4)
             Instruction.Operator = EntityOp_Idle;
             Instruction.Data.Idle = 1.0f + 4.0f * (float(rand()) / float(RAND_MAX));
-            self->ThreadInstructions.Enqueue(Instruction);
             
-            // Grow no-job execution count
-            Count++;
+            // Push the instruction
+            self->AddInstruction(Instruction);
         }
         else
         {
@@ -475,43 +444,46 @@ void* DwarfEntity::ComputeTask(void* data)
                 Instruction.Data.Pos.x = Target.x;
                 Instruction.Data.Pos.y = Target.y;
                 Instruction.Data.Pos.z = Target.z;
-                self->ThreadInstructions.Enqueue(Instruction);
                 
-                // Grow no-job execution count
-                Count++;
+                // Push the instruction
+                self->AddInstruction(Instruction);
             }
         }
+        
+        // Grow no-job execution count
+        Count++;
     }
     
     /*** Complete & Post Result ***/
     
     // Lock the running state
     pthread_mutex_lock(&self->ThreadMutex);
-    self->ThreadStart = false;
-    self->ThreadDone = true;
+    self->ThreadRunningFlag = false;
+    self->HasJobFlag = FoundJob;
+    self->Job = Job;
     pthread_mutex_unlock(&self->ThreadMutex);
     
     // Nothing to post directly
     return NULL;
 }
 
-bool DwarfEntity::ThreadStarted()
+bool DwarfEntity::ThreadRunning()
 {
     bool State = false;
     
     pthread_mutex_lock(&ThreadMutex);
-    State = ThreadStart;
+    State = ThreadRunningFlag;
     pthread_mutex_unlock(&ThreadMutex);
     
     return State;
 }
 
-bool DwarfEntity::ThreadComplete()
+bool DwarfEntity::HasJob()
 {
     bool State = false;
     
     pthread_mutex_lock(&ThreadMutex);
-    State = ThreadDone;
+    State = HasJobFlag;
     pthread_mutex_unlock(&ThreadMutex);
     
     return State;

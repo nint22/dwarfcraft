@@ -74,10 +74,10 @@ public:
     {
         // Exit on empty data error
         UtilAssert(listSize > 0, "Empty data set memory access.");
-
+        
         // Exit on out of bounds access
         UtilAssert(index >= 0 && index < listSize, "Index %d is out of bounds.", index);
-
+        
         // Return data
         return listData[index];
     }
@@ -117,6 +117,23 @@ public:
     int GetSize()
     {
         return listSize;
+    }
+    
+    // Remove an item from the list
+    void Remove(int index)
+    {
+        // Exit on out of bounds access
+        UtilAssert(index >= 0 && index < listSize, "Index %d is out of bounds.", index);
+        
+        // All elements, from i + 1 to n - 2, copy left
+        if(listSize > 1)
+        {
+            for(int i = index; i < listSize - 1; i++)
+                listData[i] = listData[i + 1];
+        }
+        
+        // Shrink by one element
+        Resize(listSize - 1);
     }
 
 private:

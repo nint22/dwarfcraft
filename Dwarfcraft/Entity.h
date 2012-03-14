@@ -60,6 +60,13 @@
 // Foward declare, as we can't do an inclusion cycle
 class Entities;
 
+// Possible entity error states (i.e. can't move into block, 
+enum EntityError
+{
+    EntityError_None,       // No error
+    EntityError_Blocked,    // Cannot move into target (solid object)
+};
+
 // Entity instruction set
 // Operator: what we are doing
 static const int EntityOpCount = 4;
@@ -71,6 +78,7 @@ enum EntityOp
     EntityOP_Break,     // Break a given block (forces the dwarf to face it during the mining process)
     EntityOp_Pickup,    // Take an item from the current position
     EntityOp_Dropoff,   // Drop item off at the current position
+    EntityOp_MovePath,  // Move using the given path
 };
 
 // Entity instruction set names
@@ -100,6 +108,7 @@ struct EntityInstruction
             int x, y, z;
         } Pos;
         int ItemID;
+        Stack<Vector3<int> >* Path;
     } Data;
 };
 
@@ -206,6 +215,14 @@ public:
     
     // Returns true if there are some instructions to execute; else returns false
     bool HasInstructions();
+    
+    // Raise an error of the given type
+    // Internally will stop AI execution and push a 1-second idle instruction
+    void RaiseExecutionError(EntityError Error);
+    
+    // Return the current error state of the instruction execution
+    // Note: Once called, the error state is reset to none until another error is raised
+    EntityError GetExecutionError();
     
     /*** Graphics Management ***/
     
@@ -398,6 +415,9 @@ private:
     // Queue of instructions to execute
     Queue< EntityInstruction > InstructionQueue;
     
+    // Execution error state
+    EntityError ExecutionError;
+    
     // Active instruction
     EntityInstruction ActiveInstruction;
     
@@ -431,6 +451,9 @@ private:
     int BreakingCellIndex;
     
     /*** Misc. ***/
+    
+    // Mutext to protect the instructions list
+    pthread_mutex_t InstructionsLock;
     
     // Declare we are a friend so we can be more easily
     // reached when attempting to update / initialize
