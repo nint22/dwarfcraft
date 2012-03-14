@@ -203,12 +203,17 @@ void DwarfEntity::Update(float dT)
     // If current execution failed, deal with the error
     if(Error != EntityError_None)
     {
-        // State on the console there was a failure
-        printf("Unable to complete assigned task!\n");
+        // Give job back (if we have one)
+        if(HasJobFlag)
+        {
+            // State on the console there was a failure
+            printf("Entity %d: Unable to complete assigned task!\n", GetEntityID());
+            
+            GetDesignations()->ResignJob(&Job);
+            HasJobFlag = false;
+        }
         
-        // Give job back
-        GetDesignations()->ResignJob(&Job);
-        HasJobFlag = false;
+        // Otherwise... silently fail
     }
     
     /*** Jobs / Tasks Updates ***/
@@ -396,20 +401,6 @@ void* DwarfEntity::ComputeTask(void* data)
                 bool IsSolved;
                 while(!PathCheck.GetPath(&self->JobPath, &IsSolved))
                     sched_yield();
-                
-                // DEBUG: Print the movement stack
-                if(IsSolved)
-                {
-                    printf("Start: %d %d %d\n", self->GetPositionBlock().x, self->GetPositionBlock().y, self->GetPositionBlock().z);
-                    Stack< Vector3<int> > MoveCopy = self->JobPath;
-                    while(!MoveCopy.IsEmpty())
-                    {
-                        Vector3<int> P = MoveCopy.Pop();
-                        printf("P: %d %d %d\n", P.x, P.y, P.z);
-                    }
-                }
-                else
-                    printf("Cannot path to: %d %d %d\n", TargetPosition.x, TargetPosition.y, TargetPosition.z);
                 
                 // This is the first valid path, take it
                 // Note: it is up to the dwarf to generate instructions for the job

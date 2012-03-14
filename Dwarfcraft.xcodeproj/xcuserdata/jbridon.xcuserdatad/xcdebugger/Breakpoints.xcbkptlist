@@ -12,20 +12,6 @@
          timestampString = "353456682.491731"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "727"
-         endingLineNumber = "727"
-         landmarkName = "Entity::ExecuteMove(float dT)"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         isPathRelative = "1"
-         filePath = "Dwarfcraft/Entity.cpp"
-         timestampString = "353456682.491731"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
          startingLineNumber = "779"
          endingLineNumber = "779"
          landmarkName = "Entity::ExecuteMove(float dT)"

@@ -14,7 +14,9 @@
  only being able to be manipulated one at a time. This is done
  so that dwarfs can still manipulate the world data (as that is
  too big and too important to lock) but the instruction generation
- is relatively safe.
+ is relatively safe. This is all assuming access to one object,
+ and not across multiple objects. This is why the object must
+ be handled by address (pointers).
  
 ***************************************************************/
 
@@ -119,12 +121,16 @@ static const char DesignationNames[DesignationCount][32] =
 // A designation data type
 struct Designation
 {
+    // Type and volume of a designation
     DesignationType Type;
     Vector3<int> Origin;
     Vector3<int> Volume;
     
     // A list of positions in the volume that needs to be processed
     Queue< Vector3<int> > TaskPositions;
+    
+    // Total number of jobs that are currently out to specific dwarves
+    int JobsOut;
 };
 
 // Returns the texture coordinates of a given designation; similar to the "dGetBlockTexture(...)" function
@@ -191,8 +197,7 @@ private:
     WorldContainer* WorldData;
     
     // Designations data lock (to help us be thread safe)
-    static pthread_mutex_t DesignationsLock;
-    static bool DesignationsLock_Init;
+    pthread_mutex_t DesignationsLock;
 };
 
 #endif

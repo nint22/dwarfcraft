@@ -66,6 +66,7 @@ enum EntityError
     EntityError_None,           // No error
     EntityError_Blocked,        // Cannot move into target (solid object)
     EntityError_NotReachable,   // Not adjacent, even though entity should
+    EntityError_BadPath,        // Impossible to find a path (i.e. pathing past what dwarves can do)
 };
 
 // Entity instruction set

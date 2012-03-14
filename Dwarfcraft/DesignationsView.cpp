@@ -11,10 +11,6 @@
 #include "DesignationsView.h"
 #include "DwarfEntity.h"
 
-// Since this is a static var, we need to explicitly declare it
-pthread_mutex_t DesignationsView::DesignationsLock;
-bool DesignationsView::DesignationsLock_Init = false;
-
 void dGetDesignationTexture(DesignationType Type, float* x, float* y, float* width, float* height, GLuint* TerrainID)
 {
     // Get the total width and height
@@ -36,17 +32,14 @@ DesignationsView::DesignationsView(WorldContainer* MainWorld)
     // Save world data
     WorldData = MainWorld;
     
-    // If not yet initialized, init the lock
-    if(!DesignationsLock_Init)
-    {
-        pthread_mutex_init(&DesignationsLock, NULL);
-        DesignationsLock_Init = true;
-    }
+    // Initialize lock
+    pthread_mutex_init(&DesignationsLock, NULL);
 }
 
 DesignationsView::~DesignationsView()
 {
     // Nothing to release...
+    pthread_mutex_destroy(&DesignationsLock);
 }
 
 void DesignationsView::AddDesignation(DesignationType Type, Vector3<int> Origin, Vector3<int> Volume)
@@ -60,6 +53,7 @@ void DesignationsView::AddDesignation(DesignationType Type, Vector3<int> Origin,
     ToInsert->Type = Type;
     ToInsert->Origin = Origin;
     ToInsert->Volume = Volume;
+    ToInsert->JobsOut = 0;
     
     // If mining, put all non-air blocks as targets to remove
     if(Type == DesignationType_Mine)
@@ -132,10 +126,19 @@ bool DesignationsView::FindDesignation(DesignationType Type, Designation** Targe
                 // Is this position next to air? (This is to attempt to give a possibley accesable block)
                 for(int j = 0; j < AdjacentOffsetsCount && !Found; j++)
                 {
+                    // The air block position
                     Vector3<int> TargetPosition = *TargetBlock + AdjacentOffsets[j];
                     dBlock BlockCheck = WorldData->GetBlock(TargetPosition);
-                    if(WorldData->IsWithinWorld(TargetPosition) && (BlockCheck.GetType() == dBlockType_Air || !BlockCheck.IsWhole()))
+                    
+                    // Check if ether an air block or half block
+                    // Special exception: if we are above our target, we cannot be in a half block
+                    if(WorldData->IsWithinWorld(TargetPosition) && (BlockCheck.GetType() == dBlockType_Air || (!BlockCheck.IsWhole() && j != 0)))
+                    {
+                        // Found a job, increase the job-out increment
                         Found = true;
+                        Area->JobsOut++;
+                        printf("Jobs out: %d\n", Area->JobsOut);
+                    }
                 }
             }
         }
@@ -204,6 +207,8 @@ void DesignationsView::ResignJob(JobTask* Job)
     // Failed the job, so let us place it back into the queue
     pthread_mutex_lock(&DesignationsLock);
     Job->TargetDesignation->TaskPositions.Enqueue(Job->TargetBlock);
+    Job->TargetDesignation->JobsOut--;
+    printf("Jobs out: %d\n", Job->TargetDesignation->JobsOut);
     pthread_mutex_unlock(&DesignationsLock);
 }
 
@@ -213,11 +218,14 @@ void DesignationsView::CompleteJob(JobTask* Job)
     
     // If this was the last item, delete the designation
     pthread_mutex_lock(&DesignationsLock);
+    Job->TargetDesignation->JobsOut--;
+    printf("Jobs out: %d\n", Job->TargetDesignation->JobsOut);
+    int JobsOut = Job->TargetDesignation->JobsOut;
     bool IsEmpty = Job->TargetDesignation->TaskPositions.IsEmpty();
     pthread_mutex_unlock(&DesignationsLock);
     
     // Perform delete outside of lock, as we actually already have a lock
-    if(IsEmpty)
+    if(IsEmpty && JobsOut == 0)
         RemoveDesignation(Job->TargetDesignation);
 }
 

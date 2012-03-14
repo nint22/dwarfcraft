@@ -587,7 +587,7 @@ void Entity::Execute(float dT)
             }
             // Error out
             else
-                RaiseExecutionError(EntityError_Blocked);
+                RaiseExecutionError(EntityError_BadPath);
             
             // Regardless of success, release the path planner object
             delete PathPlanner;
