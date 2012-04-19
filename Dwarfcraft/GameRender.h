@@ -25,7 +25,7 @@
 #include "BackgroundView.h"
 #include "UserInterface.h"
 #include "WorldView.h"
-#include "DesignationsView.h"
+#include "VolumeView.h"
 #include "ItemsView.h"
 #include "Entities.h"
 #include "StructsView.h"
@@ -99,7 +99,7 @@ private:
     WorldView* WorldRender;
     
     // Designations list
-    DesignationsView* Designations;
+    VolumeView* Designations;
     
     // Items list
     ItemsView* Items;

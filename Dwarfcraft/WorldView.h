@@ -23,7 +23,7 @@
 #include "VBuffer.h"
 #include "Stack.h"
 
-#include "DesignationsView.h"
+#include "VolumeView.h"
 #include "ItemsView.h"
 #include "Entities.h"
 #include "StructsView.h"
@@ -56,7 +56,7 @@ class WorldView
 public:
     
     // Constructor and destructor
-    WorldView(WorldContainer* WorldData, DesignationsView* Designations, ItemsView* Items, StructsView* Structs, Entities* EntitiesList);
+    WorldView(WorldContainer* WorldData, VolumeView* Designations, ItemsView* Items, StructsView* Structs, Entities* EntitiesList);
     ~WorldView();
     
     // Render the world (no projection changes)
@@ -106,7 +106,7 @@ private:
     // Note: The below references are stringly for rendering only
     
     // Designations list
-    DesignationsView* Designations;
+    VolumeView* Designations;
     
     // Items list
     ItemsView* Items;

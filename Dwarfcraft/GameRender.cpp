@@ -19,6 +19,16 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     IsIsometric = true;
     MainWindow->Use3DPerspective(false);
     
+    /*** Set OpenGL Fog ***/
+    
+    // Set fog to simple default values
+    glFogi(GL_FOG_MODE, GL_EXP);
+    //glFogfv(GL_FOG_COLOR, fogColor);
+    glFogf(GL_FOG_DENSITY, 0.35f);
+    glFogf(GL_FOG_START, 1.0f);
+    glFogf(GL_FOG_END, 5.0f);
+    glEnable(GL_FOG);
+    
     /*** Load Configuration ***/
     
     g2Config WorldConfig;
@@ -67,7 +77,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     
     // Create all of the special views
     Items = new ItemsView(WorldData);
-    Designations = new DesignationsView(WorldData);
+    Designations = new VolumeView(WorldData);
     Structs = new StructsView(WorldData);
     EntitiesList = new Entities(WorldData, Designations, Items);
     
@@ -119,7 +129,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     // Select one of four skin colors
     char Skins[4][32] = 
     {
-        "Lightest Dwarf.cfg",//"NewDwarf.cfg",//"Lightest Dwarf.cfg",//"SampleDwarf.cfg",
+        "SampleDwarf.cfg",
         "Lighter Dwarf.cfg",
         "Darker Dwarf.cfg",
         "Darkest Dwarf.cfg"
@@ -134,7 +144,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
         int x = WorldData->GetWorldWidth() / 2 + i; //rand() % WorldView_WorldWidth;
         int z = WorldData->GetWorldWidth() / 2 + rand() % EntityCount; //rand() % WorldView_WorldWidth;
         int y = WorldData->GetSurfaceDepth(x, z) + 1;
-        
+        	
         // Create a "dumb" AI for test
         DwarfEntity* SampleDwarf = new DwarfEntity(Skins[0]);// Debugging: always same skin for now Skins[i % 4]);
         SampleDwarf->SetPosition(Vector3<float>(x + 0.5f, y - 0.5f, z + 0.5f)); // Center on the tile (dwarf will auto-fall if needed)

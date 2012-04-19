@@ -11,7 +11,7 @@
 // Includes
 #include "WorldView.h"
 
-WorldView::WorldView(WorldContainer* WorldData, DesignationsView* Designations, ItemsView* Items, StructsView* Structs, Entities* EntitiesList)
+WorldView::WorldView(WorldContainer* WorldData, VolumeView* Designations, ItemsView* Items, StructsView* Structs, Entities* EntitiesList)
 {
     // Save the world data and all other renderables
     this->WorldData = WorldData;

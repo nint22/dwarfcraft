@@ -11,63 +11,8 @@
 // Includes
 #include "g2DashboardController.h"
 
-// Helper function to map icons to designation types
-static inline DesignationType GetDesignationType(IconType Type)
-{
-    DesignationType Result = DesignationType_Armory; // Default
-    
-    // Case for fast mapping
-    switch(Type)
-    {
-        case IconType_Mine:
-            Result = DesignationType_Mine; break;
-        case IconType_Fill:
-            Result = DesignationType_Fill; break;
-        case IconType_Flood:
-            Result = DesignationType_Flood; break;
-        case IconType_Rubbish:
-            Result = DesignationType_Rubbish; break;
-        case IconType_Food:
-            Result = DesignationType_Food; break;
-        case IconType_Crafted:
-            Result = DesignationType_Crafted; break;
-        case IconType_RawResources:
-            Result = DesignationType_RawResources; break;
-        case IconType_Ingots:
-            Result = DesignationType_Ingots; break;
-        case IconType_Grave:
-            Result = DesignationType_Grave; break;
-        case IconType_Farm:
-            Result = DesignationType_Farm; break;
-        case IconType_Wood:
-            Result = DesignationType_Wood; break;
-        case IconType_Forage:
-            Result = DesignationType_Forage; break;
-        case IconType_Protect:
-            Result = DesignationType_Protect; break;
-        case IconType_Barracks:
-            Result = DesignationType_Barracks; break;
-        case IconType_Hall:
-            Result = DesignationType_Hall; break;
-        case IconType_Armory:
-            Result = DesignationType_Armory; break;
-        
-        // Incorect
-        case IconType_Construct:
-        case IconType_Storage:
-        case IconType_Collect:
-        case IconType_Military:
-        case IconType_Accept:
-        case IconType_Cancel:
-            UtilAbort("Unable to map the given IconType to a DesignationType!");
-    }
-    
-    // Designation found
-    return Result;
-}
-
 g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainTheme)
-:g2Controller(Owner, MainTheme)
+    : g2Controller(Owner, MainTheme)
 {
     // Set size
     int CompWidth, CompHeight;
@@ -81,7 +26,8 @@ g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainT
     CustomText = new g2Label(NULL, MainTheme);
     
     // Get the initial size of the icon (Armory is just one of any regular icon)
-    GetTheme()->GetComponentSize(GetIconName(IconType_Armory), &IconW, &IconH);
+    GetTheme()->GetComponent("IconsList", &IconSrcW, &IconSrcH, &IconSrcX, &IconSrcY);
+    GetTheme()->GetComponentSize("IconsList", &IconW, &IconH);
     GetTheme()->GetComponentSize("IconButton", &ButtonW, &ButtonH);
     
     // Double all icon sizes
@@ -102,11 +48,11 @@ g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainT
     IconColCount = 4;
     
     // No initial list or group type
-    TypeCount = 0;
     State = DashboardState_Root;
     
     // Not currently selecting
     Selecting = false;
+    TypeCount = 0;
 }
 
 g2DashboardController::~g2DashboardController()
@@ -114,7 +60,16 @@ g2DashboardController::~g2DashboardController()
     
 }
 
-void g2DashboardController::SetDesignationsList(DesignationsView* Designations)
+void g2DashboardController::GetIconInfo(IconType Type, float* SrcX, float* SrcY, float* SrcW, float* SrcH)
+{
+    // Post the size and grid offset
+    *SrcW = IconSrcW;
+    *SrcH = IconSrcH;
+    *SrcX = float((int)Type % 8) * IconSrcW;
+    *SrcY = float((int)Type / 8) * IconSrcH;
+}
+
+void g2DashboardController::SetDesignationsList(VolumeView* Designations)
 {
     this->Designations = Designations;
 }
@@ -211,43 +166,42 @@ void g2DashboardController::Render(int x, int y)
     
     /** Designations **/
     
-    // Render default 4 designation types
+    // Render default 4 categories
     if(State == DashboardState_Root)
     {
-        IconType Types[4] = {IconType_Construct, IconType_Storage, IconType_Collect, IconType_Military};
+        IconType Types[4] = {Icon_RootMenu_Build, Icon_RootMenu_Designations, Icon_RootMenu_Stockpiles, Icon_RootMenu_Zones};
         Render(x, y, Types, 4);
     }
     // In a group
     else if(State == DashboardState_Group)
     {
-        // Construction
-        if(StateGroup == DesignationGroup_Construct)
+        if(StateGroup == UI_RootMenu_Build)
         {
-            IconType Types[4] = {IconType_Mine, IconType_Fill, IconType_Flood, IconType_Cancel};
-            Render(x, y, Types, 4);
-        }
-        else if(StateGroup == DesignationGroup_Storage)
-        {
-            IconType Types[7] = {IconType_Rubbish, IconType_Food, IconType_Crafted, IconType_RawResources, IconType_Ingots, IconType_Grave, IconType_Cancel};
-            Render(x, y, Types, 7);
-        }
-        else if(StateGroup == DesignationGroup_Collect)
-        {
-            IconType Types[4] = {IconType_Farm, IconType_Wood, IconType_Forage, IconType_Cancel};
-            Render(x, y, Types, 4);
-        }
-        else if(StateGroup == DesignationGroup_Military)
-        {
-            IconType Types[5] = {IconType_Protect, IconType_Barracks, IconType_Hall, IconType_Armory, IconType_Cancel};
+            IconType Types[5] = {Icon_BuildMenu_Farm, Icon_BuildMenu_Architecture, Icon_BuildMenu_Workshops, Icon_BuildMenu_Furniture, Icon_BuildMenu_Mechanical};
             Render(x, y, Types, 5);
+        }
+        else if(StateGroup == UI_RootMenu_Designations)
+        {
+            IconType Types[5] = {Icon_DesignationMenu_Fell, Icon_DesignationMenu_Forage, Icon_DesignationMenu_Mine, Icon_DesignationMenu_Fill, Icon_DesignationMenu_Flood};
+            Render(x, y, Types, 5);
+        }
+        else if(StateGroup == UI_RootMenu_Stockpiles)
+        {
+            IconType Types[8] = {Icon_StockpilesMenu_Rubbish, Icon_StockpilesMenu_Food, Icon_StockpilesMenu_Crafted, Icon_StockpilesMenu_Equipment, Icon_StockpilesMenu_RawResources, Icon_StockpilesMenu_Ingots, Icon_StockpilesMenu_Graves, Icon_StockpilesMenu_Wood};
+            Render(x, y, Types, 8);
+        }
+        else if(StateGroup == UI_RootMenu_Zones)
+        {
+            IconType Types[3] = {Icon_ZonesMenu_Hall, Icon_ZonesMenu_Pen, Icon_ZonesMenu_Defend};
+            Render(x, y, Types, 3);
         }
     }
     // Actively selecting, only show a commit and reject button
     else if(State == DashboardState_Selection)
     {
         // We can cast directly from a DesignationType to an IconType, they are the same (initial) offsets
-        IconType Types[3] = {(IconType)StateType, IconType_Accept, IconType_Cancel};
-        Render(x, y, Types, 3);
+        IconType Types[2] = {Icon_Accept, Icon_Cancel};
+        Render(x, y, Types, 2);
     }
     // Else, no such group
     else
@@ -272,7 +226,9 @@ void g2DashboardController::Render(int x, int y, IconType* Types, int TypeCount)
         DrawComponent("IconButton", ix, iy, ButtonW, ButtonH);
         
         // Draw icon
-        DrawComponent(GetIconName(Types[i]), ix + dx, iy + dy, IconW, IconH);
+        float sx, sy, sw, sh;
+        GetIconInfo(Types[i], &sx, &sy, &sw, &sh);
+        DrawComponent(ix + dx, iy + dy, IconW, IconH, sx, sy, sw, sh);
         
         // If the mouse is in this position, act as though the user is hovering over it
         // and draw a label of the text as well
@@ -282,32 +238,30 @@ void g2DashboardController::Render(int x, int y, IconType* Types, int TypeCount)
             if(State != DashboardState_Selection || i != 0)
                 DrawComponent("IconButton_Hover", ix, iy, ButtonW, ButtonH);
             
-            // Button names:
-            
             // Cancel button if non-root and last element
             if(State != DashboardState_Root && i == TypeCount - 1)
                 ClockText->SetText("Cancel");
             
             // Commit button if selection and second-last element
             else if(State == DashboardState_Selection && i == 1)
-                ClockText->SetText("Make Designation");
+                ClockText->SetText("Accept");
             
             // Root view
             else if(State == DashboardState_Root)
-            {
-                if(i == 0)
-                    ClockText->SetText("Construct");
-                else if(i == 1)
-                    ClockText->SetText("Storage");
-                else if(i == 2)
-                    ClockText->SetText("Collect");
-                else
-                    ClockText->SetText("Military");
-            }
+                ClockText->SetText(UI_RootMenuNames[i]);
             
-            // All other views are just diret icon names
+            // All other views are just direct icon names
             else
-                ClockText->SetText(DesignationNames[Types[i]]);
+            {
+                if(StateGroup == UI_RootMenu_Build)
+                    ClockText->SetText(UI_BuildMenuNames[Types[i]]);
+                else if(StateGroup == UI_RootMenu_Designations)
+                    ClockText->SetText(UI_DesignationsMenuNames[Types[i]]);
+                else if(StateGroup == UI_RootMenu_Stockpiles)
+                    ClockText->SetText(UI_StockpilesMenuNames[Types[i]]);
+                else if(StateGroup == UI_RootMenu_Zones)
+                    ClockText->SetText(UI_ZonesMenuNames[Types[i]]);
+            }
         }
         
         // Draw the keybinding for the letters
@@ -367,23 +321,43 @@ void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state,
             else if(State == DashboardState_Root)
             {
                 State = DashboardState_Group;
-                StateGroup = (DesignationGroup)i;
+                StateGroup = (UI_RootMenu)i;
             }
             // Else, actuallying doing some volume selection
             else if(State == DashboardState_Group)
             {
                 State = DashboardState_Selection;
-                StateType = GetDesignationType(Types[i]);
                 Selecting = true;
+                
+                // Set the selection
+                if(StateGroup == UI_RootMenu_Build)
+                    Type.Building = (UI_BuildMenu)i;
+                else if(StateGroup == UI_RootMenu_Designations)
+                    Type.Designation = (UI_DesignationMenu)i;
+                else if(StateGroup == UI_RootMenu_Stockpiles)
+                    Type.Stockpile = (UI_StockpilesMenu)i;
+                else if(StateGroup == UI_RootMenu_Zones)
+                    Type.Zone = (UI_ZonesMenu)i;
             }
             // Else, user is commiting change
-            else if(State == DashboardState_Selection && i == 1)
+            else if(State == DashboardState_Selection && i == 0)
             {
                 State = DashboardState_Root;
                 Selecting = false;
                 
+                // Choose origin and volume
+                Vector3<int> Origin = SelectStart;
+                Vector3<int> Volume = SelectEnd - SelectStart + Vector3<int>(1, 1, 1);
+                
                 // Save into designations list
-                Designations->AddDesignation(StateType, SelectStart, SelectEnd - SelectStart + Vector3<int>(1, 1, 1));
+                if(StateGroup == UI_RootMenu_Build)
+                    Designations->AddBuilding(Type.Building, Origin, Volume);
+                else if(StateGroup == UI_RootMenu_Designations)
+                    Designations->AddDesignation(Type.Designation, Origin, Volume);
+                else if(StateGroup == UI_RootMenu_Stockpiles)
+                    Designations->AddStockpile(Type.Stockpile, Origin, Volume);
+                else if(StateGroup == UI_RootMenu_Zones)
+                    Designations->AddZone(Type.Zone, Origin, Volume);
             }
         }
     }

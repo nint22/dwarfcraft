@@ -21,7 +21,7 @@
 #include "Globals.h" // For icon access
 
 // Included for access to the designations type and names
-#include "DesignationsView.h"
+#include "VolumeView.h"
 
 // The current state of icon selection
 // Root, group, then selection
@@ -40,8 +40,11 @@ public:
     g2DashboardController(g2Controller* Owner, g2Theme* MainTheme);
     ~g2DashboardController();
     
+    // Get icon component source size
+    void GetIconInfo(IconType Type, float* SrcX, float* SrcY, float* SrcW, float* SrcH);
+    
     // Set designations list
-    void SetDesignationsList(DesignationsView* Designations);
+    void SetDesignationsList(VolumeView* Designations);
     
     // Set target width
     void SetWidth(int Width);
@@ -112,20 +115,24 @@ private:
     /*** Current Designations ***/
     
     // Designations list
-    DesignationsView* Designations;
+    VolumeView* Designations;
     
     // Current dashboard state and group
     DashboardState State;
-    DesignationGroup StateGroup;
-    DesignationType StateType;
-    
-    // Allocated list of designations used between functions
-    IconType Types[DesignationCount];
-    int TypeCount;
+    UI_RootMenu StateGroup;
+    union {
+        UI_BuildMenu Building;
+        UI_DesignationMenu Designation;
+        UI_StockpilesMenu Stockpile;
+        UI_ZonesMenu Zone;
+    } Type;
     
     // True if selecting a volume
     bool Selecting;
-    DesignationType SelectingType;
+    
+    // Icons being rendered in the current GUI
+    IconType Types[IconTypeCount];
+    int TypeCount;
     
     // Selection volume
     Vector3<int> SelectStart, SelectEnd;
@@ -133,6 +140,7 @@ private:
     /*** Icon Constants ***/
     
     // Icon and button sizes
+    float IconSrcW, IconSrcH, IconSrcX, IconSrcY;
     int IconW, IconH;
     int ButtonW, ButtonH;
     

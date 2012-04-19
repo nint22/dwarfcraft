@@ -25,7 +25,7 @@
 #include "g2ChatController.h"
 #include "g2EntityController.h"
 #include "WorldView.h"
-#include "DesignationsView.h"
+#include "VolumeView.h"
 
 class UserInterface : public GrfxObject
 {

@@ -10,7 +10,7 @@
 
 #include "Entities.h"
 
-Entities::Entities(WorldContainer* MainWorld, DesignationsView* MainDesignations, ItemsView* MainItems)
+Entities::Entities(WorldContainer* MainWorld, VolumeView* MainDesignations, ItemsView* MainItems)
 {
     Theta = 0.0f;
     this->MainWorld = MainWorld;

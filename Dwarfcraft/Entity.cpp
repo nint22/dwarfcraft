@@ -438,7 +438,7 @@ void Entity::__Render(float CameraAngle)
     
     // We only care about the first solid block under this dwarf (including which block it is in)
     dBlock SolidBlock(dBlockType_Air);
-    float ground;
+    float ground = 0.0f;
     
     for(int y = Location.y; y >= 0; y--)
     {
@@ -489,7 +489,7 @@ void Entity::UpdatePhys(float dT)
     
     // We only care about the first solid block under this dwarf (including which block it is in)
     dBlock SolidBlock(dBlockType_Air);
-    float ground;
+    float ground = 0.0f;
     
     for(int y = Location.y; y >= 0; y--)
     {
@@ -810,7 +810,7 @@ WorldContainer* Entity::GetWorld()
     return MainWorld;
 }
 
-DesignationsView* Entity::GetDesignations()
+VolumeView* Entity::GetDesignations()
 {
     return Designations;
 }

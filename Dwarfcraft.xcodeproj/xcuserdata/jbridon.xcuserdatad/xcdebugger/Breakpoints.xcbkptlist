@@ -17,5 +17,31 @@
          landmarkName = "Entity::ExecuteMove(float dT)"
          landmarkType = "5">
       </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Dwarfcraft/VolumeView.cpp"
+         timestampString = "356491905.580746"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "273"
+         endingLineNumber = "273"
+         landmarkName = "VolumeView::GetMiningJob(DwarfEntity* Dwarf, JobTask* JobOut)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Dwarfcraft/VolumeView.cpp"
+         timestampString = "356491911.116908"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "195"
+         endingLineNumber = "195"
+         landmarkName = "VolumeView::GetJob(DwarfEntity* Dwarf, JobTask* JobOut)"
+         landmarkType = "5">
+      </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>

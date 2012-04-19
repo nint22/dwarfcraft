@@ -161,80 +161,136 @@ static const Vector3<int> AdjacentOffsets[AdjacentOffsetsCount] = {
 /** Icon Set for the GUI **/
 
 // Enumeration of all icons
-// Note that the first elements have the same index (i.e. parallel
-// to) the enumeration "DesignationType"
-static const int IconTypeCount = 22;
+// These are placed in an 8-per-row, next-row-down order
+// The starting position is a key-tuble value pair in "UITheme.cfg" called "IconsList"
+static const int IconTypeCount = 27;
 enum IconType
 {
-    // Construction
-    IconType_Mine = 0, // Just start so we match "DesignationType_Mine = 0"
-    IconType_Fill,
-    IconType_Flood,
-    
-    // Storage
-    IconType_Rubbish,
-    IconType_Food,
-    IconType_Crafted,
-    IconType_RawResources, // Wood, stones, etc.
-    IconType_Ingots,
-    IconType_Grave,
-    
-    // Collection
-    IconType_Farm,
-    IconType_Wood,
-    IconType_Forage,
-    
-    // Military flags
-    IconType_Protect,
-    IconType_Barracks,
-    IconType_Hall,
-    IconType_Armory,
-    
-    // Not parallel to "DesignationType"
-    
-    // Global menu
-    IconType_Construct,
-    IconType_Storage,
-    IconType_Collect,
-    IconType_Military,
-    
-    // Accept or cancel
-    IconType_Accept,
-    IconType_Cancel,
+    Icon_RootMenu_Build,
+    Icon_RootMenu_Designations,
+    Icon_RootMenu_Stockpiles,
+    Icon_RootMenu_Zones,
+    Icon_BuildMenu_Farm,
+    Icon_BuildMenu_Architecture,
+    Icon_BuildMenu_Workshops,
+    Icon_BuildMenu_Furniture,
+    Icon_BuildMenu_Mechanical,
+    Icon_DesignationMenu_Fell,
+    Icon_DesignationMenu_Forage,
+    Icon_DesignationMenu_Mine,
+    Icon_DesignationMenu_Fill,
+    Icon_DesignationMenu_Flood,
+    Icon_StockpilesMenu_Rubbish,
+    Icon_StockpilesMenu_Food,
+    Icon_StockpilesMenu_Crafted,
+    Icon_StockpilesMenu_Equipment,
+    Icon_StockpilesMenu_RawResources,
+    Icon_StockpilesMenu_Ingots,
+    Icon_StockpilesMenu_Graves,
+    Icon_StockpilesMenu_Wood,
+    Icon_ZonesMenu_Hall,
+    Icon_ZonesMenu_Pen,
+    Icon_ZonesMenu_Defend,
+    Icon_Accept,
+    Icon_Cancel,
 };
 
-// The names of each icon
-static const char IconTypeNames[IconTypeCount][32] =
+/*** User Interface Icons ***/
+
+// Root menu:
+static const int UI_RootMenuCount = 4;
+enum UI_RootMenu
 {
-    "IconMine",
-    "IconFill",
-    "IconFlood",
-    "IconRubbish",
-    "IconFood",
-    "IconCrafted",
-    "IconRawResources",
-    "IconIngots",
-    "IconGrave",
-    "IconFarm",
-    "IconWood",
-    "IconForage",
-    "IconProtect",
-    "IconBarracks",
-    "IconHall",
-    "IconArmory",
-    "IconConstruct",
-    "IconStorage",
-    "IconCollect",
-    "IconMilitary",
-    "IconAccept",
-    "IconCancel",
+    UI_RootMenu_Build,          // Place an item, wall, etc.
+    UI_RootMenu_Designations,   // Manipulate the world
+    UI_RootMenu_Stockpiles,     // Storage
+    UI_RootMenu_Zones,          // Places for dwarves, defense, etc
+};
+static const char UI_RootMenuNames[UI_RootMenuCount][32] =
+{
+    "Build",
+    "Designations",
+    "Stockpiles",
+    "Zones",
 };
 
-// Internal helper function to give the Glui2 name based on the icon type
-static inline const char* GetIconName(IconType Type)
+// Build menu:
+static const int UI_BuildMenuCount = 5;
+enum UI_BuildMenu
 {
-    return IconTypeNames[(int)Type];
-}
+    UI_BuildMenu_Farm,          // Simple farm
+    UI_BuildMenu_Architecture,  // Stairs, floors, walls, etc.
+    UI_BuildMenu_Workshops,     // Masonry, woodshop, etc.
+    UI_BuildMenu_Furniture,     // Chairs, doors, etc.
+    UI_BuildMenu_Mechanical,    // Levers, gates, etc.
+};
+static const char UI_BuildMenuNames[UI_BuildMenuCount][32] =
+{
+    "Farm",
+    "Architecture",
+    "Workshops",
+    "Furniture",
+    "Mechanical",
+};
+
+// Designations menu:
+static const int UI_DesignationsMenuCount = 5;
+enum UI_DesignationMenu
+{
+    UI_DesignationMenu_Fell,
+    UI_DesignationMenu_Forage,
+    UI_DesignationMenu_Mine,
+    UI_DesignationMenu_Fill,
+    UI_DesignationMenu_Flood,   // Flood with water (via buckets)
+};
+static const char UI_DesignationsMenuNames[UI_DesignationsMenuCount][32] =
+{
+    "Fell Trees",
+    "Forage",
+    "Mine",
+    "Fill",
+    "Flood",
+};
+
+// Stockpiles menu:
+static const int UI_StockpilesMenuCount = 8;
+enum UI_StockpilesMenu
+{
+    UI_StockpilesMenu_Rubbish,
+    UI_StockpilesMenu_Food,
+    UI_StockpilesMenu_Crafted,
+    UI_StockpilesMenu_Equipment,
+    UI_StockpilesMenu_RawResources, // Wood, stones, etc.
+    UI_StockpilesMenu_Ingots,
+    UI_StockpilesMenu_Graves,
+    UI_StockpilesMenu_Wood,
+};
+static const char UI_StockpilesMenuNames[UI_StockpilesMenuCount][32] =
+{
+    "Rubbish",
+    "Food",
+    "Crafted",
+    "Equipment",
+    "Raw Resources",
+    "Ignots",
+    "Graves",
+    "Wood",
+};
+
+// Zones:
+static const int UI_ZonesMenuCount = 3;
+enum UI_ZonesMenu
+{
+    UI_ZonesMenu_Hall,              // All idle dwarves go here
+    UI_ZonesMenu_Pen,               // Animals
+    UI_ZonesMenu_Defend,            // Any enimies enter here, we attack
+};
+static const char UI_ZonesMenuNames[UI_ZonesMenuCount][32] =
+{
+    "Hall",
+    "Animal Pen",
+    "Defend",
+};
 
 // End of inclusion guard
 #endif

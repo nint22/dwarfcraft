@@ -53,7 +53,7 @@
 #include <Glui2/g2Images.h>
 #include "WorldContainer.h"
 #include "EntityPath.h"
-#include "DesignationsView.h"
+#include "VolumeView.h"
 #include "ItemsView.h"
 #include "g2ChatController.h"
 
@@ -298,7 +298,7 @@ protected:
     WorldContainer* GetWorld();
     
     // Get the current main designations list
-    DesignationsView* GetDesignations();
+    VolumeView* GetDesignations();
     
     // Get the current main items list
     ItemsView* GetItems();
@@ -343,7 +343,7 @@ private:
     WorldContainer* MainWorld;
     
     // Main designations; so this AI knows where what is
-    DesignationsView* Designations;
+    VolumeView* Designations;
     
     // Main items; so the AI can get/set items
     ItemsView* Items;

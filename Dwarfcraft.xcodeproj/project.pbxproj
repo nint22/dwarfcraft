@@ -10,7 +10,7 @@
 		060DBD6F14FDC897008BD6E6 /* UISkin.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 060DBD6E14FDC88D008BD6E6 /* UISkin.png */; };
 		060EE31F14FC683900D0A08C /* AnimalEntity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2EE14FC683900D0A08C /* AnimalEntity.cpp */; };
 		060EE32014FC683900D0A08C /* dBlocks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F014FC683900D0A08C /* dBlocks.cpp */; };
-		060EE32114FC683900D0A08C /* DesignationsView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F214FC683900D0A08C /* DesignationsView.cpp */; };
+		060EE32114FC683900D0A08C /* VolumeView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F214FC683900D0A08C /* VolumeView.cpp */; };
 		060EE32214FC683900D0A08C /* DwarfEntity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F414FC683900D0A08C /* DwarfEntity.cpp */; };
 		060EE32314FC683900D0A08C /* Entities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F614FC683900D0A08C /* Entities.cpp */; };
 		060EE32414FC683900D0A08C /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 060EE2F814FC683900D0A08C /* Entity.cpp */; };
@@ -180,8 +180,8 @@
 		060EE2EF14FC683900D0A08C /* AnimalEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnimalEntity.h; path = Dwarfcraft/AnimalEntity.h; sourceTree = "<group>"; };
 		060EE2F014FC683900D0A08C /* dBlocks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dBlocks.cpp; path = Dwarfcraft/dBlocks.cpp; sourceTree = "<group>"; };
 		060EE2F114FC683900D0A08C /* dBlocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dBlocks.h; path = Dwarfcraft/dBlocks.h; sourceTree = "<group>"; };
-		060EE2F214FC683900D0A08C /* DesignationsView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DesignationsView.cpp; path = Dwarfcraft/DesignationsView.cpp; sourceTree = "<group>"; };
-		060EE2F314FC683900D0A08C /* DesignationsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DesignationsView.h; path = Dwarfcraft/DesignationsView.h; sourceTree = "<group>"; };
+		060EE2F214FC683900D0A08C /* VolumeView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VolumeView.cpp; path = Dwarfcraft/VolumeView.cpp; sourceTree = "<group>"; };
+		060EE2F314FC683900D0A08C /* VolumeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VolumeView.h; path = Dwarfcraft/VolumeView.h; sourceTree = "<group>"; };
 		060EE2F414FC683900D0A08C /* DwarfEntity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DwarfEntity.cpp; path = Dwarfcraft/DwarfEntity.cpp; sourceTree = "<group>"; };
 		060EE2F514FC683900D0A08C /* DwarfEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DwarfEntity.h; path = Dwarfcraft/DwarfEntity.h; sourceTree = "<group>"; };
 		060EE2F614FC683900D0A08C /* Entities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Entities.cpp; path = Dwarfcraft/Entities.cpp; sourceTree = "<group>"; };
@@ -494,8 +494,8 @@
 				060EE31C14FC683900D0A08C /* WorldView.h */,
 				060EE30414FC683900D0A08C /* ItemsView.cpp */,
 				060EE30514FC683900D0A08C /* ItemsView.h */,
-				060EE2F214FC683900D0A08C /* DesignationsView.cpp */,
-				060EE2F314FC683900D0A08C /* DesignationsView.h */,
+				060EE2F214FC683900D0A08C /* VolumeView.cpp */,
+				060EE2F314FC683900D0A08C /* VolumeView.h */,
 				060EE31114FC683900D0A08C /* StructsView.cpp */,
 				060EE31214FC683900D0A08C /* StructsView.h */,
 				0614F75214FF0F5800842808 /* BackgroundView.cpp */,
@@ -545,7 +545,7 @@
 		060EE2A614FC637400D0A08C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 060EE2A914FC637400D0A08C /* Build configuration list for PBXProject "Dwarfcraft" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -571,7 +571,7 @@
 			files = (
 				060EE31F14FC683900D0A08C /* AnimalEntity.cpp in Sources */,
 				060EE32014FC683900D0A08C /* dBlocks.cpp in Sources */,
-				060EE32114FC683900D0A08C /* DesignationsView.cpp in Sources */,
+				060EE32114FC683900D0A08C /* VolumeView.cpp in Sources */,
 				060EE32214FC683900D0A08C /* DwarfEntity.cpp in Sources */,
 				060EE32314FC683900D0A08C /* Entities.cpp in Sources */,
 				060EE32414FC683900D0A08C /* Entity.cpp in Sources */,

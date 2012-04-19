@@ -20,7 +20,7 @@
 
 #include "GrfxObject.h"
 #include "WorldContainer.h"
-#include "DesignationsView.h"
+#include "VolumeView.h"
 #include "Entity.h"
 #include "Queue.h"
 
@@ -29,7 +29,7 @@ class Entities
 public:
     
     // Standard constructor and destructor
-    Entities(WorldContainer* MainWorld, DesignationsView* MainDesignations, ItemsView* MainItems);
+    Entities(WorldContainer* MainWorld, VolumeView* MainDesignations, ItemsView* MainItems);
     ~Entities();
     
     // Add a new entity; gives the main world reference
@@ -63,7 +63,7 @@ private:
     WorldContainer* MainWorld;
     
     // Designations handle
-    DesignationsView* MainDesignations;
+    VolumeView* MainDesignations;
     
     // Items handle
     ItemsView* MainItems;
