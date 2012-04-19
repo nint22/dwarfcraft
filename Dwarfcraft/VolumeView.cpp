@@ -11,11 +11,14 @@
 #include "VolumeView.h"
 #include "DwarfEntity.h"
 
-VolumeView::VolumeView(WorldContainer* MainWorld)
+VolumeView::VolumeView(WorldContainer* MainWorld, g2Theme* MainTheme)
 {
     // Save world data
     WorldData = MainWorld;
     pthread_mutex_init(&VolumeLock, NULL);
+    
+    // Get the icon texture info
+    MainTheme->GetComponent("IconsList", &IconSrcX, &IconSrcY, &IconSrcW, &IconSrcH, NULL, NULL, &IconTextureID);
 }
 
 VolumeView::~VolumeView()
@@ -47,6 +50,7 @@ void VolumeView::AddBuilding(UI_BuildMenu Type, Vector3<int> Origin, Vector3<int
                 Job->Volume = Task;
                 Job->Type = JobType_PlaceBlock; // TODO!!!
                 Job->TargetBlock = Vector3<int>(x, y, z);
+                Task->Jobs.Enqueue(Job);
             }
         }
     }
@@ -89,6 +93,7 @@ void VolumeView::AddDesignation(UI_DesignationMenu Type, Vector3<int> Origin, Ve
                 Job->Volume = Task;
                 Job->Type = JobType_Mine; // TODO
                 Job->TargetBlock = Vector3<int>(x, y, z);
+                Task->Jobs.Enqueue(Job);
             }
         }
     }
@@ -130,6 +135,7 @@ void VolumeView::AddStockpile(UI_StockpilesMenu Type, Vector3<int> Origin, Vecto
                 Job->Volume = Task;
                 Job->Type = JobType_StockpilePos; // TODO!!!
                 Job->TargetBlock = Vector3<int>(x, y, z);
+                Task->Jobs.Enqueue(Job);
             }
         }
     }
@@ -171,6 +177,7 @@ void VolumeView::AddZone(UI_ZonesMenu Type, Vector3<int> Origin, Vector3<int> Vo
                 Job->Volume = Task;
                 Job->Type = JobType_ZonePos; // TODO!!!
                 Job->TargetBlock = Vector3<int>(x, y, z);
+                Task->Jobs.Enqueue(Job);
             }
         }
     }
@@ -396,6 +403,14 @@ void VolumeView::RenderVolume(List< VolumeTask* >* VolumeList)
         // Pop this localized coordinate
         glPopMatrix();
         
+        // Get the texture for this job type
+        float tx, ty, tw, th;
+        GetIconInfo(GetIconType(Volume), &tx, &ty, &tw, &th);
+        
+        // Enable and set texture
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, IconTextureID);
+        
         // Render each job queue
         for(int QueueIndex = 0; QueueIndex < 2; QueueIndex++)
         {
@@ -432,13 +447,45 @@ void VolumeView::RenderVolume(List< VolumeTask* >* VolumeList)
                     // Render a mining tile
                     // Note the slight shift upwards because we want to render it ABOVE a block
                     glBegin(GL_QUADS);
+                        glTexCoord2f(tx, ty);
                         glVertex3f(TilePos.x + 0.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 0.0f);
+                        glTexCoord2f(tx + tw, ty);
                         glVertex3f(TilePos.x + 0.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 1.0f);
+                        glTexCoord2f(tx + tw, ty + th);
                         glVertex3f(TilePos.x + 1.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 1.0f);
+                        glTexCoord2f(tx, ty + th);
                         glVertex3f(TilePos.x + 1.0f, TilePos.y + 1.01f + VerticalOffset, TilePos.z + 0.0f);
                     glEnd();
                 }
             }
         }
+        
+        // Done with texture
+        glDisable(GL_TEXTURE_2D);
     }
+}
+
+IconType VolumeView::GetIconType(VolumeTask* Volume)
+{
+    IconType IType = Icon_Cancel; // Default to error
+    
+    if(Volume->Category == UI_RootMenu_Build)
+        IType = IconType(Icon_BuildMenu_Farm + (int)Volume->Type.Building);
+    else if(Volume->Category == UI_RootMenu_Designations)
+        IType = IconType(Icon_DesignationMenu_Fell + (int)Volume->Type.Designation);
+    else if(Volume->Category == UI_RootMenu_Stockpiles)
+        IType = IconType(Icon_StockpilesMenu_Rubbish + (int)Volume->Type.Stockpile);
+    else if(Volume->Category == UI_RootMenu_Zones)
+        IType = IconType(Icon_ZonesMenu_Hall + (int)Volume->Type.Zone);
+    
+    return IType;
+}
+
+void VolumeView::GetIconInfo(IconType Type, float* SrcX, float* SrcY, float* SrcW, float* SrcH)
+{
+    // Post the size and grid offset
+    *SrcX = IconSrcX + float((int)Type % 4) * IconSrcW;
+    *SrcY = IconSrcY + float((int)Type / 4) * IconSrcH;
+    *SrcW = IconSrcW;
+    *SrcH = IconSrcH;
 }

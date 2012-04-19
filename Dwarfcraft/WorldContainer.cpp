@@ -134,6 +134,8 @@ void WorldContainer::SetBlock(int x, int y, int z, dBlock Block)
     // Find the chunk
     int cx = x / ColumnWidth;
     int cz = z / ColumnWidth;
+    
+    // Localize change
     int dx = x % ColumnWidth;
     int dz = z % ColumnWidth;
     
@@ -157,6 +159,16 @@ void WorldContainer::SetBlock(int x, int y, int z, dBlock Block)
         // Set the target block
         Plane.Data.PlaneData[dz * ColumnWidth + dx] = Block;
     }
+    
+    // Note: if the changed block is on a column bound, update the adjacent
+    if(dx == 0 && cx > 0)
+        WorldChunks[cz * ChunkCount + (cx - 1)].NeedsUpdate = true;
+    if(dx == (ColumnWidth - 1) && cx < ChunkCount - 1)
+        WorldChunks[cz * ChunkCount + (cx + 1)].NeedsUpdate = true;
+    if(dz == 0 && cz > 0)
+        WorldChunks[(cz - 1) * ChunkCount + cx].NeedsUpdate = true;
+    if(dz == (ColumnWidth - 1) && cz < ChunkCount - 1)
+        WorldChunks[(cz + 1) * ChunkCount + cx].NeedsUpdate = true;
 }
 
 void WorldContainer::SetBlock(Vector3<int> Pos, dBlock Block)

@@ -11,6 +11,11 @@
 // Includes
 #include "GameRender.h"
 
+// Min / max zoom distances
+static float const GameRender_MinZoom = 40.0f;
+static float const GameRender_MaxZoom = 180.0f;
+static float const GameRender_ZoomSpeed = 1.5f;
+
 GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
 : GrfxObject(Parent)
 {
@@ -24,10 +29,10 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     // Set fog to simple default values
     glFogi(GL_FOG_MODE, GL_EXP);
     //glFogfv(GL_FOG_COLOR, fogColor);
-    glFogf(GL_FOG_DENSITY, 0.35f);
-    glFogf(GL_FOG_START, 1.0f);
-    glFogf(GL_FOG_END, 5.0f);
-    glEnable(GL_FOG);
+    glFogf(GL_FOG_DENSITY, 1.05f);
+    glFogf(GL_FOG_START, 10000.0f);
+    glFogf(GL_FOG_END, 20000.0f);
+    //glEnable(GL_FOG);
     
     /*** Load Configuration ***/
     
@@ -77,7 +82,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     
     // Create all of the special views
     Items = new ItemsView(WorldData);
-    Designations = new VolumeView(WorldData);
+    Designations = new VolumeView(WorldData, GluiHandle->GetMainTheme());
     Structs = new StructsView(WorldData);
     EntitiesList = new Entities(WorldData, Designations, Items);
     
@@ -137,7 +142,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     
     // Add a dozen entities purely for testing...
     Clock.Start();
-    int EntityCount = 3; // Any variable count while testing the code
+    int EntityCount = 1; // Any variable count while testing the code
     for(int i = 0; i < EntityCount; i++)
     {
         // Randomly choose a position
@@ -180,14 +185,15 @@ void GameRender::Render()
     if(!IsIsometric)
     {
         MainWindow->SetFovy(60);
-        CameraSource = GetCameraSource(CameraZoom);
-        CameraBacked = GetCameraSource(CameraZoom + 8);
+        float Normalized = 1.0f - (CameraZoom - GameRender_MinZoom) / (GameRender_MaxZoom - GameRender_MinZoom);
+        CameraSource = GetCameraSource(2 + Normalized * 10.0f);
+        CameraBacked = GetCameraSource(2 + Normalized * 10.0f + 8);
     }
     else
     {
-        MainWindow->SetFovy(90 - CameraZoom * 1.5f);
+        MainWindow->SetFovy(CameraZoom);
         CameraSource = GetCameraSource(WorldView_CameraDist * 5);
-        CameraBacked = GetCameraSource(CameraZoom + 16);
+        CameraBacked = GetCameraSource(WorldView_CameraDist + 16);
     }
     
     // Change projection matrix to look from the source to the target; up vector is y+
@@ -216,7 +222,7 @@ void GameRender::Render()
     WorldRender->Render(CameraBacked, RightDirection, LayerCutoff, CameraAngle);
     
     /*** Render Breaking Blocks ***/
-    /*
+    
     // For each entity
     Queue<Entity*> Entities = EntitiesList->GetEntities();
     while(!Entities.IsEmpty())
@@ -226,11 +232,17 @@ void GameRender::Render()
         
         // Is this entity breaking a block?
         Vector3<int> Target; int Step;
-        if(Obj->GetBreaking(&Target, &Step) && Target.y <= GetLayerCutoff())
+        if(Obj->GetBreaking(&Target, &Step) && Target.y <= LayerCutoff)
         {
+            // Is this breaking block a solid or half?
+            bool IsBlockSolid = WorldData->GetBlock(Target).IsWhole();
+            
             // Compute the texture
             float srcx, srcy, srcw, srch;
             dGetBlockTexture(dBlockType_Breaking, dBlockFace_Top, &srcx, &srcy, &srcw, &srch);
+            
+            GLuint BlockTexture;
+            BlockTexture = dGetTerrainTextureID();
             
             // Offset based on progress
             srcx += srcw * float(Step);
@@ -241,26 +253,47 @@ void GameRender::Render()
             // The small offsets are to make the breaking cube right above the target cube
             glTranslatef(Target.x - 0.01f, Target.y - 0.01f, Target.z - 0.01f);
             glScalef(1.02f, 1.02f, 1.02f);
-            glColor4f(1, 1, 1, 0.5f);
+            glColor3f(1, 1, 1);
+            
+            // Set texture
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, BlockTexture);
+            
+            // Always render ontop
+            //glEnable(GL_POLYGON_OFFSET_FILL);
+            //glPolygonOffset(1, 1);
             
             // For each surface
             for(int i = 0; i < 5; i++)
             {
+                // Will be cutting the side by half if it's a half block?
+                float SideFactor = 1.0f, TextFactor = 1.0f;
+                if(!IsBlockSolid)
+                {
+                    SideFactor = 0.51f; // Overcome the shadow
+                    if(i != 0)
+                        TextFactor = 0.5f;
+                }
+                
                 // Draw surface
-                glEnable(GL_TEXTURE_2D);
                 glBegin(GL_QUADS);
-                glTexCoord2f(srcx, srcy); glVertex3f(GameRender_FaceQuads[i][0].x, GameRender_FaceQuads[i][0].y, GameRender_FaceQuads[i][0].z);
-                glTexCoord2f(srcx + srcw, srcy); glVertex3f(GameRender_FaceQuads[i][1].x, GameRender_FaceQuads[i][1].y, GameRender_FaceQuads[i][1].z);
-                glTexCoord2f(srcx + srcw, srcy + srch); glVertex3f(GameRender_FaceQuads[i][2].x, GameRender_FaceQuads[i][2].y, GameRender_FaceQuads[i][2].z);
-                glTexCoord2f(srcx, srcy + srch); glVertex3f(GameRender_FaceQuads[i][3].x, GameRender_FaceQuads[i][3].y, GameRender_FaceQuads[i][3].z);
+                    glTexCoord2f(srcx, srcy);
+                    glVertex3f(WorldView_FaceQuads[i][0].x, WorldView_FaceQuads[i][0].y * SideFactor, WorldView_FaceQuads[i][0].z);
+                    glTexCoord2f(srcx + srcw, srcy);
+                    glVertex3f(WorldView_FaceQuads[i][1].x, WorldView_FaceQuads[i][1].y * SideFactor, WorldView_FaceQuads[i][1].z);
+                    glTexCoord2f(srcx + srcw, srcy + srch * TextFactor);
+                    glVertex3f(WorldView_FaceQuads[i][2].x, WorldView_FaceQuads[i][2].y * SideFactor, WorldView_FaceQuads[i][2].z);
+                    glTexCoord2f(srcx, srcy + srch * TextFactor);
+                    glVertex3f(WorldView_FaceQuads[i][3].x, WorldView_FaceQuads[i][3].y * SideFactor, WorldView_FaceQuads[i][3].z);
                 glEnd();
-                glDisable(GL_TEXTURE_2D);
             }
             
+            glDisable(GL_TEXTURE_2D);
+            
+            glDisable(GL_POLYGON_OFFSET_FILL);
             glPopMatrix();
         }
     }
-    */
     
     /*** Render Selections ***/
     
@@ -353,13 +386,13 @@ void GameRender::Update(float dT)
     // Change zoom
     if(KeyZoomIn)
     {
-        CameraZoom = fmax(5, CameraZoom - 0.3f); // 1/4th of middle
-        WorldUI->GetFovySlider()->SetProgress((CameraZoom - 5) / 35);
+        CameraZoom = fmax(GameRender_MinZoom, CameraZoom - GameRender_ZoomSpeed);
+        WorldUI->GetFovySlider()->SetProgress((CameraZoom - GameRender_MinZoom) / (GameRender_MaxZoom - GameRender_MinZoom));
     }
     if(KeyZoomOut)
     {
-        CameraZoom = fmin(40, CameraZoom + 0.3f); // 2x max
-        WorldUI->GetFovySlider()->SetProgress((CameraZoom - 5) / 35);
+        CameraZoom = fmin(GameRender_MaxZoom, CameraZoom + GameRender_ZoomSpeed);
+        WorldUI->GetFovySlider()->SetProgress((CameraZoom - GameRender_MinZoom) / (GameRender_MaxZoom - GameRender_MinZoom));
     }
     
     /*** UI Updates ***/
@@ -373,7 +406,7 @@ void GameRender::Update(float dT)
     WorldUI->SetDepth(LayerCutoff);
     
     // Get the slider's zoom
-    CameraZoom = WorldUI->GetFovySlider()->GetProgress() * 35 + 5;
+    CameraZoom = WorldUI->GetFovySlider()->GetProgress() * (GameRender_MaxZoom - GameRender_MinZoom) + GameRender_MinZoom;
     
     /*** Data Updates ***/
     
@@ -406,9 +439,9 @@ void GameRender::KeyboardEventDown(unsigned char key, int x, int y)
         WorldUI->GetDepthSlider()->SetProgress(WorldUI->GetDepthSlider()->GetProgress() + 1.0f / float(WorldData->GetWorldHeight() - 1));
     else if(key == 'e')
         WorldUI->GetDepthSlider()->SetProgress(WorldUI->GetDepthSlider()->GetProgress() - 1.0f / float(WorldData->GetWorldHeight() - 1));
-    else if(key == 'z')
-        KeyZoomIn = true;
     else if(key == 'x')
+        KeyZoomIn = true;
+    else if(key == 'z')
         KeyZoomOut = true;
 }
 
@@ -426,9 +459,9 @@ void GameRender::KeyboardEventUp(unsigned char key, int x, int y)
         KeyLeft = false;
     
     // Zoom and depth changes
-    else if(key == 'z')
-        KeyZoomIn = false;
     else if(key == 'x')
+        KeyZoomIn = false;
+    else if(key == 'z')
         KeyZoomOut = false;
 }
 
@@ -583,7 +616,7 @@ Vector3<float> GameRender::GetCameraSource(float Dist)
 void GameRender::GetUserSelectionRay(Vector2<int> MousePos, Vector3<float>* SelectionPos, Vector3<float>* SelectionRay)
 {
     // Where the camera origin (center) is
-    Vector3<float> ViewOrigin = GetCameraSource(CameraZoom);
+    Vector3<float> ViewOrigin = GetCameraSource(GameRender_MinZoom);
     
     // Compute camera face (for directional vector), left vector, and up vector
     Vector3<float> ViewDirection = CameraTarget - ViewOrigin;

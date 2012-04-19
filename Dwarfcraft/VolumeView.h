@@ -120,7 +120,7 @@ class VolumeView
 public:
     
     // Standard constructor and destructor
-    VolumeView(WorldContainer* MainWorld);
+    VolumeView(WorldContainer* MainWorld, g2Theme* MainTheme);
     ~VolumeView();
     
     /*** Manage (add / remove) jobs / volumes ***/
@@ -167,6 +167,16 @@ private:
     
     // Render an volume given a list
     void RenderVolume(List< VolumeTask* >* VolumeList);
+    
+    // Get the UI icon type from a given category and sub-type of a job
+    IconType GetIconType(VolumeTask* Volume);
+    
+    // Get the icon information for the 
+    void GetIconInfo(IconType Type, float* SrcX, float* SrcY, float* SrcW, float* SrcH);
+    
+    // Texture information for all icons
+    float IconSrcW, IconSrcH, IconSrcX, IconSrcY;
+    GLuint IconTextureID;
     
     // List of each major data and associated lock
     List< VolumeTask* > BuildingList;

@@ -149,7 +149,7 @@ void WorldGenerator::PlaceTree(int x, int z)
 {
     // Find the surface of this column
     int Surface = WorldData->GetSurfaceDepth(x, z);
-    if(!dIsSolid(WorldData->GetBlock(x, Surface, z)))
+    if(!dIsSolid(WorldData->GetBlock(x, Surface, z)) || !WorldData->GetBlock(x, Surface, z).IsWhole())
         return;
     
     // Make it so this block is the root / trunk of the tree
@@ -210,7 +210,7 @@ void WorldGenerator::PlaceFoliage(int x, int z)
 {
     // Find the surface of this column
     int Surface = WorldData->GetSurfaceDepth(x, z);
-    if(!dIsSolid(WorldData->GetBlock(x, Surface, z)))
+    if(!dIsSolid(WorldData->GetBlock(x, Surface, z)) || !WorldData->GetBlock(x, Surface, z).IsWhole())
         return;
     
     // Move the surface up so we are placing on it, not as it

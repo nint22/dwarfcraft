@@ -84,7 +84,7 @@ static Vector2<int> dBlockTexturePos[dBlockType_Count] =
     Vector2<int>(8, 5),
     Vector2<int>(15, 4),
     Vector2<int>(12, 1),
-    Vector2<int>(0, 0),
+    Vector2<int>(0, 240),
     Vector2<int>(0, 15),
 };
 

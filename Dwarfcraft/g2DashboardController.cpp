@@ -26,7 +26,7 @@ g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainT
     CustomText = new g2Label(NULL, MainTheme);
     
     // Get the initial size of the icon (Armory is just one of any regular icon)
-    GetTheme()->GetComponent("IconsList", &IconSrcW, &IconSrcH, &IconSrcX, &IconSrcY);
+    GetTheme()->GetComponent("IconsList", &IconSrcX, &IconSrcY, &IconSrcW, &IconSrcH);
     GetTheme()->GetComponentSize("IconsList", &IconW, &IconH);
     GetTheme()->GetComponentSize("IconButton", &ButtonW, &ButtonH);
     
@@ -45,7 +45,7 @@ g2DashboardController::g2DashboardController(g2Controller* Owner, g2Theme* MainT
     IconSpaceX = 45;
     
     // How many icons we show on a level
-    IconColCount = 4;
+    IconColCount = 5;
     
     // No initial list or group type
     State = DashboardState_Root;
@@ -63,10 +63,10 @@ g2DashboardController::~g2DashboardController()
 void g2DashboardController::GetIconInfo(IconType Type, float* SrcX, float* SrcY, float* SrcW, float* SrcH)
 {
     // Post the size and grid offset
+    *SrcX = IconSrcX + float((int)Type % 4) * IconSrcW;
+    *SrcY = IconSrcY + float((int)Type / 4) * IconSrcH;
     *SrcW = IconSrcW;
     *SrcH = IconSrcH;
-    *SrcX = float((int)Type % 8) * IconSrcW;
-    *SrcY = float((int)Type / 8) * IconSrcH;
 }
 
 void g2DashboardController::SetDesignationsList(VolumeView* Designations)
@@ -177,23 +177,23 @@ void g2DashboardController::Render(int x, int y)
     {
         if(StateGroup == UI_RootMenu_Build)
         {
-            IconType Types[5] = {Icon_BuildMenu_Farm, Icon_BuildMenu_Architecture, Icon_BuildMenu_Workshops, Icon_BuildMenu_Furniture, Icon_BuildMenu_Mechanical};
-            Render(x, y, Types, 5);
+            IconType Types[6] = {Icon_BuildMenu_Farm, Icon_BuildMenu_Architecture, Icon_BuildMenu_Workshops, Icon_BuildMenu_Furniture, Icon_BuildMenu_Mechanical, Icon_Cancel};
+            Render(x, y, Types, 6);
         }
         else if(StateGroup == UI_RootMenu_Designations)
         {
-            IconType Types[5] = {Icon_DesignationMenu_Fell, Icon_DesignationMenu_Forage, Icon_DesignationMenu_Mine, Icon_DesignationMenu_Fill, Icon_DesignationMenu_Flood};
-            Render(x, y, Types, 5);
+            IconType Types[6] = {Icon_DesignationMenu_Fell, Icon_DesignationMenu_Forage, Icon_DesignationMenu_Mine, Icon_DesignationMenu_Fill, Icon_DesignationMenu_Flood, Icon_Cancel};
+            Render(x, y, Types, 6);
         }
         else if(StateGroup == UI_RootMenu_Stockpiles)
         {
-            IconType Types[8] = {Icon_StockpilesMenu_Rubbish, Icon_StockpilesMenu_Food, Icon_StockpilesMenu_Crafted, Icon_StockpilesMenu_Equipment, Icon_StockpilesMenu_RawResources, Icon_StockpilesMenu_Ingots, Icon_StockpilesMenu_Graves, Icon_StockpilesMenu_Wood};
-            Render(x, y, Types, 8);
+            IconType Types[9] = {Icon_StockpilesMenu_Rubbish, Icon_StockpilesMenu_Food, Icon_StockpilesMenu_Crafted, Icon_StockpilesMenu_Equipment, Icon_StockpilesMenu_RawResources, Icon_StockpilesMenu_Ingots, Icon_StockpilesMenu_Graves, Icon_StockpilesMenu_Wood, Icon_Cancel};
+            Render(x, y, Types, 9);
         }
         else if(StateGroup == UI_RootMenu_Zones)
         {
-            IconType Types[3] = {Icon_ZonesMenu_Hall, Icon_ZonesMenu_Pen, Icon_ZonesMenu_Defend};
-            Render(x, y, Types, 3);
+            IconType Types[4] = {Icon_ZonesMenu_Hall, Icon_ZonesMenu_Pen, Icon_ZonesMenu_Defend, Icon_Cancel};
+            Render(x, y, Types, 4);
         }
     }
     // Actively selecting, only show a commit and reject button
@@ -225,26 +225,33 @@ void g2DashboardController::Render(int x, int y, IconType* Types, int TypeCount)
         // Background image
         DrawComponent("IconButton", ix, iy, ButtonW, ButtonH);
         
-        // Draw icon
-        float sx, sy, sw, sh;
-        GetIconInfo(Types[i], &sx, &sy, &sw, &sh);
-        DrawComponent(ix + dx, iy + dy, IconW, IconH, sx, sy, sw, sh);
+        // If accept or cancel, draw special
+        if(Types[i] == Icon_Accept)
+            DrawComponent("IconAccept", ix + dx, iy + dy, IconW, IconH);
+        else if(Types[i] == Icon_Cancel)
+            DrawComponent("IconCancel", ix + dx, iy + dy, IconW, IconH);
+        else
+        {
+            // Draw regular icon
+            float sx, sy, sw, sh;
+            GetIconInfo(Types[i], &sx, &sy, &sw, &sh);
+            DrawComponent(ix + dx, iy + dy, IconW, IconH, sx, sy, sw, sh);
+        }
         
         // If the mouse is in this position, act as though the user is hovering over it
         // and draw a label of the text as well
         if(MouseX >= ix - x && MouseX < ix - x + ButtonW && MouseY >= iy - y && MouseY < iy - y + ButtonH)
         {
             // Only draw the hover if not the designation type when in selection mode
-            if(State != DashboardState_Selection || i != 0)
-                DrawComponent("IconButton_Hover", ix, iy, ButtonW, ButtonH);
-            
-            // Cancel button if non-root and last element
-            if(State != DashboardState_Root && i == TypeCount - 1)
-                ClockText->SetText("Cancel");
+            DrawComponent("IconButton_Hover", ix, iy, ButtonW, ButtonH);
             
             // Commit button if selection and second-last element
-            else if(State == DashboardState_Selection && i == 1)
+            if(State == DashboardState_Selection && i == 0)
                 ClockText->SetText("Accept");
+            
+            // Cancel button if non-root and last element
+            else if(State != DashboardState_Root && i == TypeCount - 1)
+                ClockText->SetText("Cancel");
             
             // Root view
             else if(State == DashboardState_Root)
@@ -253,14 +260,15 @@ void g2DashboardController::Render(int x, int y, IconType* Types, int TypeCount)
             // All other views are just direct icon names
             else
             {
+                // Note: we have to offset from the Icon enum to the correct UI enum
                 if(StateGroup == UI_RootMenu_Build)
-                    ClockText->SetText(UI_BuildMenuNames[Types[i]]);
+                    ClockText->SetText(UI_BuildMenuNames[Types[i] - Icon_BuildMenu_Farm]);
                 else if(StateGroup == UI_RootMenu_Designations)
-                    ClockText->SetText(UI_DesignationsMenuNames[Types[i]]);
+                    ClockText->SetText(UI_DesignationsMenuNames[Types[i] - Icon_DesignationMenu_Fell]);
                 else if(StateGroup == UI_RootMenu_Stockpiles)
-                    ClockText->SetText(UI_StockpilesMenuNames[Types[i]]);
+                    ClockText->SetText(UI_StockpilesMenuNames[Types[i] - Icon_StockpilesMenu_Rubbish]);
                 else if(StateGroup == UI_RootMenu_Zones)
-                    ClockText->SetText(UI_ZonesMenuNames[Types[i]]);
+                    ClockText->SetText(UI_ZonesMenuNames[Types[i] - Icon_ZonesMenu_Hall]);
             }
         }
         
@@ -307,12 +315,8 @@ void g2DashboardController::MouseClick(g2MouseButton button, g2MouseClick state,
         // If the mouse is in this position, act as though the user is hovering over it
         if(x >= ix && x < ix + ButtonW && y >= iy && y < iy + ButtonH)
         {
-            // Ignore clicking the first element if we are in selection mode
-            if(State == DashboardState_Selection && i == 0)
-                continue;
-            
             // Alyways go to the root screen when canceling and cancel any volume selection
-            else if(State != DashboardState_Root && i == TypeCount - 1)
+            if(State != DashboardState_Root && i == TypeCount - 1)
             {
                 State = DashboardState_Root;
                 Selecting = false;
