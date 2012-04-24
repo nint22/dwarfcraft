@@ -83,6 +83,8 @@
 		06CDAE09150EA9F000F0229E /* character_sheet.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06CDAE07150EA92200F0229E /* character_sheet.png */; };
 		06CDAE0C150EADBD00F0229E /* NewDwarf.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06CDAE0B150EADB400F0229E /* NewDwarf.png */; };
 		06CDAE0D150EADBD00F0229E /* NewDwarf.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06CDAE0A150EAD6F00F0229E /* NewDwarf.cfg */; };
+		06E0A4521547288200BC1600 /* Tools.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06E0A450154727F800BC1600 /* Tools.cfg */; };
+		06E0A4531547288200BC1600 /* Tools.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06E0A4511547286800BC1600 /* Tools.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -92,6 +94,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
+				06E0A4521547288200BC1600 /* Tools.cfg in CopyFiles */,
+				06E0A4531547288200BC1600 /* Tools.png in CopyFiles */,
 				06CDAE0C150EADBD00F0229E /* NewDwarf.png in CopyFiles */,
 				06CDAE0D150EADBD00F0229E /* NewDwarf.cfg in CopyFiles */,
 				06CDAE08150EA9F000F0229E /* SampleDwarf.cfg in CopyFiles */,
@@ -256,6 +260,8 @@
 		06CDAE07150EA92200F0229E /* character_sheet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = character_sheet.png; path = Resources/character_sheet.png; sourceTree = "<group>"; };
 		06CDAE0A150EAD6F00F0229E /* NewDwarf.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = NewDwarf.cfg; path = "Resources/Configuration files/NewDwarf.cfg"; sourceTree = "<group>"; };
 		06CDAE0B150EADB400F0229E /* NewDwarf.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = NewDwarf.png; path = Resources/NewDwarf.png; sourceTree = "<group>"; };
+		06E0A450154727F800BC1600 /* Tools.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Tools.cfg; path = "Resources/Configuration files/Tools.cfg"; sourceTree = "<group>"; };
+		06E0A4511547286800BC1600 /* Tools.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Tools.png; path = Resources/Tools.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -325,12 +331,14 @@
 				060EE2E714FC66B400D0A08C /* RedLongBeard.cfg */,
 				060EE2E814FC66B400D0A08C /* Steel Armor.cfg */,
 				060EE2E914FC66B400D0A08C /* Steel Boots.cfg */,
+				06E0A450154727F800BC1600 /* Tools.cfg */,
 				060EE2DA14FC665100D0A08C /* MiningPick.png */,
 				060EE2D314FC660900D0A08C /* RedHair.png */,
 				060EE2D414FC660900D0A08C /* RedLongBeard.png */,
 				060EE2D114FC660000D0A08C /* LeatherArmor.png */,
 				060EE2D214FC660000D0A08C /* LeatherBoots.png */,
 				060EE2D014FC65F300D0A08C /* Armors.png */,
+				06E0A4511547286800BC1600 /* Tools.png */,
 			);
 			name = Misc;
 			sourceTree = "<group>";

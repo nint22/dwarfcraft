@@ -239,3 +239,44 @@ float dGetBreakTime(int ItemID, dBlock Block)
     // TODO: Compute the breaking time
     return 3.0f;
 }
+
+dItemType dGetItemFromBlock(dBlock Block)
+{
+    // For now, we do some simple matches
+    switch(Block.GetType())
+    {
+        case dBlockType_Gravel:         return dItem_Sand;
+        case dBlockType_SmoothStone:    return dItem_Stone;
+        case dBlockType_RoughStone:     return dItem_Stone;
+        case dBlockType_Dirt:           return dItem_Dirt;
+        case dBlockType_Sand:           return dItem_Sand;
+        case dBlockType_Wood_Top:       
+        case dBlockType_Wood:           return dItem_Dirt;
+        case dBlockType_Coal:           return dItem_Coal;
+        case dBlockType_StoneSlab_Top:  return dItem_Stone;
+        case dBlockType_StoneSlab:      return dItem_Stone;
+        case dBlockType_Torch:          return dItem_Torch;
+        case dBlockType_Grass:          return dItem_Dirt;
+        case dBlockType_Mushroom:       return dItem_Dirt;
+        
+        // No match
+        case dBlockType_Bush:
+        case dBlockType_Leaves:
+        case dBlockType_Border:
+        case dBlockType_Breaking:
+        case dBlockType_Caravan:
+        case dBlockType_Lava:
+        default: break;
+    }
+    
+    return dItem_None;
+}
+
+bool dBlockCollapses(dBlock Block)
+{
+    dBlockType Type = Block.GetType();
+    if(Type == dBlockType_Bush || Type == dBlockType_Mushroom || Type == dBlockType_Torch || Type == dBlockType_Grass)
+        return true;
+    else
+        return false;
+}

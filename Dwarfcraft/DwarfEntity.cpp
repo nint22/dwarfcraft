@@ -52,6 +52,7 @@ DwarfEntity::DwarfEntity(const char* ConfigName)
     
     // Start with no job
     HasJobFlag = false;
+    Job = NULL;
 }
 
 DwarfEntity::~DwarfEntity()
@@ -65,6 +66,12 @@ void DwarfEntity::SetArmor(dItem Chest, dItem Legs)
 {
     Armor[0] = Chest;
     Armor[1] = Legs;
+}
+
+void DwarfEntity::SetItems(dItem Item1, dItem Item2)
+{
+    Items[0] = Item1;
+    Items[1] = Item2;
 }
 
 void DwarfEntity::RenderPreview(int x, int y, int width, int height)
@@ -209,7 +216,7 @@ void DwarfEntity::Update(float dT)
             // State on the console there was a failure
             printf("Entity %d: Unable to complete assigned task!\n", GetEntityID());
             
-            GetDesignations()->ResignJob(&Job);
+            GetDesignations()->ResignJob(Job);
             HasJobFlag = false;
         }
         
@@ -222,7 +229,7 @@ void DwarfEntity::Update(float dT)
     if(!HasInstructions() && HasJob())
     {
         // Build instructions for the given job (i.e. path to it, etc..)
-        if(Job.Type == JobType_Mine)
+        if(Job->Type == JobType_Mine)
         {
             // Goto adjacent
             EntityInstruction Instr;
@@ -232,9 +239,9 @@ void DwarfEntity::Update(float dT)
             
             // Break
             Instr.Operator = EntityOP_Break;
-            Instr.Data.Pos.x = Job.TargetBlock.x;
-            Instr.Data.Pos.y = Job.TargetBlock.y;
-            Instr.Data.Pos.z = Job.TargetBlock.z;
+            Instr.Data.Pos.x = Job->TargetBlock.x;
+            Instr.Data.Pos.y = Job->TargetBlock.y;
+            Instr.Data.Pos.z = Job->TargetBlock.z;
             AddInstruction(Instr);
         }
         
@@ -298,6 +305,17 @@ void DwarfEntity::Render()
         RenderBillboard(GetPosition(), WorldSize.x, WorldSize.y, x, y, width, height, 0, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL), TextID);
     }
     
+    /*** Render Tools (IFF mining) ***/
+    
+    if(GetState() == EntityState_Breaking && (Items[0].Type == dItem_Pickaxe || Items[1].Type == dItem_Pickaxe))
+    {
+        GetWearableSprite(dItem_Pickaxe, &x, &y, &width, &height, &TextID);
+        x += width * float(GetSpriteCellIndex());
+        
+        Vector2<float> WorldSize = GetWorldSize();
+        RenderBillboard(GetPosition(), WorldSize.x, WorldSize.y, x, y, width, height, 0, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL), TextID);
+    }
+    
     // Render normal z-fighting render method
     glDisable(GL_POLYGON_OFFSET_FILL);
 }
@@ -309,9 +327,9 @@ void DwarfEntity::InstructionComplete(EntityInstruction Instr)
         return;
     
     // Done with our mining job
-    if(Job.Type == JobType_Mine && Instr.Operator == EntityOP_Break)
+    if(Job->Type == JobType_Mine && Instr.Operator == EntityOP_Break)
     {
-        GetDesignations()->CompleteJob(&Job);
+        GetDesignations()->CompleteJob(Job);
         HasJobFlag = false;
     }
 }
@@ -358,8 +376,8 @@ void* DwarfEntity::ComputeTask(void* data)
     // Max number of times we attempt to find a task
     static const int MaxAttempts = 3;
     
-    // Job object; only gets copied at the end
-    JobTask Job;
+    // Job we want to do; not to be modified
+    JobTask* Job;
     
     // Instruction holder, gets pushed as needed
     EntityInstruction Instruction;
@@ -385,7 +403,7 @@ void* DwarfEntity::ComputeTask(void* data)
         for(int i = 0; i < AdjacentOffsetsCount && !FoundJob; i++)
         {
             // Path into the target or directly adjacent to it if that target is air or a half block
-            Vector3<int> TargetPosition = Job.TargetBlock + AdjacentOffsets[i];
+            Vector3<int> TargetPosition = Job->TargetBlock + AdjacentOffsets[i];
             dBlock BlockCheck = self->GetWorld()->GetBlock(TargetPosition);
             
             // Is the offset (Job target + adjacent) an open space?
@@ -411,7 +429,7 @@ void* DwarfEntity::ComputeTask(void* data)
         
         // Job is not good, resign it
         if(!FoundJob)
-            self->GetDesignations()->ResignJob(&Job);
+            self->GetDesignations()->ResignJob(Job);
     }
     
     // No job found, go idle

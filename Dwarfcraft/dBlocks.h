@@ -21,7 +21,7 @@
 #include "Vector3.h"
 
 // Total number of block types in the world
-static const int dBlockType_Count = 22;
+static const int dBlockType_Count = 20;
 
 // Enumerate block types (must be <= 255; unsigned char)
 // Note that dBlock_None is default to -1 since it us "unknown"
@@ -67,32 +67,33 @@ enum dBlockFace
 // Note that these are grid positions; not pixel positions, upon initialization
 static Vector2<int> dBlockTexturePos[dBlockType_Count] =
 {
-    Vector2<int>(0, 0),
-    Vector2<int>(3, 1),
-    Vector2<int>(1, 0),
-    Vector2<int>(0, 1),
-    Vector2<int>(2, 0),
-    Vector2<int>(2, 1),
-    Vector2<int>(4, 1),
-    Vector2<int>(5, 1),
-    Vector2<int>(2, 2),
-    Vector2<int>(5, 0),
-    Vector2<int>(6, 0),
-    Vector2<int>(0, 5),
-    Vector2<int>(14, 14),
-    Vector2<int>(4, 8),
-    Vector2<int>(8, 5),
-    Vector2<int>(15, 4),
-    Vector2<int>(12, 1),
-    Vector2<int>(0, 240),
-    Vector2<int>(0, 15),
+    Vector2<int>(0, 0), // Air
+    Vector2<int>(3, 1), // Gravel
+    Vector2<int>(1, 0), // Smoothstone
+    Vector2<int>(0, 1), // Rough stone
+    Vector2<int>(2, 0), // Dirt
+    Vector2<int>(2, 1), // Sand
+    Vector2<int>(4, 1), // Wood
+    Vector2<int>(5, 1), // Wood top
+    Vector2<int>(2, 2), // Coal
+    Vector2<int>(5, 0), // Stone slab
+    Vector2<int>(6, 0), // Stone slab top
+    Vector2<int>(0, 5), // Torch
+    Vector2<int>(14, 14), // Lava
+    Vector2<int>(4, 8), // Leaves
+    Vector2<int>(8, 5), // Grass
+    Vector2<int>(15, 4), // Bush
+    Vector2<int>(12, 1), // Mushroom
+    Vector2<int>(0, 0), // Border
+    Vector2<int>(0, 15), // Breaking
+    Vector2<int>(0, 0), // Caravan
 };
 
 // Non-block, used for designations texture selection
 static const Vector2<int> dDesignationTexturePos(0, 12);
 
 // Total number of item types in the world
-static const int dItemType_Count = 63;
+static const int dItemType_Count = 64;
 
 // Item declaration (similar to minecraft items)
 enum dItemType
@@ -119,6 +120,7 @@ enum dItemType
     dItem_HeavySword,
     
     // Todo: mined materials
+    dItem_Stone,
     dItem_Coal,
     dItem_Dirt,
     dItem_Sand,
@@ -204,6 +206,7 @@ static Vector2<int> dItemTypeTexturePos[dItemType_Count] =
     Vector2<int>(0, 0),
     Vector2<int>(0, 0),
     Vector2<int>(0, 0),
+    Vector2<int>(0, 0),  // Stone
     Vector2<int>(13, 3), // Coal
     Vector2<int>(10, 3), // Dirt
     Vector2<int>(11, 3), // Sand
@@ -384,5 +387,12 @@ bool dIsSolid(dBlock Block);
 
 // Returns the amount of seconds (as a fraction) of the time it takes to use the given tool against the given block type
 float dGetBreakTime(int ItemID, dBlock Block);
+
+// Map a block to the associated item
+// May return "dItem_None" if no item-block match
+dItemType dGetItemFromBlock(dBlock Block);
+
+// Returns true if the given block (like mushrooms) break if the support is removed
+bool dBlockCollapses(dBlock Block);
 
 #endif

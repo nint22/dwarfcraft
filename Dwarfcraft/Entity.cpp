@@ -175,6 +175,17 @@ void Entity::SetBreaking(Vector3<int> BreakTarget, float BreakTime)
     BreakingTarget = BreakTarget;
     BreakingTime = FullBreakingTime = BreakTime;
     BreakingCellIndex = 0;
+    
+    // We must face the breaking target
+    Vector3<int> Direction = BreakTarget - GetPositionBlock();
+    if(Direction.x > 0)
+        SetFacingAngle(UtilPI);
+    else if(Direction.z > 0)
+        SetFacingAngle(UtilPI / 2.0f);
+    else if(Direction.x < 0)
+        SetFacingAngle(0);
+    else if(Direction.z < 0)
+        SetFacingAngle(UtilPI * 1.5f);
 }
 
 void Entity::AddInstruction(EntityInstruction Instruction)
@@ -793,9 +804,8 @@ void Entity::ExecuteBreak(float dT)
         State = EntityState_Idle;
         IsExecuting = false;
         
-        // Place the coal onto the ground now; then replace block to air
-        GetItems()->AddItem(dItem(dItem_Coal), BreakingTarget);
-        GetWorld()->SetBlock(BreakingTarget.x, BreakingTarget.y, BreakingTarget.z, dBlockType_Air);
+        // Actually break the block (special function)
+        BreakBlock(BreakingTarget);
     }
     // Else, post the progress
     else
@@ -1039,6 +1049,37 @@ bool Entity::GetWearableSprite(dItemType ItemType, float* x, float* y, float* wi
     
     // Never found...
     return false;
+}
+
+EntityState Entity::GetState()
+{
+    return State;
+}
+
+void Entity::BreakBlock(Vector3<int> Pos)
+{
+    // Ignore if out of bounds
+    if(!GetWorld()->IsWithinWorld(Pos))
+        return;
+    
+    // What is the block we are breaking?
+    dBlock Block = GetWorld()->GetBlock(Pos);
+    if(Block.GetType() == dBlockType_Air)
+        return;
+    
+    // Place the associated item onto the ground, then replace block to air
+    GetItems()->AddItem(dGetItemFromBlock(Block), Pos);
+    GetWorld()->SetBlock(Pos, dBlockType_Air);
+    
+    // Should we update above?
+    Pos.y++;
+    if(GetWorld()->IsWithinWorld(Pos))
+    {
+        // Is there anything above us that can be broken?
+        Block = GetWorld()->GetBlock(Pos);
+        if(dBlockCollapses(Block))
+            BreakBlock(Pos);
+    }
 }
 
 bool Entity::LocalizePosition(Vector3<int> Pos, Vector3<float>* PosOut)

@@ -50,6 +50,7 @@ void VolumeView::AddBuilding(UI_BuildMenu Type, Vector3<int> Origin, Vector3<int
                 Job->Volume = Task;
                 Job->Type = JobType_PlaceBlock; // TODO!!!
                 Job->TargetBlock = Vector3<int>(x, y, z);
+                Job->Attempts = 0;
                 Task->Jobs.Enqueue(Job);
             }
         }
@@ -93,6 +94,7 @@ void VolumeView::AddDesignation(UI_DesignationMenu Type, Vector3<int> Origin, Ve
                 Job->Volume = Task;
                 Job->Type = JobType_Mine; // TODO
                 Job->TargetBlock = Vector3<int>(x, y, z);
+                Job->Attempts = 0;
                 Task->Jobs.Enqueue(Job);
             }
         }
@@ -135,6 +137,7 @@ void VolumeView::AddStockpile(UI_StockpilesMenu Type, Vector3<int> Origin, Vecto
                 Job->Volume = Task;
                 Job->Type = JobType_StockpilePos; // TODO!!!
                 Job->TargetBlock = Vector3<int>(x, y, z);
+                Job->Attempts = 0;
                 Task->Jobs.Enqueue(Job);
             }
         }
@@ -177,6 +180,7 @@ void VolumeView::AddZone(UI_ZonesMenu Type, Vector3<int> Origin, Vector3<int> Vo
                 Job->Volume = Task;
                 Job->Type = JobType_ZonePos; // TODO!!!
                 Job->TargetBlock = Vector3<int>(x, y, z);
+                Job->Attempts = 0;
                 Task->Jobs.Enqueue(Job);
             }
         }
@@ -196,7 +200,7 @@ void VolumeView::AddZone(UI_ZonesMenu Type, Vector3<int> Origin, Vector3<int> Vo
         delete Task;
 }
 
-bool VolumeView::GetJob(DwarfEntity* Dwarf, JobTask* JobOut)
+bool VolumeView::GetJob(DwarfEntity* Dwarf, JobTask** JobOut)
 {
     // Build a list of highest preference to lowesr preference
     Queue<DwarfJobs> JobPriority;
@@ -239,41 +243,104 @@ bool VolumeView::GetJob(DwarfEntity* Dwarf, JobTask* JobOut)
 
 void VolumeView::ResignJob(JobTask* Job)
 {
-    /*
-    // Failed the job, so let us place it back into the queue
-    pthread_mutex_lock(&DesignationsLock);
-    Job->TargetDesignation->TaskPositions.Enqueue(Job->TargetBlock);
-    Job->TargetDesignation->JobsOut--;
-    printf("Jobs out: %d\n", Job->TargetDesignation->JobsOut);
-    pthread_mutex_unlock(&DesignationsLock);
-    */
+    // What is the job's working volume?
+    VolumeTask* Volume = Job->Volume;
+    
+    // Lock volume
+    Volume->LockData();
+    
+    // Update the job attempt acount
+    Job->Attempts++;
+    
+    // Move this job from the assigned list to unassigned
+    int AssignedCount = Volume->AssignedJobs.GetSize();
+    for(int i = 0; i < AssignedCount; i++)
+    {
+        // If we matched the job, pop it off the queue
+        JobTask* Task = Volume->AssignedJobs.Dequeue();
+        if(Task == Job)
+            break;
+        Volume->AssignedJobs.Enqueue(Task);
+    }
+    
+    // Put job back into the jobs list
+    Volume->Jobs.Enqueue(Job);
+    
+    // Release lock
+    Volume->UnlockData();
 }
 
 void VolumeView::CompleteJob(JobTask* Job)
 {
-    /*
-    // No need to do anything, the item is off the queue already
+    // What is the job's working volume?
+    VolumeTask* Volume = Job->Volume;
     
-    // If this was the last item, delete the designation
-    pthread_mutex_lock(&DesignationsLock);
-    Job->TargetDesignation->JobsOut--;
-    printf("Jobs out: %d\n", Job->TargetDesignation->JobsOut);
-    int JobsOut = Job->TargetDesignation->JobsOut;
-    bool IsEmpty = Job->TargetDesignation->TaskPositions.IsEmpty();
-    pthread_mutex_unlock(&DesignationsLock);
+    // Lock volume
+    Volume->LockData();
     
-    // Perform delete outside of lock, as we actually already have a lock
-    if(IsEmpty && JobsOut == 0)
-        RemoveDesignation(Job->TargetDesignation);
-    */
+    // Move this job from the assigned list to unassigned
+    int AssignedCount = Volume->AssignedJobs.GetSize();
+    for(int i = 0; i < AssignedCount; i++)
+    {
+        // If we matched the job, pop it off the queue
+        JobTask* Task = Volume->AssignedJobs.Dequeue();
+        if(Task == Job)
+        {
+            delete Task;
+            break;
+        }
+        Volume->AssignedJobs.Enqueue(Task);
+    }
+    
+    // Check though if we are done with the volume
+    bool VolumeComplete = Volume->AssignedJobs.GetSize() <= 0 && Volume->Jobs.GetSize() <= 0;
+    
+    // Release lock
+    Volume->UnlockData();
+    
+    // If volume is empty, release
+    if(VolumeComplete)
+    {
+        // Lock designations
+        pthread_mutex_lock(&VolumeLock);
+        
+        List< VolumeTask* >* List = NULL;
+        if(Volume->Category == UI_RootMenu_Build)
+            List = &BuildingList;
+        else if(Volume->Category == UI_RootMenu_Designations)
+            List = &DesignationList;
+        else if(Volume->Category == UI_RootMenu_Stockpiles)
+            List = &StockpileList;
+        else if(Volume->Category == UI_RootMenu_Zones)
+            List = &ZoneList;
+        
+        // Match the volume to release
+        int Volumecount = List->GetSize();
+        for(int i = 0; i < Volumecount; i++)
+        {
+            // Matched; remove
+            if((*List)[i] == Volume)
+            {
+                List->Remove(i);
+                delete Volume;
+                break;
+            }
+        }
+        
+        // Unlock designations
+        pthread_mutex_unlock(&VolumeLock);
+    }
 }
 
-bool VolumeView::GetMiningJob(DwarfEntity* Dwarf, JobTask* JobOut)
+bool VolumeView::GetMiningJob(DwarfEntity* Dwarf, JobTask** JobOut)
 {
     // Do any of the following jobs in order if possible:
     //   UI_DesignationMenu_Mine
     //   UI_DesignationMenu_Fill
     //   UI_DesignationMenu_Flood
+    
+    // Best job we have (i.e. the lowest attempt count)
+    JobTask* BestJob = NULL;
     
     // For each designation
     int DesignationCount = DesignationList.GetSize();
@@ -294,10 +361,9 @@ bool VolumeView::GetMiningJob(DwarfEntity* Dwarf, JobTask* JobOut)
                 // See if this job position is trivial to reach (i.e. adjacently accessible)
                 if(AdjacentAccessible(Job->TargetBlock))
                 {
-                    // Save job and push into the "checked out jobs list"
-                    Volume->AssignedJobs.Enqueue(Job);
-                    *JobOut = *Job;
-                    return true;
+                    // Save job if either best job is null OR this job has a lower attempt count
+                    if(BestJob == NULL || BestJob->Attempts > Job->Attempts)
+                        BestJob = Job;
                 }
                 
                 // Putback
@@ -306,10 +372,37 @@ bool VolumeView::GetMiningJob(DwarfEntity* Dwarf, JobTask* JobOut)
         }
     }
     
-    return false;
+    // If found job, remove self from jobs queue and add self to assigned queue
+    if(BestJob != NULL)
+    {
+        // Volume we will work on
+        VolumeTask* Volume = BestJob->Volume;
+        
+        // Remove from 
+        int JobCount = Volume->Jobs.GetSize();
+        for(int JobIndex = 0; JobIndex < JobCount; JobIndex++)
+        {
+            // Peek
+            JobTask* Job = Volume->Jobs.Dequeue();
+            
+            // If match, pop off from jobs queue
+            if(BestJob == Job)
+                break;
+            
+            // Putback
+            Volume->Jobs.Enqueue(Job);
+        }
+        
+        // Save self to assigned jobs queue
+        BestJob->Volume->AssignedJobs.Enqueue(BestJob);
+        *JobOut = BestJob;
+    }
+    
+    // Return true if we found a job
+    return BestJob != NULL;
 }
 
-bool VolumeView::GetFarmerJob(DwarfEntity* Dwarf, JobTask* JobOut)
+bool VolumeView::GetFarmerJob(DwarfEntity* Dwarf, JobTask** JobOut)
 {
     //UI_DesignationMenu_Fell,
     //UI_DesignationMenu_Forage,
@@ -317,7 +410,7 @@ bool VolumeView::GetFarmerJob(DwarfEntity* Dwarf, JobTask* JobOut)
     return false;
 }
 
-bool VolumeView::GetCrafterJob(DwarfEntity* Dwarf, JobTask* JobOut)
+bool VolumeView::GetCrafterJob(DwarfEntity* Dwarf, JobTask** JobOut)
 {
     //UI_BuildMenu_Architecture,  // Stairs, floors, walls, etc.
     //UI_BuildMenu_Workshops,     // Masonry, woodshop, etc.
@@ -333,26 +426,26 @@ bool VolumeView::AdjacentAccessible(Vector3<int> Pos)
     {
         // Where the dwarf will be and the block below
         Vector3<int> SourcePosition = Pos + AdjacentOffsets[j];
-        Vector3<int> BasePosition = Pos + AdjacentOffsets[j];
-        dBlock BlockCheck = WorldData->GetBlock(SourcePosition);
+        dBlock SourceBlock = WorldData->GetBlock(SourcePosition);
         
-        // If the surce is half a block, we can reach to the target
-        if(WorldData->IsWithinWorld(SourcePosition) && BlockCheck.GetType() != dBlockType_Air && !BlockCheck.IsWhole())
-        {
-            // Special exception: we can't mine from directly ontop to the block below if it is a half block
-            // i.e. if the source is directly above the target, then the source block must be air
-            if(j != 3)
-                return true;
-        }
+        Vector3<int> BelowPosition = SourcePosition + Vector3<int>(0, -1, 0);
+        if(!WorldData->IsWithinWorld(BelowPosition))
+            continue;
+        dBlock BelowBlock = WorldData->GetBlock(BelowPosition);
         
-        // Check if either the source position an air block ontop of a solid block *or* is just a half block
-        // Special exception: if we are above our target, we cannot be in a half block
-        else if(WorldData->IsWithinWorld(BasePosition))
-        {
-            dBlock BaseCheck = WorldData->GetBlock(BasePosition);
-            if(BlockCheck.GetType() == dBlockType_Air && BaseCheck.GetType() != dBlockType_Air && BaseCheck.IsWhole())
-                return true;
-        }
+        // In air and above a solid block
+        if(SourceBlock.GetType() == dBlockType_Air && BelowBlock.IsWhole() && dIsSolid(BelowBlock))
+            return true;
+        
+        // Get the above position
+        Vector3<int> AbovePosition = SourcePosition + Vector3<int>(0, 1, 0);
+        if(!WorldData->IsWithinWorld(AbovePosition))
+            continue;
+        dBlock AboveBlock = WorldData->GetBlock(AbovePosition);
+        
+        // If on a half block, above must be air (j != 3 means we can't be directly above target)
+        if(j != 3 && !SourceBlock.IsWhole() && AboveBlock.IsWhole() && AboveBlock.GetType() == dBlockType_Air)
+            return true;
     }
     
     return false;

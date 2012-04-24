@@ -56,6 +56,9 @@ struct JobTask
     // Note: this may or may not be a block we want to go into, it
     // all depends on the job type and if it is a half step or not
     Vector3<int> TargetBlock;
+    
+    // Total attemps count (i.e. how many times attempted but resigned)
+    int Attempts;
 };
 
 // A task volume structure
@@ -107,6 +110,9 @@ struct VolumeTask
     inline void LockInit() {
         pthread_mutex_init(&Lock, NULL);
     }
+    inline void LockFree() {
+        pthread_mutex_destroy(&Lock);
+    }
     inline void LockData() {
         pthread_mutex_lock(&Lock);
     }
@@ -134,7 +140,7 @@ public:
     /*** Job Management ***/
     
     // Given an entity, find a job that fits the dwarf's preferences and current world needs
-    bool GetJob(DwarfEntity* Dwarf, JobTask* JobOut);
+    bool GetJob(DwarfEntity* Dwarf, JobTask** JobOut);
     
     // Unable to complete job
     void ResignJob(JobTask* Job);
@@ -146,9 +152,9 @@ public:
 private:
     
     // Job specific task management
-    bool GetMiningJob(DwarfEntity* Dwarf, JobTask* JobOut);
-    bool GetFarmerJob(DwarfEntity* Dwarf, JobTask* JobOut);
-    bool GetCrafterJob(DwarfEntity* Dwarf, JobTask* JobOut);
+    bool GetMiningJob(DwarfEntity* Dwarf, JobTask** JobOut);
+    bool GetFarmerJob(DwarfEntity* Dwarf, JobTask** JobOut);
+    bool GetCrafterJob(DwarfEntity* Dwarf, JobTask** JobOut);
     
     // Returns true if this given block can be accessed by a dwarf
     bool AdjacentAccessible(Vector3<int> Pos);

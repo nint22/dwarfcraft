@@ -264,18 +264,18 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
                 }
             }
                 
-    //            // Case 2: Specialty 3D model (i.e. workbench)
-    //            else if(TargetBlock.GetType() == dBlockType_Mushroom)
-    //            {
-    //                // Allocate new model
-    //                GameRender_Model Model;
-    //                Model.x = x;
-    //                Model.z = z;
-    //                Model.ModelData = new VBuffer("MushroomModel.cfg");
-    //                
-    //                // Push to this layer's model list
-    //                LayerOut->Models.Enqueue(Model);
-    //            }
+//            // Case 2: Specialty 3D model (i.e. workbench)
+//            else if(TargetBlock.GetType() == dBlockType_Mushroom)
+//            {
+//                // Allocate new model
+//                GameRender_Model Model;
+//                Model.x = x;
+//                Model.z = z;
+//                Model.ModelData = new VBuffer("MushroomModel.cfg");
+//                
+//                // Push to this layer's model list
+//                LayerOut->Models.Enqueue(Model);
+//            }
                 
             // Case 3: Generic 3D model (x-shape, for bushes, etc.)
             else

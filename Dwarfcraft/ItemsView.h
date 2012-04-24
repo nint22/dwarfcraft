@@ -29,7 +29,6 @@ struct ItemsView_Item // Renderable item
     dItem Item;
     
     // Current location and movement vector (when in "pop'ed" state)
-    bool Settled; // If settled, no longer animating
     Vector3<float> Pos;
     Vector3<float> Vel;
     
@@ -67,7 +66,7 @@ private:
     WorldContainer* WorldData;
     
     // List of items (a list per each level)
-    List< ItemsView_Item >* ItemLevels;
+    List< ItemsView_Item > Items;
     
     // Texture ID of the items texture atlas
     GLuint TextureID;

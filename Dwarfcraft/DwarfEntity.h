@@ -98,6 +98,9 @@ public:
     // Explicitly set the armor set of this dwarf
     void SetArmor(dItem Chest, dItem Legs);
     
+    // Explicitly set the tool for the dwarf
+    void SetItems(dItem Item1, dItem Item2);
+    
     // Custom preview-drawing function so that we can render all armor & tools
     void RenderPreview(int x, int y, int width, int height);
     
@@ -181,7 +184,7 @@ private:
     pthread_mutex_t ThreadMutex;
     
     // Current job for the dwarf
-    JobTask Job;
+    JobTask* Job;
     bool HasJobFlag;
     
     // Active job path

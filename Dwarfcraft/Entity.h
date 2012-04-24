@@ -125,13 +125,14 @@ enum EntityFacing
 };
 
 // List of all wearable items / sets
-static const int EntityWearablesCount = 4;
+static const int EntityWearablesCount = 5;
 static const char EntityWearablesConfig[EntityWearablesCount][32] =
 {
     "Leather Armor.cfg",
     "Steel Armor.cfg",
     "Leather Boots.cfg",
     "Steel Boots.cfg",
+    "Tools.cfg"
 };
 static const dItemType EntityWearablesType[EntityWearablesCount] =
 {
@@ -139,6 +140,7 @@ static const dItemType EntityWearablesType[EntityWearablesCount] =
     dItem_ArmorChest_Steel,
     dItem_ArmorBoots_Leather,
     dItem_ArmorBoots_Steel,
+    dItem_Pickaxe,
 };
 
 // Animation / activity state
@@ -320,6 +322,9 @@ protected:
     // Posts information on the wearable sprite details; returns false if not found
     bool GetWearableSprite(dItemType ItemType, float* x, float* y, float* width, float* height, GLuint* TextureID);
     
+    // Get current entity state (i.e. breaking, etc.)
+    EntityState GetState();
+    
     /*** Rendering Functions ***/
     
     // Render the sprite based on the given state
@@ -332,6 +337,9 @@ protected:
 private:
     
     /*** Helper / Misc. Functions ***/
+    
+    // Break block
+    void BreakBlock(Vector3<int> Pos);
     
     // Turn a given block into a centered-position for an entity
     bool LocalizePosition(Vector3<int> Pos, Vector3<float>* PosOut);;

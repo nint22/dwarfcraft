@@ -142,7 +142,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     
     // Add a dozen entities purely for testing...
     Clock.Start();
-    int EntityCount = 1; // Any variable count while testing the code
+    int EntityCount = 3; // Any variable count while testing the code
     for(int i = 0; i < EntityCount; i++)
     {
         // Randomly choose a position
@@ -158,6 +158,9 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
         dItem Chest(dItemType(dItem_ArmorChest_Leather + rand() % 2));
         dItem Boots(dItemType(dItem_ArmorBoots_Leather + rand() % 2));
         //SampleDwarf->SetArmor(Chest, Boots);
+        
+        // Give dwarf some picks
+        SampleDwarf->SetItems(dItem_Pickaxe, dItem_None);
         
         // Add to entities list
         EntitiesList->AddEntity(SampleDwarf);
@@ -259,10 +262,6 @@ void GameRender::Render()
             glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, BlockTexture);
             
-            // Always render ontop
-            //glEnable(GL_POLYGON_OFFSET_FILL);
-            //glPolygonOffset(1, 1);
-            
             // For each surface
             for(int i = 0; i < 5; i++)
             {
@@ -290,7 +289,6 @@ void GameRender::Render()
             
             glDisable(GL_TEXTURE_2D);
             
-            glDisable(GL_POLYGON_OFFSET_FILL);
             glPopMatrix();
         }
     }

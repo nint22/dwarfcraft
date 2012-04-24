@@ -10,13 +10,14 @@
 
 #include "ItemsView.h"
 
+// A buffer between ground and the item, so we have enough space
+// to render shadows, etc.
+static const float ItemsView_dHover = 0.01f;
+
 ItemsView::ItemsView(WorldContainer* WorldData)
 {
     // Save data
     this->WorldData = WorldData;
-    
-    // Allocate an array of item levels
-    ItemLevels = new List< ItemsView_Item >[WorldData->GetWorldHeight()];
     
     // Load the terrain texture
     TextureID = dGetItemTextureID();
@@ -24,15 +25,14 @@ ItemsView::ItemsView(WorldContainer* WorldData)
 
 ItemsView::~ItemsView()
 {
-    // Release the array list
-    delete[] ItemLevels;
+    // Nothing to release
 }
 
 void ItemsView::AddItem(dItem Item, Vector3<int> Pos)
 {
     // Grow list size, add to end
-    int OriginalLength = ItemLevels[Pos.y].GetSize();
-    ItemLevels[Pos.y].Resize(OriginalLength + 1);
+    int OriginalLength = Items.GetSize();
+    Items.Resize(OriginalLength + 1);
     
     // Randomize upward facing "pop" animation vector (random x, z, while y is always up)
     Vector3<float> PopVector(float(rand()) / float(RAND_MAX), 1.0f, float(rand()) / float(RAND_MAX));
@@ -47,33 +47,16 @@ void ItemsView::AddItem(dItem Item, Vector3<int> Pos)
     // Place to end
     ItemsView_Item Data;
     Data.Item = Item;
-    Data.Settled = false; // Initially animating
-    Data.Pos = Vector3<float>(Pos.x, Pos.y, Pos.z); // Cast to float
+    Data.Pos = Vector3<float>(Pos.x + 0.5f, Pos.y + 2.0f * ItemsView_dHover, Pos.z + 0.5f); // Cast to float, and start a little higher
     Data.Vel = PopVector; // Initial velocity
     Data.dT = float(rand()) / float(RAND_MAX); // Randomize the initial time
     
-    ItemLevels[Pos.y][OriginalLength] = Data;
+    Items[OriginalLength] = Data;
 }
 
 void ItemsView::RemoveItem(Vector3<int> Pos)
 {
-    // Seek the list for items at the position
-    int OriginalLength = ItemLevels[Pos.y].GetSize();
-    for(int i = 0; i < OriginalLength; i++)
-    {
-        // If found, shift over from right, then resize
-        Vector3<float> fPos = ItemLevels[Pos.y][i].Pos;
-        if(Vector3<int>(fPos.x, fPos.y, fPos.z) == Pos)
-        {
-            // Shift over from right
-            for(int j = i; j < OriginalLength - 1; j++)
-                ItemLevels[Pos.y][j] = ItemLevels[Pos.y][j + 1];
-            
-            // Resize
-            OriginalLength--;
-            ItemLevels[Pos.y].Resize(OriginalLength);
-        }
-    }
+    // TODO... How should an item be idenitified? Pointer? Unique ID?
 }
 
 void ItemsView::Render(int LayerCutoff, float CameraAngle)
@@ -81,30 +64,47 @@ void ItemsView::Render(int LayerCutoff, float CameraAngle)
     // Save camera angle
     this->CameraAngle = CameraAngle;
     
-    // For each layer (bottom to top)
-    for(int LayerIndex = 0; LayerIndex <= LayerCutoff; LayerIndex++)
+    // For each item
+    int ItemCount = Items.GetSize();
+    for(int ItemIndex = 0; ItemIndex < ItemCount; ItemIndex++)
     {
-        // For each item
-        int ItemCount = ItemLevels[LayerIndex].GetSize();
-        for(int ItemIndex = 0; ItemIndex < ItemCount; ItemIndex++)
+        // Get the item we are working on
+        ItemsView_Item* ItemView = &Items[ItemIndex];
+        
+        /*** Item Sprite ***/
+        
+        // Only render if at level or below
+        if((int)ItemView->Pos.y <= LayerCutoff)
         {
             // Convert to float position
-            dItem ItemType = ItemLevels[LayerIndex][ItemIndex].Item;
-            Vector3<float> Pos = ItemLevels[LayerIndex][ItemIndex].Pos;
+            dItem ItemType = ItemView->Item;
+            Vector3<float> Pos = ItemView->Pos;
             Vector3<float> fPos(Pos.x, Pos.y, Pos.z);
-            Vector3<float> fShadowPos(Pos.x, LayerIndex, Pos.z);
             
             // Get item information
             float x, y, width, height;
             dGetItemTexture(ItemType.Type, &x, &y, &width, &height);
             
             // Render the tile at this given location in 2D
-            float dY = 0.02f + 0.02f * sin(ItemLevels[LayerIndex][ItemIndex].dT);
+            float dY = 0.02f + 0.02f * sin(ItemView->dT);
             RenderBillboard(fPos + Vector3<float>(0, dY, 0), x, y, width, height);
-            
-            // Render a shadow under it (always at the layer)
-            RenderShadow(fShadowPos, 0.2f);
         }
+        
+        /*** Shadow ***/
+        
+        // Get the surface the item is on
+        float GroundSurface = WorldData->GetSurfaceDepth(ItemView->Pos.x, ItemView->Pos.y, ItemView->Pos.z);
+        
+        // Is the block a half-block? (we do -1 to look down to the colliding block)
+        bool IsWhole = WorldData->GetBlock(ItemView->Pos.x, GroundSurface, ItemView->Pos.z).IsWhole();
+        if(IsWhole)
+            GroundSurface += 1.0f;
+        else
+            GroundSurface += 0.5f;
+        
+        // Render a shadow under it (always at the layer or below)
+        if((int)GroundSurface <= LayerCutoff)
+            RenderShadow(Vector3<float>(ItemView->Pos.x, GroundSurface, ItemView->Pos.z), 0.2f);
     }
 }
 
@@ -113,31 +113,36 @@ void ItemsView::Update(float dT)
     // Define an animation speed, so we can make things look faster
     static const float AnimationSpeed = 2.0f;
     
-    // For each layer
-    for(int LayerIndex = 0; LayerIndex < WorldData->GetWorldHeight(); LayerIndex++)
+    // For each item
+    int ItemCount = Items.GetSize();
+    for(int ItemIndex = 0; ItemIndex < ItemCount; ItemIndex++)
     {
-        // For each item
-        int ItemCount = ItemLevels[LayerIndex].GetSize();
-        for(int ItemIndex = 0; ItemIndex < ItemCount; ItemIndex++)
+        // Get the item we are working on
+        ItemsView_Item* ItemView = &Items[ItemIndex];
+        
+        // Update the existance time
+        ItemView->dT += dT * 5.0f;
+        
+        // Get the surface the item is on
+        float GroundSurface = WorldData->GetSurfaceDepth(ItemView->Pos.x, ItemView->Pos.y, ItemView->Pos.z);
+        
+        // Is the block a half-block? (we do -1 to look down to the colliding block)
+        bool IsWhole = WorldData->GetBlock(ItemView->Pos.x, GroundSurface, ItemView->Pos.z).IsWhole();
+        if(IsWhole)
+            GroundSurface += 1.0f;
+        else
+            GroundSurface += 0.5f;
+        
+        // Apply velocity to the position (only if above the surface)
+        if(ItemView->Pos.y > GroundSurface + ItemsView_dHover)
         {
-            // Update the existance time
-            ItemLevels[LayerIndex][ItemIndex].dT += dT * 5.0f;
-            
-            // Apply velocity to the position (only if above the surface)
-            if(!ItemLevels[LayerIndex][ItemIndex].Settled)
-            {
-                // Slow velocity over time..
-                ItemLevels[LayerIndex][ItemIndex].Pos += ItemLevels[LayerIndex][ItemIndex].Vel * dT * AnimationSpeed;
-                ItemLevels[LayerIndex][ItemIndex].Vel.y += -2.5f * dT * AnimationSpeed; // Gravity is a fudge-factor
-                
-                // If the position is ever below the associated layer, drop down
-                if(ItemLevels[LayerIndex][ItemIndex].Pos.y <= LayerIndex)
-                {
-                    ItemLevels[LayerIndex][ItemIndex].Settled = true;
-                    ItemLevels[LayerIndex][ItemIndex].Pos.y = LayerIndex;
-                }
-            }
+            // Increase velocity over time due to acceleration
+            ItemView->Vel.y += -2.0f * dT * AnimationSpeed; // Gravity is a fudge-factor
+            ItemView->Pos += ItemView->Vel * dT * AnimationSpeed;
         }
+        // Else, just reset velocity
+        else
+            ItemView->Vel = Vector3<float>(); // Set to zero
     }
 }
 
@@ -156,13 +161,6 @@ void ItemsView::RenderBillboard(Vector3<float> pos, float srcx, float srcy, floa
     static const float outwidth = 0.4f;
     static const float outheight = 0.4f;
     
-    // Compute the view-ray offsets (so we can order textures)
-    Vector2<float> Offset(cos(-CameraAngle), sin(-CameraAngle));
-    if(doffset >= 0.001f || doffset <= -0.001f)
-        Offset *= doffset;
-    else
-        Offset = Vector2<float>(0.0f, 0.0f);
-    
     // Enable texture
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, TextureID);
@@ -174,7 +172,7 @@ void ItemsView::RenderBillboard(Vector3<float> pos, float srcx, float srcy, floa
         glColor3f(1, 1, 1);
         
         // Center position
-        glTranslatef(pos.x + 0.5f + Offset.x, pos.y, pos.z + 0.5f + Offset.y);
+        glTranslatef(pos.x, pos.y, pos.z);
         glRotatef(UtilRadToDeg * (CameraAngle  - UtilPI / 2.0f), 0, 1, 0);
         
         // Front facing sprite
@@ -205,7 +203,7 @@ void ItemsView::RenderShadow(Vector3<float> pos, float radius)
     
     // Start a circle at the face
     glPushMatrix();
-        glTranslatef(pos.x + 0.5f, pos.y + 0.01f, pos.z + 0.5f);
+        glTranslatef(pos.x, pos.y + 0.01f, pos.z);
         glColor4f(0, 0, 0, 0.5f);
         
         glBegin(GL_TRIANGLE_FAN);

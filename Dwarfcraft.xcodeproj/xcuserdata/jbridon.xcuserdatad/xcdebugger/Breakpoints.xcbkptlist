@@ -9,25 +9,12 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Dwarfcraft/Entity.cpp"
-         timestampString = "353456682.491731"
+         timestampString = "356985615.235246"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "779"
-         endingLineNumber = "779"
+         startingLineNumber = "790"
+         endingLineNumber = "790"
          landmarkName = "Entity::ExecuteMove(float dT)"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "Dwarfcraft/DwarfEntity.cpp"
-         timestampString = "356562010.30442"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "414"
-         endingLineNumber = "414"
-         landmarkName = "DwarfEntity::ComputeTask(void* data)"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
