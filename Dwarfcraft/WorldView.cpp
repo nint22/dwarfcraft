@@ -304,7 +304,9 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
         for(int x = OriginX; x <= OriginX + ColumnWidth; x++)
         {
             // Make sure we are not at the last block, and within the world, to do an occlusion test
-            if(x != (OriginX + ColumnWidth) && WorldData->IsWithinWorld(x, y + 1, z) && dIsSolid(WorldData->GetBlock(x, y + 1, z)))
+            if(x != (OriginX + ColumnWidth) &&
+               WorldData->IsWithinWorld(x, y + 1, z) && dIsSolid(WorldData->GetBlock(x, y + 1, z)) &&
+               WorldData->IsWithinWorld(x, y, z) && WorldData->GetBlock(x, y, z).GetType() != dBlockType_Air && WorldData->GetBlock(x, y, z).IsWhole())
             {
                 BorderFaces.Push(x);
             }
@@ -367,14 +369,17 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
                     if(z == WorldData->GetWorldWidth() - 1)
                         FaceList[3] = 4;
                     
+                    // Save if the starting block is a half block or not
+                    bool IsWhole = WorldData->GetBlock(x, EndY, z).IsWhole();
+                    
                     // Push the strip geometry
                     for(int j = 0; j < 4; j++)
                     {
                         if(FaceList[j] != 0)
                         {
-                            for(int i = 0; i < 2; i++)
-                                AddVertex(Layer->SideGeometry, Vector3<float>(x, EndY, z) + WorldView_FaceQuads[FaceList[j]][i], WorldView_Normals[FaceList[j]], i, dBlockType_Border);
-                            for(int i = 2; i < 4; i++)
+                            for(int i = 0; i < 2; i++) // High vertices
+                                AddVertex(Layer->SideGeometry, Vector3<float>(x, EndY, z) + WorldView_FaceQuads[FaceList[j]][i] + (IsWhole ? Vector3<float>() : Vector3<float>(0, -.5f, 0)), WorldView_Normals[FaceList[j]], i, dBlockType_Border);
+                            for(int i = 2; i < 4; i++) // Low vertices
                                 AddVertex(Layer->SideGeometry, Vector3<float>(x, StartY, z) + WorldView_FaceQuads[FaceList[j]][i], WorldView_Normals[FaceList[j]], i, dBlockType_Border);
                         }
                     }
@@ -455,6 +460,13 @@ void WorldView::AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float>
     if(Block.GetType() == dBlockType_Border)
         LightFactor = 1.0f;
     
+    // Apply occlusion factor
+    // Little hack: if it's a half block, we have to bump the vertex's y up a half
+    if(Vertex.y - (int)Vertex.y > 0.0f)
+        LightFactor *= GetAmbientOcclusion(Vector3ftoi(Vertex) + Vector3<int>(0, 1, 0));
+    else
+        LightFactor *= GetAmbientOcclusion(Vector3ftoi(Vertex));
+    
     // Add vertices
     if(dHasSpecialGeometry(Block))
     {
@@ -496,4 +508,24 @@ void WorldView::ClearVBO()
         delete[] Chunks[i].Planes;
         Chunks[i].Planes = NULL;
     }
+}
+
+float WorldView::GetAmbientOcclusion(Vector3<int> Pos)
+{
+    // At first, we have full lights
+    float Occlusion = 1.0f;
+    
+    // For each block around this vertex...
+    for(int y = 0; y < 2; y++)
+    for(int x = 0; x < 2; x++)
+    for(int z = 0; z < 2; z++)
+    {
+        // Get the block offset position
+        Vector3<int> BlockPos = Pos + Vector3<int>(x, y, z);
+        if(WorldData->IsWithinWorld(BlockPos) && WorldData->GetBlock(BlockPos).GetType() != dBlockType_Air)
+            Occlusion -= 1.0f / 8.0f; // 8 Blocks are being traversed
+    }
+    
+    // Return the computed occlusion
+    return Occlusion;
 }

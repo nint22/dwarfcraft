@@ -148,7 +148,7 @@ void Entities::Render(int LayerCutoff, float CameraAngle)
     int EntitiesCount = EntitiesList.GetSize();
     for(int i = 0; i < EntitiesCount; i++)
     {
-        if(EntitiesList[i]->GetPosition().y <= LayerCutoff)
+        if(EntitiesList[i]->GetPosition().y <= LayerCutoff + 1) // +1 because we want to see dwarves that are ontop
             EntitiesList[i]->__Render(CameraAngle);
     }
     

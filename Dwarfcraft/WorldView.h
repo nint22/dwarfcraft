@@ -83,6 +83,9 @@ protected:
     // Remove / release all VBOs
     void ClearVBO();
     
+    // Give a position (a vertex position, so the pos is a point on the cube), return the ambient-occlusion factor
+    float GetAmbientOcclusion(Vector3<int> Pos);
+    
 private:
     
     /*** World Data ***/
