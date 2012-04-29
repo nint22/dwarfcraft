@@ -53,7 +53,7 @@
 #endif
 
 // Declare the official version
-#define __DWARFCRAFT_VERSION__ "DwarfCraft 0.5"
+#define __DWARFCRAFT_VERSION__ "DwarfCraft 0.6"
 
 // OpenGL Uiser Interface extensions
 #include <Glui2/glui2.h>

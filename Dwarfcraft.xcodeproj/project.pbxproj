@@ -76,6 +76,9 @@
 		0614F74514FDFB4600842808 /* terrain_mc.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0614F74414FDFB3C00842808 /* terrain_mc.png */; };
 		0614F75114FF0F2F00842808 /* MainView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0614F74F14FF0F2D00842808 /* MainView.cpp */; };
 		0614F75414FF0F5900842808 /* BackgroundView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0614F75214FF0F5800842808 /* BackgroundView.cpp */; };
+		064FB535154CB74D00501878 /* WorkBenchModel.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 064FB531154CB6C100501878 /* WorkBenchModel.cfg */; };
+		064FB536154CB74D00501878 /* wood_workbench.obx in CopyFiles */ = {isa = PBXBuildFile; fileRef = 064FB533154CB6D300501878 /* wood_workbench.obx */; };
+		064FB537154CB74D00501878 /* wood_workbench.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 064FB534154CB6EE00501878 /* wood_workbench.png */; };
 		0668FDEC1502BB6900751B5E /* Settings.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0668FDEB1502B61C00751B5E /* Settings.cfg */; };
 		06C497BE1500474000456F34 /* moon.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06C497BB1500468700456F34 /* moon.png */; };
 		06C497BF1500474000456F34 /* sun.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 06C497BC1500468700456F34 /* sun.png */; };
@@ -94,6 +97,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
+				064FB535154CB74D00501878 /* WorkBenchModel.cfg in CopyFiles */,
+				064FB536154CB74D00501878 /* wood_workbench.obx in CopyFiles */,
+				064FB537154CB74D00501878 /* wood_workbench.png in CopyFiles */,
 				06E0A4521547288200BC1600 /* Tools.cfg in CopyFiles */,
 				06E0A4531547288200BC1600 /* Tools.png in CopyFiles */,
 				06CDAE0C150EADBD00F0229E /* NewDwarf.png in CopyFiles */,
@@ -253,6 +259,9 @@
 		0614F75214FF0F5800842808 /* BackgroundView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BackgroundView.cpp; path = Dwarfcraft/BackgroundView.cpp; sourceTree = "<group>"; };
 		0614F75314FF0F5900842808 /* BackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackgroundView.h; path = Dwarfcraft/BackgroundView.h; sourceTree = "<group>"; };
 		0614F75514FF108900842808 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Globals.h; path = Dwarfcraft/Globals.h; sourceTree = "<group>"; };
+		064FB531154CB6C100501878 /* WorkBenchModel.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = WorkBenchModel.cfg; path = "Resources/Configuration files/WorkBenchModel.cfg"; sourceTree = "<group>"; };
+		064FB533154CB6D300501878 /* wood_workbench.obx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = wood_workbench.obx; path = "Resources/3D Models/Exported Objects/wood_workbench.obx"; sourceTree = "<group>"; };
+		064FB534154CB6EE00501878 /* wood_workbench.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = wood_workbench.png; path = "Resources/3D Models/Blender Files/wood_workbench.png"; sourceTree = "<group>"; };
 		0668FDEB1502B61C00751B5E /* Settings.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Settings.cfg; path = "Resources/Configuration files/Settings.cfg"; sourceTree = "<group>"; };
 		06C497BB1500468700456F34 /* moon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = moon.png; path = Resources/Background/moon.png; sourceTree = "<group>"; };
 		06C497BC1500468700456F34 /* sun.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sun.png; path = Resources/Background/sun.png; sourceTree = "<group>"; };
@@ -363,12 +372,15 @@
 			children = (
 				060EE2CE14FC659400D0A08C /* CaravanModel.cfg */,
 				060EE2CF14FC659400D0A08C /* MushroomModel.cfg */,
+				064FB531154CB6C100501878 /* WorkBenchModel.cfg */,
 				060EE2CA14FC656900D0A08C /* pinetree.obx */,
 				060EE2C814FC656900D0A08C /* Caravan.obx */,
 				060EE2C914FC656900D0A08C /* Mushroom.obx */,
+				064FB533154CB6D300501878 /* wood_workbench.obx */,
 				060EE2CB14FC657B00D0A08C /* Caravan.png */,
 				060EE2CD14FC657B00D0A08C /* Red Mushroom.png */,
 				060EE2CC14FC657B00D0A08C /* pinetree.png */,
+				064FB534154CB6EE00501878 /* wood_workbench.png */,
 			);
 			name = Models;
 			sourceTree = "<group>";

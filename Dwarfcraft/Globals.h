@@ -121,16 +121,6 @@ static const Vector3<float> WorldView_FaceQuads[5][4] =
     }
 };
 
-// A true 3D model used in-game, like a mushroom or caravan, or 
-struct WorldView_Model
-{
-    // Model's level position
-    int x, z;
-    
-    // Model VBO
-    VBuffer* ModelData;
-};
-
 // A helper data structure that does the offsets for a 3x3 grid (including the origin)
 static const Vector2<int> WorldView_Grid3Offsets[9] =
 {
@@ -290,6 +280,16 @@ static const char UI_ZonesMenuNames[UI_ZonesMenuCount][32] =
     "Hall",
     "Animal Pen",
     "Defend",
+};
+
+/*** Misc. ***/
+
+enum dFacing
+{
+    dFacing_North,
+    dFacing_East,
+    dFacing_South,
+    dFacing_West,
 };
 
 // End of inclusion guard

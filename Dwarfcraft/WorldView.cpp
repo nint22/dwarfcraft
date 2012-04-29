@@ -107,12 +107,22 @@ void WorldView::Render(Vector3<float> CameraPos, Vector3<float> CameraRight, int
             if(i == LayerCutoff && Plane.SideGeometry != NULL)
                 Plane.SideGeometry->Render();
             
+            // Render all models
+            for(int ModelIndex = 0; ModelIndex < Plane.Models.GetSize(); ModelIndex++)
+            {
+                glPushMatrix();
+                    Vector3<int> ModelPos = Plane.Models[ModelIndex].Position;
+                    glTranslatef(ModelPos.x, ModelPos.y, ModelPos.z);
+                    Plane.Models[ModelIndex].ModelData->Render();
+                glPopMatrix();
+            }
+            
             // Done rendering this layer
             glPopMatrix();
         }
     }
     
-    // Render all items
+    // Render all other entities
     Items->Render(LayerCutoff, CameraAngle);
     Designations->Render(LayerCutoff);
     Structs->Render();
@@ -139,6 +149,7 @@ void WorldView::GenerateColumnVBO(int ChunkX, int ChunkZ)
     {
         for(int j = 0; j < WorldData->GetWorldHeight(); j++)
         {
+            // Release all VBO data
             if(ChunkGraphics->Planes[j].WorldGeometry != NULL)
                 ChunkGraphics->Planes[j].WorldGeometry->Clear();
             
@@ -147,6 +158,10 @@ void WorldView::GenerateColumnVBO(int ChunkX, int ChunkZ)
             
             if(ChunkGraphics->Planes[j].SideGeometry != NULL)
                 ChunkGraphics->Planes[j].SideGeometry->Clear();
+            
+            // Release all models
+            for(int ModelIndex = 0; ModelIndex < ChunkGraphics->Planes[j].Models.GetSize(); ModelIndex++)
+                delete ChunkGraphics->Planes[j].Models[ModelIndex].ModelData; // Internally releases VBO
         }
     }
     
@@ -263,19 +278,23 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
                     }
                 }
             }
+            
+            // Case 2: Specialty 3D model (i.e. workbenches, mushrooms, etc.)
+            else if(TargetBlock.GetType() == dBlockType_Mushroom || TargetBlock.GetType() == dBlockType_Torch) // TORHC IS WORKBENCH DURING MODEL TESTING
+            {
+                // Allocate new model
+                WorldView_Model Model;
+                Model.Position = Vector3<int>(x, y, z);
+                Model.Facing = dFacing_North;
                 
-//            // Case 2: Specialty 3D model (i.e. workbench)
-//            else if(TargetBlock.GetType() == dBlockType_Mushroom)
-//            {
-//                // Allocate new model
-//                GameRender_Model Model;
-//                Model.x = x;
-//                Model.z = z;
-//                Model.ModelData = new VBuffer("MushroomModel.cfg");
-//                
-//                // Push to this layer's model list
-//                LayerOut->Models.Enqueue(Model);
-//            }
+                // Load the model
+                Model.ModelData = new VBuffer("WorkBenchModel.cfg");
+                
+                // Push to this layer's model list
+                int ModelCount = Layer->Models.GetSize();
+                Layer->Models.Resize(ModelCount + 1);
+                Layer->Models[ModelCount] = Model;
+            }
                 
             // Case 3: Generic 3D model (x-shape, for bushes, etc.)
             else

@@ -28,6 +28,17 @@
 #include "Entities.h"
 #include "StructsView.h"
 
+// A single renderable model (Just a VBO and position)
+struct WorldView_Model
+{
+    // Position and facing (NWSE)
+    Vector3<int> Position;
+    dFacing Facing;
+    
+    // Model itself
+    VBuffer* ModelData;
+};
+
 // A column's layer VBO representation
 struct WorldView_Plane
 {
@@ -42,6 +53,9 @@ struct WorldView_Plane
     // The side geometry; hiding world boundaries
     // Only render if intersected layer
     VBuffer* SideGeometry;
+    
+    // List of all models on this plane
+    List<WorldView_Model> Models;
 };
 
 // A column: a list of planes (0 being bottom, index growing up)
