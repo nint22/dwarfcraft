@@ -67,35 +67,74 @@ PerlinNoise::~PerlinNoise()
     // ...
 }
 
-float PerlinNoise::perlin_noise_2D(float vec[2])
+float PerlinNoise::GetNoise1D(float x)
 {
     int terms    = mOctaves;
 	float result = 0.0f;
     float amp = mAmplitude;
     
-    vec[0]*=mFrequency;
-    vec[1]*=mFrequency;
+    x *= mFrequency;
     
 	for( int i=0; i<terms; i++ )
 	{
-		result += GetNoise2D(vec[0], vec[1])*amp;
-		vec[0] *= 2.0f;
-		vec[1] *= 2.0f;
-        amp*=0.5f;
+		result += Noise1D(x) * amp;
+		x *= 2.0f;
+		amp *= 0.5f;
 	}
-    
     
 	return result;
 }
 
-float PerlinNoise::GetNoise1D(float arg)
+float PerlinNoise::GetNoise2D(float x, float y)
+{
+    int terms    = mOctaves;
+	float result = 0.0f;
+    float amp = mAmplitude;
+    
+    x *= mFrequency;
+    y *= mFrequency;
+    
+	for( int i=0; i<terms; i++ )
+	{
+		result += Noise2D(x, y) * amp;
+		x *= 2.0f;
+		y *= 2.0f;
+        amp *= 0.5f;
+	}
+    
+	return result;
+}
+
+float PerlinNoise::GetNoise3D(float x, float y, float z)
+{
+    int terms    = mOctaves;
+	float result = 0.0f;
+    float amp = mAmplitude;
+    
+    x *= mFrequency;
+    y *= mFrequency;
+    z *= mFrequency;
+    
+	for( int i=0; i<terms; i++ )
+	{
+		result += Noise3D(x, y, z) * amp;
+		x *= 2.0f;
+		y *= 2.0f;
+		z *= 2.0f;
+        amp *= 0.5f;
+	}
+    
+	return result;
+}
+
+float PerlinNoise::Noise1D(float x)
 {
     int bx0, bx1;
 	float rx0, rx1, sx, t, u, v, vec[1];
     
-	vec[0] = arg;
+	vec[0] = x;
     
-	PerlinNoise_setup(0, bx0,bx1, rx0,rx1);
+	PerlinNoise_setup(0, bx0, bx1, rx0, rx1);
     
 	sx = s_curve(rx0);
     
@@ -105,7 +144,7 @@ float PerlinNoise::GetNoise1D(float arg)
 	return lerp(sx, u, v) + 0.5f;
 }
 
-float PerlinNoise::GetNoise2D(float x, float y)
+float PerlinNoise::Noise2D(float x, float y)
 {
 	int bx0, bx1, by0, by1, b00, b10, b01, b11;
 	float rx0, rx1, ry0, ry1, *q, sx, sy, a, b, t, u, v;
@@ -141,7 +180,7 @@ float PerlinNoise::GetNoise2D(float x, float y)
 	return lerp(sy, a, b) + 0.5f;
 }
 
-float PerlinNoise::GetNoise3D(float x, float y, float z)
+float PerlinNoise::Noise3D(float x, float y, float z)
 {
 	int bx0, bx1, by0, by1, bz0, bz1, b00, b10, b01, b11;
 	float rx0, rx1, ry0, ry1, rz0, rz1, *q, sy, sz, a, b, c, d, t, u, v;

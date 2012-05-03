@@ -46,7 +46,6 @@ public:
     // Returns a normalized value for the given "map" position, which
     // should also be normalized. This means that giving a set of (0.5, 0.5)
     // returns the [0, 1] value of the middle pixel.
-    float perlin_noise_2D(float vec[2]);
 	float GetNoise1D(float x);
 	float GetNoise2D(float x, float y);
 	float GetNoise3D(float x, float y, float z);
@@ -54,6 +53,10 @@ public:
 private:
     
     // Helper funcs
+	float Noise1D(float x);
+	float Noise2D(float x, float y);
+	float Noise3D(float x, float y, float z);
+    
     void normalize2(float v[2]);
     void normalize3(float v[3]);
     
