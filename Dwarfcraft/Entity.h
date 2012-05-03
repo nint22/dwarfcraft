@@ -125,22 +125,32 @@ enum EntityFacing
 };
 
 // List of all wearable items / sets
-static const int EntityWearablesCount = 5;
+static const int EntityWearablesCount = 10;
 static const char EntityWearablesConfig[EntityWearablesCount][32] =
 {
     "Leather Armor.cfg",
     "Steel Armor.cfg",
     "Leather Boots.cfg",
     "Steel Boots.cfg",
-    "Tools.cfg"
+    "Tools.cfg",
+    "Leather Armor.cfg",
+    "Steel Armor.cfg",
+    "Leather Boots.cfg",
+    "Steel Boots.cfg",
+    "Tools.cfg",
 };
 static const dItemType EntityWearablesType[EntityWearablesCount] =
 {
-    dItem_ArmorChest_Leather,
-    dItem_ArmorChest_Steel,
-    dItem_ArmorBoots_Leather,
-    dItem_ArmorBoots_Steel,
-    dItem_Pickaxe,
+    dItem_HelmArmor,
+    dItem_ChestArmor,
+    dItem_PantsArmor,
+    dItem_FeetArmor,
+    dItem_Axe,
+    dItem_Pick,
+    dItem_Shovel,
+    dItem_Hoe,
+    dItem_Sword,
+    dItem_Bow,
 };
 
 // Animation / activity state

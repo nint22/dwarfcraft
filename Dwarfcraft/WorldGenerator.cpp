@@ -47,12 +47,10 @@ void WorldGenerator::Generate(WorldContainer* WorldData, const char* Seed)
     /*** Perlin Masks ***/
     
     // Just the regular topography
-    PerlinNoise* TerrainHeight = new PerlinNoise(WorldWidth, WorldWidth);
-    TerrainHeight->Render(float(Random->Rand()) / float(UINT_MAX), 35.0, 0.01);
+    PerlinNoise* TerrainHeight = new PerlinNoise(Seed);
     
     // Current three biomes: planes (dirt), desert (sand), and forest (trees, noted as dBlockType_Leaves)
-    PerlinNoise* TerrainBiomes = new PerlinNoise(WorldWidth, WorldWidth);
-    TerrainBiomes->Render(float(Random->Rand()) / float(UINT_MAX), 65.0, 0.01);
+    PerlinNoise* TerrainBiomes = new PerlinNoise(Seed);
     
     /*** Fill bottom with lava ***/
     
@@ -70,14 +68,18 @@ void WorldGenerator::Generate(WorldContainer* WorldData, const char* Seed)
         if(Progress % 200 == 0)
             printf("\tWorld generation: %.2f%% complete\n", 100.0f * float(Progress + 1) / (WorldWidth * WorldWidth));
         
+        // Normalized positions
+        float nx = (float)x / (float)WorldWidth;
+        float nz = (float)z / (float)WorldWidth;
+        
         // Get the layer heights
-        int SurfaceHeight = GetSurfaceHeight(TerrainHeight, x, z);
-        int DirtHeight = GetDirtHeight(TerrainHeight, x, z);
-        int StoneHeight = GetStoneHeight(TerrainHeight, x, z);
-        int Step = (GetSurfaceHeight(TerrainHeight, x, z) - SurfaceHeight) * 2.0f;
+        int SurfaceHeight = GetSurfaceHeight(TerrainHeight, nx, nz);
+        int DirtHeight = GetDirtHeight(TerrainHeight, nx, nz);
+        int StoneHeight = GetStoneHeight(TerrainHeight, nx, nz);
+        int Step = (GetSurfaceHeight(TerrainHeight, nx, nz) - SurfaceHeight) * 2.0f;
         
         // Get the biome type
-        int BiomeIndex = (float(TerrainBiomes->GetDepth(x, z)) / 256.0f) * float(SurfaceTypesCount);
+        int BiomeIndex = TerrainBiomes->GetNoise2D(nx, nz) * float(SurfaceTypesCount);
         
         // Fill column
         // Note: we are going from bottom-to-up
@@ -86,7 +88,7 @@ void WorldGenerator::Generate(WorldContainer* WorldData, const char* Seed)
             // Get block type
             dBlockType BlockType = dBlockType_Air;
             if(y <= StoneHeight)
-                BlockType = dBlockType_RoughStone;
+                BlockType = dBlockType_Stone;
             else if(y <= DirtHeight)
                 BlockType = dBlockType_Dirt;
             else if(y <= SurfaceHeight)
@@ -133,7 +135,7 @@ void WorldGenerator::Generate(WorldContainer* WorldData, const char* Seed)
     
     // Place 100 mineral blobs
     for(int i = 0; i < 100; i++)
-        PlaceBlob(Random->Rand() % WorldWidth, Random->Rand() % WorldDepth, Random->Rand() % WorldWidth, dBlockType_Coal);
+        PlaceBlob(Random->Rand() % WorldWidth, Random->Rand() % WorldDepth, Random->Rand() % WorldWidth, dBlockType_CoalOre);
     
     /*** Optimize Geometry ***/
     
@@ -232,21 +234,21 @@ void WorldGenerator::PlaceFoliage(int x, int z)
     WorldData->SetBlock(x, Surface, z, dBlock(BlockType, Meta));
 }
 
-float WorldGenerator::GetSurfaceHeight(PerlinNoise* TerrainHeight, int x, int z)
+float WorldGenerator::GetSurfaceHeight(PerlinNoise* TerrainHeight, float x, float z)
 {
-    float SurfaceHeight = float(WorldData->GetWorldHeight() / 6.0f);
-    return fmin(WorldData->GetWorldHeight() - 1, (float(TerrainHeight->GetDepth(x, z)) / 255.0f) * SurfaceHeight + WorldData->GetWorldHeight() - SurfaceHeight - 1);
+    float SurfaceHeight = float(WorldData->GetWorldHeight() / 3.0f);
+    return fmin(WorldData->GetWorldHeight() - 1, TerrainHeight->GetNoise2D(x, z) * SurfaceHeight + WorldData->GetWorldHeight() - SurfaceHeight - 1);
 }
 
-float WorldGenerator::GetDirtHeight(PerlinNoise* TerrainHeight, int x, int z)
+float WorldGenerator::GetDirtHeight(PerlinNoise* TerrainHeight, float x, float z)
 {
-    float SurfaceHeight = float(WorldData->GetWorldHeight() / 8.0f);
-    return fmin(WorldData->GetWorldHeight() - 1, (float(TerrainHeight->GetDepth(x, z)) / 255.0f) * SurfaceHeight + WorldData->GetWorldHeight() - SurfaceHeight - float(WorldData->GetWorldHeight() / 6.0f) - 1);
+    float SurfaceHeight = float(WorldData->GetWorldHeight() / 4.0f);
+    return fmin(WorldData->GetWorldHeight() - 1, TerrainHeight->GetNoise2D(x, z) * SurfaceHeight + WorldData->GetWorldHeight() - SurfaceHeight - float(WorldData->GetWorldHeight() / 6.0f) - 1);
 }
 
-float WorldGenerator::GetStoneHeight(PerlinNoise* TerrainHeight, int x, int z)
+float WorldGenerator::GetStoneHeight(PerlinNoise* TerrainHeight, float x, float z)
 {
     
-    float SurfaceHeight = float(WorldData->GetWorldHeight() / 4.0f);
-    return fmin(WorldData->GetWorldHeight() - 1, (float(TerrainHeight->GetDepth(x, z)) / 255.0f) * SurfaceHeight + WorldData->GetWorldHeight() - SurfaceHeight - float(WorldData->GetWorldHeight() / 6.0f) - float(WorldData->GetWorldHeight() / 4) - 1);
+    float SurfaceHeight = float(WorldData->GetWorldHeight() / 2.0f);
+    return fmin(WorldData->GetWorldHeight() - 1, TerrainHeight->GetNoise2D(x, z) * SurfaceHeight + WorldData->GetWorldHeight() - SurfaceHeight - float(WorldData->GetWorldHeight() / 6.0f) - float(WorldData->GetWorldHeight() / 4) - 1);
 }

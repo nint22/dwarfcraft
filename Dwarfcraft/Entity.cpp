@@ -21,6 +21,7 @@ Entity::Entity(const char* ConfigName)
 {
     // Save location
     SetFacingAngle(UtilPI / 2.0f); // Default facing north
+    CameraTheta = GetFacingAngle(); // Set some sort of default for our first render
     
     // Attempt to read configuration file
     ConfigFile = new g2Config();

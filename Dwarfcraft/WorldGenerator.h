@@ -56,13 +56,13 @@ protected:
 private:
     
     // Get the height of the block of the top-most layer (earth-top)
-    float GetSurfaceHeight(PerlinNoise* TerrainHeight, int x, int z);
+    float GetSurfaceHeight(PerlinNoise* TerrainHeight, float x, float z);
     
     // Get the height of the second layer (soil)
-    float GetDirtHeight(PerlinNoise* TerrainHeight, int x, int z);
+    float GetDirtHeight(PerlinNoise* TerrainHeight, float x, float z);
     
     // Get the height of the third layer (stone)
-    float GetStoneHeight(PerlinNoise* TerrainHeight, int x, int z);
+    float GetStoneHeight(PerlinNoise* TerrainHeight, float x, float z);
     
     // Random number generator
     UtilRand* Random;

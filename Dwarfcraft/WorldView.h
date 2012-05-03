@@ -91,8 +91,9 @@ protected:
     // Generate a VBO at the given layer
     bool GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane* Layer);
     
-    // Add a vertex
+    // Add a vertex (variable function types)
     void AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float> Normal, int QuadCornerIndex, dBlock Block);
+    void AddVertex(VBuffer* Buffer, Vector3<float> Vertex); // Nothing special, just black
     
     // Remove / release all VBOs
     void ClearVBO();

@@ -341,9 +341,9 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
                 // Place starting and ending vertices
                 // Ternary operator is to unduce overlap
                 for(int i = 0; i < 2; i++)
-                    AddVertex(Layer->HiddenGeometry, Vector3<float>(StartX, y, z + ((i == 0) ? StripOverlap : -StripOverlap)) + WorldView_FaceQuads[0][i], WorldView_Normals[0], i, dBlockType_Border);
+                    AddVertex(Layer->HiddenGeometry, Vector3<float>(StartX, y, z + ((i == 0) ? StripOverlap : -StripOverlap)) + WorldView_FaceQuads[0][i]);
                 for(int i = 2; i < 4; i++)
-                    AddVertex(Layer->HiddenGeometry, Vector3<float>(EndX, y, z + ((i == 3) ? StripOverlap : -StripOverlap)) + WorldView_FaceQuads[0][i], WorldView_Normals[0], i, dBlockType_Border);
+                    AddVertex(Layer->HiddenGeometry, Vector3<float>(EndX, y, z + ((i == 3) ? StripOverlap : -StripOverlap)) + WorldView_FaceQuads[0][i]);
             }
         }
     }
@@ -397,9 +397,9 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
                         if(FaceList[j] != 0)
                         {
                             for(int i = 0; i < 2; i++) // High vertices
-                                AddVertex(Layer->SideGeometry, Vector3<float>(x, EndY, z) + WorldView_FaceQuads[FaceList[j]][i] + (IsWhole ? Vector3<float>() : Vector3<float>(0, -.5f, 0)), WorldView_Normals[FaceList[j]], i, dBlockType_Border);
+                                AddVertex(Layer->SideGeometry, Vector3<float>(x, EndY, z) + WorldView_FaceQuads[FaceList[j]][i] + (IsWhole ? Vector3<float>() : Vector3<float>(0, -.5f, 0)));
                             for(int i = 2; i < 4; i++) // Low vertices
-                                AddVertex(Layer->SideGeometry, Vector3<float>(x, StartY, z) + WorldView_FaceQuads[FaceList[j]][i], WorldView_Normals[FaceList[j]], i, dBlockType_Border);
+                                AddVertex(Layer->SideGeometry, Vector3<float>(x, StartY, z) + WorldView_FaceQuads[FaceList[j]][i]);
                         }
                     }
                 }
@@ -476,8 +476,6 @@ void WorldView::AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float>
     float LightNormal = 0.2f * Vector3Dot(Vector3<float>(1, 2, 4), Normal);
     
     float LightFactor = fmin(1.0f, fmax(0.4f, LightRand + LightDepth + LightNormal));
-    if(Block.GetType() == dBlockType_Border)
-        LightFactor = 1.0f;
     
     // Apply occlusion factor
     // Little hack: if it's a half block, we have to bump the vertex's y up a half
@@ -502,6 +500,13 @@ void WorldView::AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float>
     
     // Add the full data set for the given vertex into the buffer
     Buffer->AddVertex(Vertex, TextureColor * LightFactor, FaceTexture[QuadCornerIndex]);
+}
+
+void WorldView::AddVertex(VBuffer* Buffer, Vector3<float> Vertex)
+{
+    // Black color, no UV texture
+    Vector3<float> VertexColor(0, 0, 0);
+    Buffer->AddVertex(Vertex, VertexColor, Vector2<float>());
 }
 
 void WorldView::ClearVBO()

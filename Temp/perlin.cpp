@@ -14,6 +14,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define SIZE 256
+#define MASK 0xFF
+
 //=============================================================================
 CPerlin::CPerlin()
 {

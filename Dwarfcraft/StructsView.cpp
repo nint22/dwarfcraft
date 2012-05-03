@@ -36,6 +36,7 @@ StructsView::~StructsView()
 
 void StructsView::AddStruct(dBlock Struct, Vector3<int> Pos)
 {
+    /*
     // Grow list size, add to end
     int OriginalLength = Structs[Pos.y].GetSize();
     Structs[Pos.y].Resize(OriginalLength + 1);
@@ -56,6 +57,7 @@ void StructsView::AddStruct(dBlock Struct, Vector3<int> Pos)
     
     // Add to the structs list
     Structs[Pos.y][OriginalLength] = NewStruct;
+    */
 }
 
 void StructsView::RemoveStruct(Vector3<int> Pos)

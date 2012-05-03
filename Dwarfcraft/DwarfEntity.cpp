@@ -74,44 +74,6 @@ void DwarfEntity::SetItems(dItem Item1, dItem Item2)
     Items[1] = Item2;
 }
 
-void DwarfEntity::RenderPreview(int x, int y, int width, int height)
-{
-    // Draw the parent / base object
-    Entity::RenderPreview(x, y, width, height);
-    
-    // Working vars
-    float srcx, srcy, srcwidth, srcheight;
-    GLuint TextID;
-    
-    /*** Render Armor ***/
-    
-    if(Armor[0].Type == dItem_ArmorChest_Steel || Armor[0].Type == dItem_ArmorChest_Leather)
-    {
-        // Get the current sprite overlay of a chest piece
-        GetWearableSprite(Armor[0].Type, &srcx, &srcy, &srcwidth, &srcheight, &TextID);
-        
-        // Chage cell in the sheet if needed
-        srcx += srcwidth * float(GetSpriteCellIndex());
-        
-        // Render the preview sprite
-        Entity::RenderPreview(x, y, width, height, srcx, srcy, srcwidth, srcheight, TextID);
-    }
-    
-    /*** Render Boots ***/
-    
-    if(Armor[1].Type == dItem_ArmorBoots_Steel || Armor[1].Type == dItem_ArmorBoots_Leather)
-    {
-        // Get the current sprite overlay of a chest piece
-        GetWearableSprite(Armor[1].Type, &srcx, &srcy, &srcwidth, &srcheight, &TextID);
-        
-        // Chage cell in the sheet if needed
-        srcx += srcwidth * float(GetSpriteCellIndex());
-        
-        // Render the preview sprite
-        Entity::RenderPreview(x, y, width, height, srcx, srcy, srcwidth, srcheight, TextID);
-    }
-}
-
 int DwarfEntity::GetMaxHealth()
 {
     // TODO: Should be a function of experiance & armor
@@ -276,7 +238,7 @@ void DwarfEntity::Render()
     glPolygonOffset(-1.0f, -1.0f);
     
     /*** Render Armor ***/
-    
+    /*
     if(Armor[0].Type == dItem_ArmorChest_Steel || Armor[0].Type == dItem_ArmorChest_Leather)
     {
         // Get the current sprite overlay of a chest piece
@@ -289,9 +251,9 @@ void DwarfEntity::Render()
         Vector2<float> WorldSize = GetWorldSize();
         RenderBillboard(GetPosition(), WorldSize.x, WorldSize.y, x, y, width, height, 0, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL), TextID);
     }
-    
+    */
     /*** Render Boots ***/
-    
+    /*
     if(Armor[1].Type == dItem_ArmorBoots_Steel || Armor[1].Type == dItem_ArmorBoots_Leather)
     {
         // Get the current sprite overlay of a chest piece
@@ -304,12 +266,12 @@ void DwarfEntity::Render()
         Vector2<float> WorldSize = GetWorldSize();
         RenderBillboard(GetPosition(), WorldSize.x, WorldSize.y, x, y, width, height, 0, (NewGlobalFacing == EntityFacing_FL || NewGlobalFacing == EntityFacing_BL), TextID);
     }
-    
+    */
     /*** Render Tools (IFF mining) ***/
     
-    if(GetState() == EntityState_Breaking && (Items[0].Type == dItem_Pickaxe || Items[1].Type == dItem_Pickaxe))
+    if(GetState() == EntityState_Breaking && (Items[0].Type == dItem_Pick || Items[1].Type == dItem_Pick))
     {
-        GetWearableSprite(dItem_Pickaxe, &x, &y, &width, &height, &TextID);
+        GetWearableSprite(dItem_Pick, &x, &y, &width, &height, &TextID);
         x += width * float(GetSpriteCellIndex());
         
         Vector2<float> WorldSize = GetWorldSize();

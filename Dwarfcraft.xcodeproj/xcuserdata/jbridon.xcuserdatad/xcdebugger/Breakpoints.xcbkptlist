@@ -9,12 +9,25 @@
          continueAfterRunningActions = "No"
          isPathRelative = "1"
          filePath = "Dwarfcraft/Entity.cpp"
-         timestampString = "356985615.235246"
+         timestampString = "357717549.896307"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "790"
-         endingLineNumber = "790"
+         startingLineNumber = "791"
+         endingLineNumber = "791"
          landmarkName = "Entity::ExecuteMove(float dT)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Dwarfcraft/StructsView.cpp"
+         timestampString = "357606403.666871"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "38"
+         endingLineNumber = "38"
+         landmarkName = "StructsView::AddStruct(dBlock Struct, Vector3&lt;int&gt; Pos)"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

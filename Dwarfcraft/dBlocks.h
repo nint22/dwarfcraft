@@ -21,35 +21,95 @@
 #include "Vector3.h"
 
 // Total number of block types in the world
-static const int dBlockType_Count = 20;
+static const int dBlockType_Count = 33;
 
 // Enumerate block types (must be <= 255; unsigned char)
-// Note that dBlock_None is default to -1 since it us "unknown"
-// Also note, some of these aren't normal blocks, but are used
-// to map out specialty sides (i.e. a tree trunk uses a different top texture)
+// As of May 1st, all blocks have been redefined
+// Specialy "pseud-blocks" (such as tree trunk tops) are defined in the bottom
 enum dBlockType
 {
-    // Testing types
-    dBlockType_Air = 0,
-    dBlockType_Gravel,
-    dBlockType_SmoothStone,
-    dBlockType_RoughStone,
+    // Generic naturally occuring
+    dBlockType_Air,
+    dBlockType_Stone,
+    dBlockType_Cobblestone,
     dBlockType_Dirt,
-    dBlockType_Sand,
-    dBlockType_Wood,
-    dBlockType_Wood_Top,
-    dBlockType_Coal,
-    dBlockType_StoneSlab,
-    dBlockType_StoneSlab_Top,
-    dBlockType_Torch,
+    dBlockType_Bedrock,
+    dBlockType_Water,
     dBlockType_Lava,
+    dBlockType_Sand,
+    dBlockType_Gravel,
+    dBlockType_Wood,
     dBlockType_Leaves,
     dBlockType_Grass,
     dBlockType_Bush,
+    dBlockType_Flower,
     dBlockType_Mushroom,
-    dBlockType_Border,
-    dBlockType_Breaking,
-    dBlockType_Caravan
+    
+    // Ores
+    dBlockType_CoalOre,
+    dBlockType_IronOre,
+    dBlockType_SilverOre,
+    dBlockType_GoldOre,
+    dBlockType_DiamondOre,
+    
+    // Crafted
+    dBlockType_Plank,
+    dBlockType_Torch,
+    dBlockType_Chest,
+    dBlockType_Furnace,
+    dBlockType_Door,
+    dBlockType_Stairs,
+    dBlockType_Glass,
+    dBlockType_Ladder,
+    
+    // Workbenches
+    dBlockType_CarpentryBench,
+    dBlockType_MasonryBench,
+    dBlockType_EngineeringBench,
+    dBlockType_KitchenBench,
+    dBlockType_SmithingBench,
+};
+
+// Matches, for the most part, Minecraft's textures
+static Vector2<int> dBlockTexturePos[dBlockType_Count] =
+{
+    Vector2<int>(0, 0),
+    Vector2<int>(1, 0),
+    Vector2<int>(0, 1),
+    Vector2<int>(2, 0),
+    Vector2<int>(11, 7),
+    Vector2<int>(13, 12),
+    Vector2<int>(13, 14),
+    Vector2<int>(2, 1),
+    Vector2<int>(3, 1),
+    Vector2<int>(5, 1),
+    Vector2<int>(4, 3),
+    Vector2<int>(8, 5),
+    Vector2<int>(15, 0),
+    Vector2<int>(12, 0),
+    Vector2<int>(13, 1),
+    
+    Vector2<int>(2, 2),
+    Vector2<int>(1, 2),
+    Vector2<int>(3, 3),
+    Vector2<int>(0, 2),
+    Vector2<int>(2, 3),
+    
+    Vector2<int>(4, 0),
+    Vector2<int>(0, 5),
+    Vector2<int>(9, 1),
+    Vector2<int>(12, 2),
+    Vector2<int>(1, 5),
+    Vector2<int>(0, 1),
+    Vector2<int>(1, 3),
+    Vector2<int>(4, 5),
+    
+    // Benches are not textures in the terrain.png list
+    Vector2<int>(0, 0),
+    Vector2<int>(0, 0),
+    Vector2<int>(0, 0),
+    Vector2<int>(0, 0),
+    Vector2<int>(0, 0),
 };
 
 // Enumerate a block's facing direction
@@ -63,196 +123,122 @@ enum dBlockFace
     dBlockFace_Back,
 };
 
-// The starting location of each block
-// Note that these are grid positions; not pixel positions, upon initialization
-static Vector2<int> dBlockTexturePos[dBlockType_Count] =
-{
-    Vector2<int>(0, 0), // Air
-    Vector2<int>(3, 1), // Gravel
-    Vector2<int>(1, 0), // Smoothstone
-    Vector2<int>(0, 1), // Rough stone
-    Vector2<int>(2, 0), // Dirt
-    Vector2<int>(2, 1), // Sand
-    Vector2<int>(4, 1), // Wood
-    Vector2<int>(5, 1), // Wood top
-    Vector2<int>(2, 2), // Coal
-    Vector2<int>(5, 0), // Stone slab
-    Vector2<int>(6, 0), // Stone slab top
-    Vector2<int>(0, 5), // Torch
-    Vector2<int>(14, 14), // Lava
-    Vector2<int>(4, 8), // Leaves
-    Vector2<int>(8, 5), // Grass
-    Vector2<int>(15, 4), // Bush
-    Vector2<int>(12, 1), // Mushroom
-    Vector2<int>(0, 0), // Border
-    Vector2<int>(0, 15), // Breaking
-    Vector2<int>(0, 0), // Caravan
-};
-
 // Non-block, used for designations texture selection
-static const Vector2<int> dDesignationTexturePos(0, 12);
+static const Vector2<int> dDesignationTexturePos(0, 16); // Paired with UI
+
+// Non-block, used for the breaking animation
+static const Vector2<int> dBreakingTexturePos(0, 15); // Paired with terrain
 
 // Total number of item types in the world
-static const int dItemType_Count = 64;
+static const int dItemType_Count = 44;
 
-// Item declaration (similar to minecraft items)
+// Items
 enum dItemType
 {
     // None / nothing
     dItem_None,
     
+    // Block equivalents
+    dItem_Stone,
+    dItem_Cobblestone,
+    dItem_Dirt,
+    dItem_Bedrock,
+    dItem_Sand,
+    dItem_Gravel,
+    dItem_Wood,
+    dItem_Leaves,
+    dItem_Grass,
+    dItem_Bush,
+    dItem_Flower,
+    dItem_Mushroom,
+    dItem_CoalOre,
+    dItem_IronOre,
+    dItem_SilverOre,
+    dItem_GoldOre,
+    dItem_DiamondOre,
+    dItem_Plank,
+    dItem_Torch,
+    dItem_Chest,
+    dItem_Furnace,
+    dItem_Door,
+    dItem_Stairs,
+    dItem_Glass,
+    dItem_Ladder,
+    
+    // Smelted materials
+    dItem_IronBar,
+    dItem_SilverBar,
+    dItem_GoldBar,
+    dItem_DiamondBar,
+    
     // Crafted items (produced)
     dItem_Axe,
-    dItem_Pickaxe,
+    dItem_Pick,
     dItem_Shovel,
     dItem_Hoe,
-    dItem_SkinningKnife,
-    dItem_ButchersKnife,
-    dItem_Sheers,
-    dItem_FishingNet,
-    dItem_FishingRod,
     dItem_Sword,
-    dItem_Shield,
-    dItem_Polearm,
     dItem_Bow,
     dItem_Arrow,
-    dItem_Daggers,
-    dItem_HeavySword,
     
-    // Todo: mined materials
-    dItem_Stone,
-    dItem_Coal,
-    dItem_Dirt,
-    dItem_Sand,
+    // Wearables
+    dItem_ChestArmor,
+    dItem_PantsArmor,
+    dItem_FeetArmor,
+    dItem_HelmArmor,
     
-    // Todo: smelted bars
-    dItem_Iron,
-    dItem_Gold,
-    
-    // Todo: Benches we can place
-    dItem_CarpentryBench,
-    dItem_StonecraftBench,
-    dItem_EngineeringBench,
-    dItem_CookingBench,
-    dItem_ForgeBench,
-    dItem_WeaponBench,
-    dItem_ArmorBench,
-    
-    // Todo: power sources
-    dItem_Furnace,
-    dItem_WaterMill,
-    dItem_MagmaRod,
-    
-    // Todo: light-emitting items
-    dItem_Torch,
-    dItem_Lantern,
-    
-    // Todo: mechanisms
-    dItem_Wire,
-    dItem_Repeater,
-    dItem_Switch,
-    dItem_LogicalAND,
-    dItem_LogicalOR,
-    dItem_LogicalNOT,
-    dItem_Pump,
-    dItem_FloodGate,
-    dItem_Rail,
-    dItem_Door,
-    dItem_MechDoor,
-    dItem_PressurePlate,
-    dItem_TrapSpike,
-    dItem_TrapMechSpike,
-    dItem_AnimalAttractor,
-    dItem_MobAttractor,
-    
-    // Todo: storage
-    dItem_Crate,
-    dItem_Barrel,
-    dItem_Bucket,
-    
-    // Todo: furniture
+    // Furniture
     dItem_Table,
     dItem_Chair,
     dItem_Bed,
-    dItem_Cup,
-    dItem_Casket,
-    
-    // Todo: Wearable
-    dItem_ArmorChest_Leather,
-    dItem_ArmorChest_Steel,
-    dItem_ArmorBoots_Leather,
-    dItem_ArmorBoots_Steel,
-    
-    // Todo: foods
 };
 
 // Item texture position (which changes based on the item base size)
 static Vector2<int> dItemTypeTexturePos[dItemType_Count] = 
 {
+    Vector2<int>(),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 1),
+    Vector2<int>(10, 1),
+    Vector2<int>(10, 1),
+    Vector2<int>(10, 1),
+    Vector2<int>(10, 1),
+    Vector2<int>(7, 1),
+    Vector2<int>(7, 1),
+    Vector2<int>(7, 1),
+    Vector2<int>(7, 1),
+    Vector2<int>(7, 1),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(11, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(10, 2),
+    Vector2<int>(7, 1),
+    Vector2<int>(7, 1),
+    Vector2<int>(7, 1),
+    Vector2<int>(7, 1),
+    Vector2<int>(0, 7),
+    Vector2<int>(0, 6),
+    Vector2<int>(0, 5),
+    Vector2<int>(0, 8),
+    Vector2<int>(0, 4),
+    Vector2<int>(5, 1),
+    Vector2<int>(5, 2),
+    Vector2<int>(0, 1),
+    Vector2<int>(0, 2),
+    Vector2<int>(0, 3),
     Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),  // Stone
-    Vector2<int>(13, 3), // Coal
-    Vector2<int>(10, 3), // Dirt
-    Vector2<int>(11, 3), // Sand
-    Vector2<int>(14, 3), // Iron
-    Vector2<int>(12, 3), // Gold
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
-    Vector2<int>(0, 0),
+    Vector2<int>(8, 8),
+    Vector2<int>(8, 8),
+    Vector2<int>(8, 8),
 };
 
 // Define item structure; item ID, quality, and current endurance
@@ -371,6 +357,9 @@ GLuint dGetItemTextureID(int* Width = NULL, int* Height = NULL, int* TileSize = 
 
 // Returns the texture coordinates of an item
 void dGetItemTexture(dItemType Item, float* x, float* y, float* width, float* height);
+
+// Get the breaking texture
+GLuint dGetBreakingTexture(float* x, float* y, float* width, float* height);
 
 // Returns true if the surface from source touching adjacent should be rendered
 // For example, if the given source block is dir, and the adjacent is air, all

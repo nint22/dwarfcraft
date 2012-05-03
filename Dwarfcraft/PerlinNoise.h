@@ -10,10 +10,10 @@
  Desc: A simple 2D perlon noise implementation based on Perlin's
  own major implementation: http://mrl.nyu.edu/~perlin/doc/oscar.html
  
- Noise is always generated on a 0-255 (unisnged char) depth ontop
- of the given width x height buffer.
+ Noise is always generated as a normalized value in [0, 1] and
+ can be generated in 1, 2, and 3 dimensions.
  
- Easier to understand explanation:
+ Easier to understand explanation (but code not derived):
  http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
  
  Current code is based off of a much more clean-cut implementation:
@@ -24,57 +24,44 @@
 // Standard includes
 #include <stdlib.h>
 #include <math.h>
+#include "MUtil.h"
 
 // Inclusion guard
 #ifndef __PERLINNOISE_H__
 #define __PERLINNOISE_H__
+
+// Table size
+static const int PerlinNoise_Size = 256;
 
 class PerlinNoise
 {
 public:
     
     // Initialize with nothing
-    PerlinNoise(int Width, int Height);
+    PerlinNoise(const char* Seed);
     
     // Release internals
     ~PerlinNoise();
     
-    // Render a new map of the noise
-    // Seed can be anything, but bigger numbers are better
-    // Uses a seed to offset the cosine (interpolation) function
-    // The zoom is how "dense" the information is (good value is 75)
-    // while persistance is the frequency (good value is 0.5)
-    // while octaves is about the consistency of the output
-    void Render(double seed = 0.0, double zoom = 75.0, double persistance = 0.25, int octaves = 8);
-    
-    // Access generated buffer
-    const unsigned char* GetBuffer();
-    
-    // Access a pixel-specific location
-    unsigned char GetDepth(int x, int y);
-    
-    // Get the depth pre-computed as a float from [0, 1]
-    float GetfDepth(int x, int y);
+    // Returns a normalized value for the given "map" position, which
+    // should also be normalized. This means that giving a set of (0.5, 0.5)
+    // returns the [0, 1] value of the middle pixel.
+	float GetNoise1D(float x);
+	float GetNoise2D(float x, float y);
+	float GetNoise3D(float x, float y, float z);
     
 private:
     
-    // Size of the noise map
-    int Width, Height;
+	// Permutation table
+	unsigned char p[PerlinNoise_Size];
     
-    // Noise output buffer
-    unsigned char* NoiseBuffer;
+	// Gradients
+	float gx[PerlinNoise_Size];
+	float gy[PerlinNoise_Size];
+	float gz[PerlinNoise_Size];
     
-    /*** Noise Generation ***/
-    
-    // Interpolate between two values based on a given factor
-    double Interpolate(double a, double b, double x);
-    
-    // Get the local depth value
-    double GetLocalNoise(double x, double y);
-    
-    // Get the global depth value considering  values
-    double GetGlobalNoise(double x, double y);
-    
+    // Random generator
+    UtilRand RandGen;
 };
 
 // End inclusion guard

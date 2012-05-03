@@ -101,9 +101,6 @@ public:
     // Explicitly set the tool for the dwarf
     void SetItems(dItem Item1, dItem Item2);
     
-    // Custom preview-drawing function so that we can render all armor & tools
-    void RenderPreview(int x, int y, int width, int height);
-    
     /*** Dwarf Status ***/
     
     // Overloaded; Get the max health count of the dwarf

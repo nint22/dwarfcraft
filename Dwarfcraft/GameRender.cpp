@@ -155,12 +155,12 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
         SampleDwarf->SetPosition(Vector3<float>(x + 0.5f, y - 0.5f, z + 0.5f)); // Center on the tile (dwarf will auto-fall if needed)
         
         // Explicitly set random armor (chest, pants)
-        dItem Chest(dItemType(dItem_ArmorChest_Leather + rand() % 2));
-        dItem Boots(dItemType(dItem_ArmorBoots_Leather + rand() % 2));
+        //dItem Chest(dItemType(dItem_ArmorChest_Leather + rand() % 2));
+        //dItem Boots(dItemType(dItem_ArmorBoots_Leather + rand() % 2));
         //SampleDwarf->SetArmor(Chest, Boots);
         
         // Give dwarf some picks
-        SampleDwarf->SetItems(dItem_Pickaxe, dItem_None);
+        SampleDwarf->SetItems(dItem_Pick, dItem_None);
         
         // Add to entities list
         EntitiesList->AddEntity(SampleDwarf);
@@ -241,11 +241,9 @@ void GameRender::Render()
             bool IsBlockSolid = WorldData->GetBlock(Target).IsWhole();
             
             // Compute the texture
-            float srcx, srcy, srcw, srch;
-            dGetBlockTexture(dBlockType_Breaking, dBlockFace_Top, &srcx, &srcy, &srcw, &srch);
-            
             GLuint BlockTexture;
-            BlockTexture = dGetTerrainTextureID();
+            float srcx, srcy, srcw, srch;
+            BlockTexture = dGetBreakingTexture(&srcx, &srcy, &srcw, &srch);
             
             // Offset based on progress
             srcx += srcw * float(Step);

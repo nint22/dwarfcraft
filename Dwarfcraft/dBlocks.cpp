@@ -63,68 +63,59 @@ void dGetBlockTexture(dBlock Block, dBlockFace Face, float* x, float* y, float* 
     dBlockType BlockType = Block.GetType();
     
     // Does this block type exist, is none, or air? Just ignore..
-    if(BlockType <= 1 || BlockType >= dBlockType_Count)
+    if(BlockType <= dBlockType_Air || BlockType >= dBlockType_Count)
         return;
     
-    // Get the appropriate base-face location
+    // Normalize terrain texture
     Vector2<int> Origin = dBlockTexturePos[BlockType];
     *x = float(Origin.x) / float(TextureWidth);
     *y = float(Origin.y) / float(TextureHeight);
     *width = float(TileSize) / float(TextureWidth);
     *height = float(TileSize) / float(TextureHeight);
     
+    // Any desired texture rotations?
     if(rotations != NULL)
         *rotations = 0;
     
     // Default color to white, unless the texture is exceptional
     if(color != NULL)
-    {
         *color = Vector3<float>(1, 1, 1);
-        if(BlockType == dBlockType_Leaves)
-            *color = Vector3<float>(0.372f, 0.623f, 0.207f);
-    }
     
     // Dirt has different sides and tops IF it is 1 (grass), or 2 (snow)
     if(BlockType == dBlockType_Dirt && Block.GetMeta() == 1)
     {
-        // Set the top to grass
+        // Set the top to grass (two faces left), else is grass (one face right)
         if(Face == dBlockFace_Top)
-            *x += 2 * *width;
-        
-        // Side grass
-        else if(Face == dBlockFace_Left || Face == dBlockFace_Right || Face == dBlockFace_Back || Face == dBlockFace_Front)
+        {
+            if(color != NULL)
+                *color = Vector3<float>(0.41, 0.66, 0.25);
+            *x -= 2 * *width;
+        }
+        else
             *x += *width;
     }
     
     // Snow
     else if(BlockType == dBlockType_Dirt && Block.GetMeta() == 2)
     {
-        // Set the top to grass
+        // Set the top to snow (two faces left), else is snow side (one face right, 4 down)
         if(Face == dBlockFace_Top)
-            *x += 4 * *width;
-        
-        // Side grass
-        else if(Face == dBlockFace_Left || Face == dBlockFace_Right || Face == dBlockFace_Back || Face == dBlockFace_Front)
-            *x += 3 * *width;
+            *x -= 2 * *width;
+        else
+        {
+            *x += *width;
+            *y += 4 * *width;
+        }
     }
     
-    // Check special cases
+    // Check special cases (trunk, face right)
     else if(BlockType == dBlockType_Wood && Face == dBlockFace_Top)
     {
-        dGetBlockTexture(dBlock(dBlockType_Wood_Top), Face, x, y, width, height, color, rotations);
-    }
-    else if(BlockType == dBlockType_StoneSlab && Face == dBlockFace_Top)
-    {
-        dGetBlockTexture(dBlock(dBlockType_StoneSlab_Top), Face, x, y, width, height, color, rotations);
+        if(Face == dBlockFace_Top)
+            *x += *width;
     }
     // Grass has 7 total tiles (grows x+)
     else if(BlockType == dBlockType_Grass && Block.GetMeta() > 0 && Block.GetMeta() <= 6)
-    {
-        // Offset based on valid meta
-        *x += *width * Block.GetMeta();
-    }
-    // Mushroom has 2 total tiles (grows x+)
-    else if(BlockType == dBlockType_Mushroom && Block.GetMeta() > 0 && Block.GetMeta() <= 1)
     {
         // Offset based on valid meta
         *x += *width * Block.GetMeta();
@@ -188,6 +179,22 @@ void dGetItemTexture(dItemType Item, float* x, float* y, float* width, float* he
     *height = float(TileSize) / float(TextureHeight);
 }
 
+GLuint dGetBreakingTexture(float* x, float* y, float* width, float* height)
+{
+    // Get the texture ID
+    int TextureWidth, TextureHeight, TileSize;
+    GLuint TextureID = dGetItemTextureID(&TextureWidth, &TextureHeight, &TileSize);
+    
+    // Find the offset and normalize the width and height
+    *width = (float)TileSize/(float)TextureWidth;
+    *height = (float)TileSize/(float)TextureHeight;
+    *x = dBreakingTexturePos.x * *width;
+    *y = dBreakingTexturePos.y * *height;
+    
+    // Done!
+    return TextureID;
+}
+
 bool dAdjacentCheck(dBlock Source, dBlock Adjacent)
 {
     // If adjacent is air, always render source
@@ -212,22 +219,27 @@ bool dHasSpecialGeometry(dBlock Block)
     // Simplify accessor
     dBlockType BlockType = Block.GetType();
     
-    // If any of the plants...
-    if(BlockType == dBlockType_Grass || BlockType == dBlockType_Bush || BlockType == dBlockType_Mushroom || BlockType == dBlockType_Caravan)
+    // Special models (Code is written this way to be simple)
+    if(BlockType == dBlockType_Mushroom || BlockType == dBlockType_Torch || BlockType == dBlockType_Chest ||
+       BlockType == dBlockType_Furnace || BlockType == dBlockType_Door || BlockType == dBlockType_Stairs || BlockType == dBlockType_Ladder ||
+       BlockType == dBlockType_CarpentryBench || BlockType == dBlockType_MasonryBench || BlockType == dBlockType_EngineeringBench ||
+       BlockType == dBlockType_KitchenBench || BlockType == dBlockType_SmithingBench)
         return true;
-    else
-        return false;
+    
+    // Else, no match
+    return false;
 }
 
 bool dIsSolid(dBlock Block)
 {
+    // If solid
     // Simplify accessor
     dBlockType BlockType = Block.GetType();
     
     // Only return true if solid
-    if(BlockType == dBlockType_Air ||
-       BlockType == dBlockType_Grass || BlockType == dBlockType_Bush ||
-       BlockType == dBlockType_Mushroom || BlockType == dBlockType_Leaves)
+    if(dHasSpecialGeometry(Block) ||
+       BlockType == dBlockType_Air || BlockType == dBlockType_Grass || BlockType == dBlockType_Bush ||
+       BlockType == dBlockType_Flower || BlockType == dBlockType_Mushroom || BlockType == dBlockType_Leaves)
         return false;
     else
         return true;
@@ -245,27 +257,23 @@ dItemType dGetItemFromBlock(dBlock Block)
     // For now, we do some simple matches
     switch(Block.GetType())
     {
-        case dBlockType_Gravel:         return dItem_Sand;
-        case dBlockType_SmoothStone:    return dItem_Stone;
-        case dBlockType_RoughStone:     return dItem_Stone;
-        case dBlockType_Dirt:           return dItem_Dirt;
-        case dBlockType_Sand:           return dItem_Sand;
-        case dBlockType_Wood_Top:       
-        case dBlockType_Wood:           return dItem_Dirt;
-        case dBlockType_Coal:           return dItem_Coal;
-        case dBlockType_StoneSlab_Top:  return dItem_Stone;
-        case dBlockType_StoneSlab:      return dItem_Stone;
-        case dBlockType_Torch:          return dItem_Torch;
-        case dBlockType_Grass:          return dItem_Dirt;
-        case dBlockType_Mushroom:       return dItem_Dirt;
-        
-        // No match
-        case dBlockType_Bush:
-        case dBlockType_Leaves:
-        case dBlockType_Border:
-        case dBlockType_Breaking:
-        case dBlockType_Caravan:
-        case dBlockType_Lava:
+        case dBlockType_Stone:      return dItem_Stone;
+        case dBlockType_Cobblestone:return dItem_Cobblestone;
+        case dBlockType_Dirt:       return dItem_Dirt;
+        case dBlockType_Bedrock:    return dItem_Bedrock;
+        case dBlockType_Sand:       return dItem_Sand;
+        case dBlockType_Gravel:     return dItem_Gravel;
+        case dBlockType_Wood:       return dItem_Wood;
+        case dBlockType_Leaves:     return dItem_Leaves;
+        case dBlockType_Grass:      return dItem_Grass;
+        case dBlockType_Bush:       return dItem_Bush;
+        case dBlockType_Flower:     return dItem_Flower;
+        case dBlockType_Mushroom:   return dItem_Mushroom;
+        case dBlockType_CoalOre:    return dItem_CoalOre;
+        case dBlockType_IronOre:    return dItem_IronOre;
+        case dBlockType_SilverOre:  return dItem_SilverOre;
+        case dBlockType_GoldOre:    return dItem_GoldOre;
+        case dBlockType_DiamondOre: return dItem_DiamondOre;
         default: break;
     }
     
@@ -274,9 +282,6 @@ dItemType dGetItemFromBlock(dBlock Block)
 
 bool dBlockCollapses(dBlock Block)
 {
-    dBlockType Type = Block.GetType();
-    if(Type == dBlockType_Bush || Type == dBlockType_Mushroom || Type == dBlockType_Torch || Type == dBlockType_Grass)
-        return true;
-    else
-        return false;
+    // If not a solid block, it collapses
+    return !dIsSolid(Block);
 }
