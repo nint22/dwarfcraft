@@ -19,6 +19,9 @@ BackgroundView::BackgroundView(GrfxObject* Parent, int ObjectDepth)
     // Load the sun and moon images
     SunTextureID = g2LoadImage("sun.png", NULL, NULL, NULL, false, false);
     MoonTextureID = g2LoadImage("moon.png", NULL, NULL, NULL, false, false);
+    
+    // Default camera angles to none
+    SetCameraAngle(0.0f, 0.0f);
 }
 
 BackgroundView::~BackgroundView()

@@ -118,6 +118,9 @@ public:
     // Returns a random number between 0 and UINT_MAX
     unsigned int Rand();
     
+    // Get the seed that was generated
+    inline unsigned int GetSeed() { return seed; }
+    
 private:
     
     // The internal seed / previous numbers

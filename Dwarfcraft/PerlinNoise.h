@@ -31,14 +31,14 @@
 #define __PERLINNOISE_H__
 
 // Table size
-static const int PerlinNoise_Size = 256;
+static const int PerlinNoise_Size = 1024;
 
 class PerlinNoise
 {
 public:
     
     // Initialize with nothing
-    PerlinNoise(const char* Seed);
+    PerlinNoise(int octaves, float freq, float amp, const char* Seed);
     
     // Release internals
     ~PerlinNoise();
@@ -46,19 +46,32 @@ public:
     // Returns a normalized value for the given "map" position, which
     // should also be normalized. This means that giving a set of (0.5, 0.5)
     // returns the [0, 1] value of the middle pixel.
+    float perlin_noise_2D(float vec[2]);
 	float GetNoise1D(float x);
 	float GetNoise2D(float x, float y);
 	float GetNoise3D(float x, float y, float z);
     
 private:
     
-	// Permutation table
-	unsigned char p[PerlinNoise_Size];
+    // Helper funcs
+    void normalize2(float v[2]);
+    void normalize3(float v[3]);
     
-	// Gradients
-	float gx[PerlinNoise_Size];
-	float gy[PerlinNoise_Size];
-	float gz[PerlinNoise_Size];
+    // Interpolation
+    float s_curve(float t) { return t * t * (3.0f - 2.0f * t); }
+    float lerp(float t, float a, float b) { return a + t * (b - a); }
+    
+    // Args
+    int   mOctaves;
+    float mFrequency;
+    float mAmplitude;
+    int   mSeed;
+    
+    // Sample data
+    int p[PerlinNoise_Size + PerlinNoise_Size + 2];
+    float g3[PerlinNoise_Size + PerlinNoise_Size + 2][3];
+    float g2[PerlinNoise_Size + PerlinNoise_Size + 2][2];
+    float g1[PerlinNoise_Size + PerlinNoise_Size + 2];
     
     // Random generator
     UtilRand RandGen;
