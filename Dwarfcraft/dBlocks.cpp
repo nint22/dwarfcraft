@@ -98,12 +98,12 @@ void dGetBlockTexture(dBlock Block, dBlockFace Face, float* x, float* y, float* 
     // Snow
     else if(BlockType == dBlockType_Dirt && Block.GetMeta() == 2)
     {
-        // Set the top to snow (two faces left), else is snow side (one face right, 4 down)
+        // Set the top to snow (4 faces down), else is snow side (2 faces right, 4 down)
         if(Face == dBlockFace_Top)
-            *x -= 2 * *width;
+            *y += 4 * *width;
         else
         {
-            *x += *width;
+            *x += 2 * *width;
             *y += 4 * *width;
         }
     }

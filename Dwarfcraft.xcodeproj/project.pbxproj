@@ -76,6 +76,12 @@
 		0614F74514FDFB4600842808 /* terrain_mc.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0614F74414FDFB3C00842808 /* terrain_mc.png */; };
 		0614F75114FF0F2F00842808 /* MainView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0614F74F14FF0F2D00842808 /* MainView.cpp */; };
 		0614F75414FF0F5900842808 /* BackgroundView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0614F75214FF0F5800842808 /* BackgroundView.cpp */; };
+		06428EA615532E2E00616AF5 /* vmath.c in Sources */ = {isa = PBXBuildFile; fileRef = 06428E9F15532E2E00616AF5 /* vmath.c */; };
+		06428EA715532E2E00616AF5 /* Voronoi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06428EA115532E2E00616AF5 /* Voronoi.cpp */; };
+		06428EA815532E2E00616AF5 /* VParabola.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06428EA315532E2E00616AF5 /* VParabola.cpp */; };
+		06428EB915533AB000616AF5 /* EasyBMP_Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06428EAC15533AB000616AF5 /* EasyBMP_Font.cpp */; };
+		06428EBA15533AB000616AF5 /* EasyBMP_Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06428EAE15533AB000616AF5 /* EasyBMP_Geometry.cpp */; };
+		06428EBE15533AB000616AF5 /* EasyBMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 06428EB715533AB000616AF5 /* EasyBMP.cpp */; };
 		064FB535154CB74D00501878 /* WorkBenchModel.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 064FB531154CB6C100501878 /* WorkBenchModel.cfg */; };
 		064FB536154CB74D00501878 /* wood_workbench.obx in CopyFiles */ = {isa = PBXBuildFile; fileRef = 064FB533154CB6D300501878 /* wood_workbench.obx */; };
 		064FB537154CB74D00501878 /* wood_workbench.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 064FB534154CB6EE00501878 /* wood_workbench.png */; };
@@ -259,6 +265,24 @@
 		0614F75214FF0F5800842808 /* BackgroundView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BackgroundView.cpp; path = Dwarfcraft/BackgroundView.cpp; sourceTree = "<group>"; };
 		0614F75314FF0F5900842808 /* BackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackgroundView.h; path = Dwarfcraft/BackgroundView.h; sourceTree = "<group>"; };
 		0614F75514FF108900842808 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Globals.h; path = Dwarfcraft/Globals.h; sourceTree = "<group>"; };
+		06428E9D15532E2E00616AF5 /* VEdge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VEdge.h; path = Dwarfcraft/VEdge.h; sourceTree = "<group>"; };
+		06428E9E15532E2E00616AF5 /* VEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VEvent.h; path = Dwarfcraft/VEvent.h; sourceTree = "<group>"; };
+		06428E9F15532E2E00616AF5 /* vmath.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vmath.c; path = Dwarfcraft/vmath.c; sourceTree = "<group>"; };
+		06428EA015532E2E00616AF5 /* vmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vmath.h; path = Dwarfcraft/vmath.h; sourceTree = "<group>"; };
+		06428EA115532E2E00616AF5 /* Voronoi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Voronoi.cpp; path = Dwarfcraft/Voronoi.cpp; sourceTree = "<group>"; };
+		06428EA215532E2E00616AF5 /* Voronoi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Voronoi.h; path = Dwarfcraft/Voronoi.h; sourceTree = "<group>"; };
+		06428EA315532E2E00616AF5 /* VParabola.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VParabola.cpp; path = Dwarfcraft/VParabola.cpp; sourceTree = "<group>"; };
+		06428EA415532E2E00616AF5 /* VParabola.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VParabola.h; path = Dwarfcraft/VParabola.h; sourceTree = "<group>"; };
+		06428EA515532E2E00616AF5 /* VPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VPoint.h; path = Dwarfcraft/VPoint.h; sourceTree = "<group>"; };
+		06428EAA15533AB000616AF5 /* EasyBMP_BMP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EasyBMP_BMP.h; path = Dwarfcraft/EasyBMP/EasyBMP_BMP.h; sourceTree = "<group>"; };
+		06428EAB15533AB000616AF5 /* EasyBMP_DataStructures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EasyBMP_DataStructures.h; path = Dwarfcraft/EasyBMP/EasyBMP_DataStructures.h; sourceTree = "<group>"; };
+		06428EAC15533AB000616AF5 /* EasyBMP_Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EasyBMP_Font.cpp; path = Dwarfcraft/EasyBMP/EasyBMP_Font.cpp; sourceTree = "<group>"; };
+		06428EAD15533AB000616AF5 /* EasyBMP_Font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EasyBMP_Font.h; path = Dwarfcraft/EasyBMP/EasyBMP_Font.h; sourceTree = "<group>"; };
+		06428EAE15533AB000616AF5 /* EasyBMP_Geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EasyBMP_Geometry.cpp; path = Dwarfcraft/EasyBMP/EasyBMP_Geometry.cpp; sourceTree = "<group>"; };
+		06428EAF15533AB000616AF5 /* EasyBMP_Geometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EasyBMP_Geometry.h; path = Dwarfcraft/EasyBMP/EasyBMP_Geometry.h; sourceTree = "<group>"; };
+		06428EB415533AB000616AF5 /* EasyBMP_VariousBMPutilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EasyBMP_VariousBMPutilities.h; path = Dwarfcraft/EasyBMP/EasyBMP_VariousBMPutilities.h; sourceTree = "<group>"; };
+		06428EB715533AB000616AF5 /* EasyBMP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EasyBMP.cpp; path = Dwarfcraft/EasyBMP/EasyBMP.cpp; sourceTree = "<group>"; };
+		06428EB815533AB000616AF5 /* EasyBMP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EasyBMP.h; path = Dwarfcraft/EasyBMP/EasyBMP.h; sourceTree = "<group>"; };
 		064FB531154CB6C100501878 /* WorkBenchModel.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = WorkBenchModel.cfg; path = "Resources/Configuration files/WorkBenchModel.cfg"; sourceTree = "<group>"; };
 		064FB533154CB6D300501878 /* wood_workbench.obx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = wood_workbench.obx; path = "Resources/3D Models/Exported Objects/wood_workbench.obx"; sourceTree = "<group>"; };
 		064FB534154CB6EE00501878 /* wood_workbench.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = wood_workbench.png; path = "Resources/3D Models/Blender Files/wood_workbench.png"; sourceTree = "<group>"; };
@@ -294,6 +318,8 @@
 				060EE33914FC735D00D0A08C /* Magi3 Lite */,
 				060EE2ED14FC670600D0A08C /* Configuration */,
 				060EE2C214FC63FD00D0A08C /* Resources */,
+				06428EA915533AA300616AF5 /* EasyBMP */,
+				06428E9B15532DCE00616AF5 /* Voronoi */,
 				060EE2C114FC63F700D0A08C /* Framework */,
 				060EE2B014FC637500D0A08C /* Products */,
 			);
@@ -539,6 +565,38 @@
 			name = World;
 			sourceTree = "<group>";
 		};
+		06428E9B15532DCE00616AF5 /* Voronoi */ = {
+			isa = PBXGroup;
+			children = (
+				06428E9D15532E2E00616AF5 /* VEdge.h */,
+				06428E9E15532E2E00616AF5 /* VEvent.h */,
+				06428E9F15532E2E00616AF5 /* vmath.c */,
+				06428EA015532E2E00616AF5 /* vmath.h */,
+				06428EA115532E2E00616AF5 /* Voronoi.cpp */,
+				06428EA215532E2E00616AF5 /* Voronoi.h */,
+				06428EA315532E2E00616AF5 /* VParabola.cpp */,
+				06428EA415532E2E00616AF5 /* VParabola.h */,
+				06428EA515532E2E00616AF5 /* VPoint.h */,
+			);
+			name = Voronoi;
+			sourceTree = "<group>";
+		};
+		06428EA915533AA300616AF5 /* EasyBMP */ = {
+			isa = PBXGroup;
+			children = (
+				06428EAA15533AB000616AF5 /* EasyBMP_BMP.h */,
+				06428EAB15533AB000616AF5 /* EasyBMP_DataStructures.h */,
+				06428EAC15533AB000616AF5 /* EasyBMP_Font.cpp */,
+				06428EAD15533AB000616AF5 /* EasyBMP_Font.h */,
+				06428EAE15533AB000616AF5 /* EasyBMP_Geometry.cpp */,
+				06428EAF15533AB000616AF5 /* EasyBMP_Geometry.h */,
+				06428EB415533AB000616AF5 /* EasyBMP_VariousBMPutilities.h */,
+				06428EB715533AB000616AF5 /* EasyBMP.cpp */,
+				06428EB815533AB000616AF5 /* EasyBMP.h */,
+			);
+			name = EasyBMP;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -617,6 +675,12 @@
 				060EE34A14FC737100D0A08C /* MUtil.cpp in Sources */,
 				0614F75114FF0F2F00842808 /* MainView.cpp in Sources */,
 				0614F75414FF0F5900842808 /* BackgroundView.cpp in Sources */,
+				06428EA615532E2E00616AF5 /* vmath.c in Sources */,
+				06428EA715532E2E00616AF5 /* Voronoi.cpp in Sources */,
+				06428EA815532E2E00616AF5 /* VParabola.cpp in Sources */,
+				06428EB915533AB000616AF5 /* EasyBMP_Font.cpp in Sources */,
+				06428EBA15533AB000616AF5 /* EasyBMP_Geometry.cpp in Sources */,
+				06428EBE15533AB000616AF5 /* EasyBMP.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

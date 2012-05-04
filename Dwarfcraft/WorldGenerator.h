@@ -22,6 +22,29 @@
 #include "PerlinNoise.h"
 #include "PlasmaNoise.h"
 
+/*** External Includes ***/
+
+// Voronoi gen. tools
+#include "Voronoi.h"
+#include "VPoint.h"
+using namespace vor;
+
+// Testing
+#include "EasyBMP/EasyBMP.h"
+#include "EasyBmp/EasyBMP_Geometry.h"
+
+// Define biomes
+static const int BiomeTypesCount = 6;
+enum BiomeTypes                 // Elevation        Moister
+{
+    BiomeTypes_Snow,            // High             High
+    BiomeTypes_Tundra,          // High             Low
+    BiomeTypes_Grasslands,      // Med              Low
+    BiomeTypes_EvergreenForest, // Med              High
+    BiomeTypes_TropicalForest,  // Low              High
+    BiomeTypes_Desert,          // Low              Low
+};
+
 class WorldGenerator
 {
 public:
@@ -35,34 +58,14 @@ public:
     
 protected:
     
-    /*** Scene Generation Functions ***/
+    // Fill all white spaces that touch this pixel and all other pixels with the given color
+    // Uses flood-fill algorithm
+    void FloodFill(BMP& Image, int x, int y, RGBApixel Color);
     
-    // Place a tree at the given location
-    void PlaceTree(int x, int z);
-    
-    // Place a blob of given blocks at a target location
-    // This does a randomized fill of adjacent areas
-    // For each step, place a block and randomly may recursivly
-    // call the same function for other blocks.
-    // When steps are 0, nothing is places. The bigger the blob
-    // you want, the bigger the step count you want; default is 2
-    // Note that this will overwrite any block EXCEPT air (so we
-    // don't have "poping out" blocks of walls)
-    void PlaceBlob(int x, int y, int z, dBlockType type, int steps = 2);
-    
-    // Place foliage at the given block location
-    void PlaceFoliage(int x, int z);
+    // True if the given point matches the target color
+    bool IsColor(BMP& Image, VPoint* Point, RGBApixel TargetColor);
     
 private:
-    
-    // Get the height of the block of the top-most layer (earth-top)
-    float GetSurfaceHeight(PerlinNoise* TerrainHeight, float x, float z);
-    
-    // Get the height of the second layer (soil)
-    float GetDirtHeight(PerlinNoise* TerrainHeight, float x, float z);
-    
-    // Get the height of the third layer (stone)
-    float GetStoneHeight(PerlinNoise* TerrainHeight, float x, float z);
     
     // Random number generator
     UtilRand* Random;

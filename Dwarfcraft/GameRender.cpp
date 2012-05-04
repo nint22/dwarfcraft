@@ -131,18 +131,9 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
     
     /*** TESTING: Place Entities ***/
     
-    // Select one of four skin colors
-    char Skins[4][32] = 
-    {
-        "SampleDwarf.cfg",
-        "Lighter Dwarf.cfg",
-        "Darker Dwarf.cfg",
-        "Darkest Dwarf.cfg"
-    };
-    
     // Add a dozen entities purely for testing...
     Clock.Start();
-    int EntityCount = 3; // Any variable count while testing the code
+    int EntityCount = 0; // Any variable count while testing the code
     for(int i = 0; i < EntityCount; i++)
     {
         // Randomly choose a position
@@ -151,7 +142,7 @@ GameRender::GameRender(GrfxWindow* Parent, Glui2* GluiHandle)
         int y = WorldData->GetSurfaceDepth(x, z) + 1;
         	
         // Create a "dumb" AI for test
-        DwarfEntity* SampleDwarf = new DwarfEntity(Skins[0]);// Debugging: always same skin for now Skins[i % 4]);
+        DwarfEntity* SampleDwarf = new DwarfEntity("SampleDwarf.cfg");// Debugging: always same skin for now Skins[i % 4]);
         SampleDwarf->SetPosition(Vector3<float>(x + 0.5f, y - 0.5f, z + 0.5f)); // Center on the tile (dwarf will auto-fall if needed)
         
         // Explicitly set random armor (chest, pants)

@@ -92,7 +92,8 @@ protected:
     bool GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane* Layer);
     
     // Add a vertex (variable function types)
-    void AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float> Normal, int QuadCornerIndex, dBlock Block);
+    // Note to self: I really need to redesign these functions to be much more simple (and face-based, not vertex based)
+    void AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float> Normal, int QuadCornerIndex, dBlock Block, bool BottomShiftedUp = false);
     void AddVertex(VBuffer* Buffer, Vector3<float> Vertex); // Nothing special, just black
     
     // Remove / release all VBOs

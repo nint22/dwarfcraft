@@ -13,11 +13,8 @@
  Noise is always generated as a normalized value in [0, 1] and
  can be generated in 1, 2, and 3 dimensions.
  
- Easier to understand explanation (but code not derived):
- http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
- 
- Current code is based off of a much more clean-cut implementation:
- http://www.dreamincode.net/forums/topic/66480-perlin-noise/
+ Based on current flip-code:
+ http://www.flipcode.com/archives/Perlin_Noise_Class.shtml
  
 ***************************************************************/
 

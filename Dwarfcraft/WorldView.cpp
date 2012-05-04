@@ -267,7 +267,7 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
                         for(int i = 0; i < 2; i++)
                             AddVertex(Layer->WorldGeometry, Vector3<float>(x, y, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
                         for(int i = 2; i < 4; i++)
-                            AddVertex(Layer->WorldGeometry, Vector3<float>(x, y + 0.5f, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock);
+                            AddVertex(Layer->WorldGeometry, Vector3<float>(x, y + 0.5f, z) + WorldView_FaceQuads[OffsetIndex][i], WorldView_Normals[OffsetIndex], i, TargetBlock, true);
                     }
                     // Normal geometry
                     else
@@ -424,7 +424,7 @@ bool WorldView::GenerateLayerVBO(int ChunkX, int Y, int ChunkZ, WorldView_Plane*
         return false;
 }
 
-void WorldView::AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float> Normal, int QuadCornerIndex, dBlock Block)
+void WorldView::AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float> Normal, int QuadCornerIndex, dBlock Block, bool BottomShiftedUp)
 {
     // UV-texture based on the block type
     float x, y, width, height;
@@ -438,12 +438,6 @@ void WorldView::AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float>
         Facing = dBlockFace_Left;
     else if(Normal == WorldView_Normals[4])
         Facing = dBlockFace_Right;
-    
-    // If this is the top-face, set the level as needed or if this is any of
-    // the uppser-sides, apply height diff. Note: the 1st and 2nd verticies
-    // given will always be the upper-y
-    if(!Block.IsWhole() && (Facing == dBlockFace_Top || QuadCornerIndex == 0 || QuadCornerIndex == 1))
-        Vertex.y -= 0.5f;
     
     // Get the correct texture facing and details
     Vector3<float> TextureColor;
@@ -467,6 +461,21 @@ void WorldView::AddVertex(VBuffer* Buffer, Vector3<float> Vertex, Vector3<float>
         FaceTexture[1] = FaceTexture[2];
         FaceTexture[2] = FaceTexture[3];
         FaceTexture[3] = Temp;
+    }
+    
+    // If this is the top-face, set the level as needed or if this is any of
+    // the uppser-sides, apply height diff. Note: the 1st and 2nd verticies
+    // given will always be the upper-y
+    if(!Block.IsWhole() && (Facing == dBlockFace_Top || QuadCornerIndex == 0 || QuadCornerIndex == 1))
+    {
+        Vertex.y -= 0.5f;
+    }
+    
+    // Half the side block textures (only modify the bottom coordinates
+    if(BottomShiftedUp || (!Block.IsWhole() && (Facing != dBlockFace_Top && (QuadCornerIndex == 2 || QuadCornerIndex == 3))))
+    {
+        FaceTexture[2].y -= height / 2.0f;
+        FaceTexture[3].y -= height / 2.0f;
     }
     
     // Compute the color as the dot product between the sun and the this normal
